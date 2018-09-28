@@ -14,8 +14,9 @@ GARBAGE=*~ $(SRCDIR)/*~ $(INCDIR)/*~ $(TESTDIR)/*~
 
 INCLUDE=-I$(INCDIR)
 
-# Pour activer les sorties INFO_MSG, ajouter -DVERBOSE aux CFLAGS 
-CFLAGS=-Wall -ansi $(INCLUDE)
+# Pour activer les sorties INFO_MSG, ajouter -DVERBOSE aux CFLAGS
+#CFLAGS=-Wall -ansi $(INCLUDE)
+CFLAGS=-Wall $(INCLUDE)
 LFLAGS=-lm
 
 CFLAGS_DBG=$(CFLAGS) -g -DDEBUG -Wall
@@ -26,7 +27,7 @@ SRC=$(wildcard $(SRCDIR)/*.c)
 OBJ_DBG=$(SRC:.c=.dbg)
 OBJ_RLS=$(SRC:.c=.rls)
 
-all : 
+all :
 	@echo "in " $(DIRNAME)
 	@echo ""
 	@echo "Usage:"
@@ -48,14 +49,13 @@ release : $(OBJ_RLS)
 %.rls : %.c
 	$(CC) $< $(CFLAGS_RLS) -c -o $(basename $<).rls
 
-docu : 
+docu :
 	$(DOXYGEN)
 
-clean : 
+clean :
 	$(RM) $(TARGET) $(SRCDIR)/*.orig $(SRCDIR)/*.dbg $(SRCDIR)/*.rls $(GARBAGE)
 	$(RM) -r $(DOCDIR)/*
 
-archive : 
-	make clean 
-	cd .. && tar -czvf as-mips-`whoami`-`date +%d-%m-%H-%M`.tgz $(DIRNAME) && cd $(DIRNAME) 
-
+archive :
+	make clean
+	cd .. && tar -czvf as-mips-`whoami`-`date +%d-%m-%H-%M`.tgz $(DIRNAME) && cd $(DIRNAME)

@@ -14,6 +14,11 @@
 #include <notify.h>
 #include <lex.h>
 
+
+
+
+//# include <normaliser_bis.h>
+
 /**
  * @param exec Name of executable.
  * @return Nothing.
@@ -76,8 +81,7 @@ int main ( int argc, char *argv[] ) {
 
     /* ---------------- Free memory and terminate -------------------*/
 
-    /* TODO free everything properly*/
+    /* TODO free everything properly */
 
     exit( EXIT_SUCCESS );
 }
-

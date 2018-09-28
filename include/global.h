@@ -5,8 +5,8 @@
  * Global definitions.
  */
 
-#ifndef _GLOBAL_H
-#define _GLOBAL_H
+#ifndef _GLOBAL_H_
+#define _GLOBAL_H_
 
 
 
@@ -66,4 +66,3 @@
 
 
 #endif /* _GLOBAL_H */
-
