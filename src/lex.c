@@ -23,31 +23,31 @@
 /* ATTENTION: getNextToken est juste un exemple -> il est à recoder completement !!! */
 /**
  * @param token The pointeur to the lexeme to be extracted.
- * @param current_line The address from which the analysis must be performed.
+ * @param start The address from which the analysis must be performed.
  * @return the address at which the analysis stopped or NULL if the analysis is terminated.
  * @brief This function get an input line, extracts a token from it and return the pointeur to the next place where the analysis should continue.
  */
 
 /* note that MIPS assembly supports distinctions between lower and upper case*/
-char* getNextToken(char** p_token, char* current_line) {
-    char* start = current_line;
+char* getNextToken(char** p_token, char* start) {
+    //char* start = current_line;
     char* end=NULL;
     int token_size=0;
     int inComment = FALSE;
     int inString = FALSE;
 
     /* check input parameter*/
-    if (current_line ==NULL) return NULL;                           /* utilité ? */
+    if (start ==NULL) return NULL;                           /* utilité ? */
 
     /* eats any blanks before the token*/
     while (*start!='\0' && isblank(*start)){
         start++;
     }
-    /* go till next blank or end*/
+    /* go till the end of the token*/
     end=start;
 
-    if (*end==':') end++;
-    else if (*end==',') end++;
+    if      (*end==':') end++;    // ici on ne peut pas etre dans un commentaire ou une string
+    else if (*end==',') end++;    // permet de récupérer juste ':' ou ',' ou '-' qui est en dehors d'un commentaire ou une string
     else if (*end=='-') end++;
     else {
         while ( *end!='\0' && ( (!isblank(*end) && *end!=':' && *end!=',' && *end!='-') || inString || inComment) ) {
@@ -55,8 +55,11 @@ char* getNextToken(char** p_token, char* current_line) {
             if ( *end == '#' ) inComment = TRUE;   // le comment va jusqu'a la fin de la ligne
     		if ( !inComment && *end == '"' ) inString = !inString;
             if ( inString && *end == '\\' ) {
-                end++;     // on saute le prochain caractere
+                end++;                  // on saute le prochain caractere
                 if (*end=='\0') break;  // sinon risque d'index out si '\\' est le dernier caractère de la ligne
+                                        // exemple : ADD $t0, "example\              .
+                                        // syntaxe fausse mais il faut prévoir les potentiels erreurs du developpeur
+                                        // TODO MESSAGE D'ERREUR
             }
             end++;
         }
@@ -65,15 +68,13 @@ char* getNextToken(char** p_token, char* current_line) {
     /*compute size : if zero there is no more token to extract*/
     token_size=end-start;
     if (token_size>0){
-        *p_token = calloc(token_size+1,sizeof(*start));         /* WHAT ??? calloc sur deja un calloc ? ou est le free  => ok c'est un pointeur du token (qui est deja un pointer)*/
+        *p_token = calloc(token_size+1,sizeof(*start));         /* WARNING WHAT ??? calloc sur deja un calloc ? ou est le free  => ok c'est un pointeur du token (qui est deja un pointer)*/
         strncpy(*p_token,start,token_size);
         (*p_token)[token_size]='\0';
-        //printf("  %d  ", token_size);
         return end;
     }
     return NULL;
 }
-
 
 
 
@@ -90,18 +91,17 @@ void lex_read_line( char *line, int nline) {
 
 
     /* TODO : faire l'analyse lexical de chaque token ici et les ajouter dans une collection*/
-    /* ATTENTION: getNextToken est à recoder completement*/
     while( (current_address= getNextToken(&token, current_address)) != NULL){
 
         /* TODO ANALYSE LEX ICI     (token)    => gros switch sa mere */
-        /* ajouter dans liste (ou fifo) */
+        /* TODO ajouter dans liste (ou fifo) */
+        printf("%ld  ", strlen(token)); //DEBUG
+        puts(token); //DEBUG
 
-        // test comment probleme C90
-
-        puts(token);
-
-        /* free(token) ???   non car mis dans une liste ??*/
+        // TODO free(token) ???   non car mis dans une liste ??
     }
+
+    // TODO add NL lexeme a la fin
 
     return;
 }
@@ -118,8 +118,6 @@ void lex_load_file( char *file, unsigned int *nlines ) {
     FILE        *fp   = NULL;
     char         line[STRLEN]; /* original source line */
 
-
-
     fp = fopen( file, "r" );
     if ( NULL == fp ) {
         /*macro ERROR_MSG : message d'erreur puis fin de programme ! */
@@ -128,19 +126,17 @@ void lex_load_file( char *file, unsigned int *nlines ) {
 
     *nlines = 0;
 
-    while(!feof(fp)) {     /*feof => test si EOF (end of file)*/
+    while(!feof(fp)) {     // feof => test si EOF (end of file)
 
         /*read source code line-by-line */
-        if ( NULL != fgets( line, STRLEN-1, fp ) ) {                     /*-1 car ajout de '\0' à la fin   //inclue => donc pas besion de -1 ??????*/
+        if ( NULL != fgets( line, STRLEN-1, fp ) ) {        // pas besoin de mettre STRLEN-1 ("It stops when either (n-1) characters are read")
+                                                            // https://www.tutorialspoint.com/c_standard_library/c_function_fgets.htm
             line[strlen(line)-1] = '\0';  /* eat final '\n' */
             (*nlines)++;
 
             if ( 0 != strlen(line) ) {
-                /* TODO NORMALISATION DE LA LIGNE A METTRE ICI */
-                //////char* line_norm = norm_line(line);
-                //printf("     %s\n", line_norm);   // DEBUG
-                // free(line); ????
                 lex_read_line(line,*nlines);
+                // TODO free(line); ????
             }
         }
     }
