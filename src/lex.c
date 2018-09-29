@@ -20,11 +20,6 @@
 
 
 
-
-
-# include <norm.h>
-
-
 /* ATTENTION: getNextToken est juste un exemple -> il est à recoder completement !!! */
 /**
  * @param token The pointeur to the lexeme to be extracted.

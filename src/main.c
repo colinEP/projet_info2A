@@ -16,9 +16,6 @@
 
 
 
-
-//# include <normaliser_bis.h>
-
 /**
  * @param exec Name of executable.
  * @return Nothing.
