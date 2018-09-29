@@ -95,9 +95,9 @@ void lex_read_line( char *line, int nline) {
 
         /* TODO ANALYSE LEX ICI     (token)    => gros switch sa mere */
         /* TODO ajouter dans liste (ou fifo) */
-        int type = lex_analyse(token);
-        if (type != -1) printf("%d  ",type);
-        else printf("   ");
+        int type = lex_analyse(token, nline);
+        if (type != -1) printf("%d\t",type);
+        else printf("\t");
         printf("%ld\t", strlen(token)); //DEBUG
         puts(token); //DEBUG
 
@@ -158,7 +158,7 @@ void lex_load_file( char *file, unsigned int *nlines ) {
 
 //INIT , DEUX_PTS , VIRGULE , MOINS , COMMENT , REGISTRE , DIRECTIVE , STRING}
 
-int lex_analyse(char* token) {
+int lex_analyse(char* token, unsigned int nline) {
     int STATE=INIT;
     char c;
     int len_tok = strlen(token);
@@ -167,43 +167,52 @@ int lex_analyse(char* token) {
     for (i=0 ; token[i]!='\0' ; i++) {
         c = token[i];
 
-        switch(STATE) {
+        switch(STATE) {       //TODO mettre des else if a la place des if
             case INIT:
-                if (c==':') return DEUX_PTS;
-                if (c==',') return VIRGULE;
-                if (c=='-') return MOINS;
-                if (c=='#') return COMMENT;
+                if      (c==':') return DEUX_PTS;
+                else if (c==',') return VIRGULE;
+                else if (c=='-') return MOINS;
+                else if (c=='#') return COMMENT;
 
-                if (c=='$') {
-                    /* check si la registre est pas "vide" */
+                else if (c=='$') {
+                    /* check si le registre est pas "vide" */
                     if (token[i+1]!='\0') return REGISTRE;
                     //else TODO erreur;
-                    else printf("AAAAAAAAAAAAA1"); // en attendant
+                    //else printf("AAAAAAAAAAAAA1"); // en attendant
                 }
-
-                if (c=='.') {
+                else if (c=='.') {
                     /* check si la directive est pas "vide" */
                     if (token[i+1]!='\0') return DIRECTIVE;
                     //else TODO erreur;
-                    else printf("AAAAAAAAAAAAA2"); // en attendant
+                    //else printf("AAAAAAAAAAAAA2"); // en attendant
                 }
                 // if (c=='$') STATE=REGISTRE;
                 // printf("BB%d\n", c);
                 // if (c=='.') STATE=DIRECTIVE;
                 // printf("CC%d\n", STATE);
-                if (c=='"') {
+                else if (c=='"') {
                     /* check si c'est pas un '"' seul */
                     if (token[i+1]!='\0') STATE=STRING;
                     //else TODO erreur;
-                    else printf("AAAAAAAAAAAAA4"); // en attendant
+                    //else printf("AAAAAAAAAAAAA4"); // en attendant
                 }
 
-                /* ... */
+                else if (isalpha(c) || c=='_') STATE=SYMBOLE;
+
+                else if (c=='0') {
+                    /* check si c'est un 0 tout seul" */
+                    if (token[i+1]=='\0') return DECIMAL;   //ou return OCTAL;
+                    else STATE=ZERO;
+                }
+
+                else if (isdigit(c)) STATE=DECIMAL;   // c!='0' forcement vrai avec le if d'avant
+
+                //else // TODO erreur
 
                 break;
 
             // case REGISTRE:   //TODO erreur
-            //     /* check si la registre est pas "vide" */
+            //     /* check si le registre est pas "vide" */
             //     if (c!='\0') return REGISTRE;
             //     //else TODO erreur;
             //     else printf("AAAAAAAAAAAAA1"); // en attendant
@@ -224,13 +233,50 @@ int lex_analyse(char* token) {
                 for ( n=0 ; token[len_tok-2-n]=='\\'; n++ );
                 if (token[len_tok-1] == '"' && !(n%2) ) return STRING;
                 //else //TODO erreur
-                else printf("AAAAAAAAAAAAA3"); // en attendant
+                //else printf("AAAAAAAAAAAAA3"); // en attendant
                 break;
             }
 
-        }
-        if (STATE==INIT) return -1;
-    }
+            case SYMBOLE:
+                if ( !isalnum(c) && c != '_') printf("ERR_SYMB\n"); //TODO erreur
+                break;
 
-    return -1;
+            case ZERO:
+                if (c == 'x' || c == 'X') STATE=HEXA;
+                else if (isdigit(c) && c < '8') STATE=OCTAL;   // un octal commence par 0 puis des chiffres < 8
+                else if (c == '(') {
+                    if (token[i+1]=='$') STATE=AIBD;
+                    //else //TODO erreur
+                }
+                else printf("ERR_ZERO\n");  //TODO erreur
+                break;
+
+            case HEXA:
+                if (c == '(') {
+                    if (token[i+1]=='$') STATE=AIBD;
+                    //else //TODO erreur
+                }
+                else if (!isxdigit(c)) printf("ERR_HEXA\n"); //TODO erreur
+                break;
+
+            case OCTAL :
+                if (c<'0' || c>'7') printf("ERR_OCTAL\n"); //TODO erreur
+
+            case DECIMAL:
+                //if (isdigit(c)) STATE=DECIMAL;
+                if (c == '(') {
+                    if (token[i+1]=='$') STATE=AIBD;
+                    //else //TODO erreur
+                }
+                else if (!isdigit(c)) printf("ERR_DECIMAL\n"); //TODO erreur
+                break;
+
+            case AIBD:  //Adressage Indirect avec Base et Déplacement
+                if (token[len_tok-1] == ')') return AIBD;   // regarde pas l'intérieur des parentheses
+                else printf("ERR_AIBD\n"); //TODO erreur
+                break;
+        }
+    }
+    if (STATE==ZERO || STATE==INIT) return -1; // TODO erreur et suppr return -1
+    return STATE;
 }

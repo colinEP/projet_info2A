@@ -13,7 +13,15 @@ boucle       :
     NOP                                $
 byebye:
     JAL viteviteauru
-
+    0
+    0x45af
+    0b1234
+    0x12sd
+    04545
+    04582
+    0($ded)
+    200($dee
+    200(7)
 .data
 lunchtime:
     .word 12
