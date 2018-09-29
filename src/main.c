@@ -15,7 +15,6 @@
 #include <lex.h>
 
 
-
 /**
  * @param exec Name of executable.
  * @return Nothing.
