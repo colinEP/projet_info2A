@@ -95,8 +95,12 @@ void lex_read_line( char *line, int nline) {
 
         /* TODO ANALYSE LEX ICI     (token)    => gros switch sa mere */
         /* TODO ajouter dans liste (ou fifo) */
+        int type = lex_analyse(token);
+        if (type != -1) printf("%d  ",type);
+        else printf("   ");
         printf("%ld\t", strlen(token)); //DEBUG
         puts(token); //DEBUG
+
 
         // TODO free(token) ???   non car mis dans une liste ??
     }
@@ -149,4 +153,84 @@ void lex_load_file( char *file, unsigned int *nlines ) {
 
     fclose(fp);
     return;
+}
+
+
+//INIT , DEUX_PTS , VIRGULE , MOINS , COMMENT , REGISTRE , DIRECTIVE , STRING}
+
+int lex_analyse(char* token) {
+    int STATE=INIT;
+    char c;
+    int len_tok = strlen(token);
+
+    int i;
+    for (i=0 ; token[i]!='\0' ; i++) {
+        c = token[i];
+
+        switch(STATE) {
+            case INIT:
+                if (c==':') return DEUX_PTS;
+                if (c==',') return VIRGULE;
+                if (c=='-') return MOINS;
+                if (c=='#') return COMMENT;
+
+                if (c=='$') {
+                    /* check si la registre est pas "vide" */
+                    if (token[i+1]!='\0') return REGISTRE;
+                    //else TODO erreur;
+                    else printf("AAAAAAAAAAAAA1"); // en attendant
+                }
+
+                if (c=='.') {
+                    /* check si la directive est pas "vide" */
+                    if (token[i+1]!='\0') return DIRECTIVE;
+                    //else TODO erreur;
+                    else printf("AAAAAAAAAAAAA2"); // en attendant
+                }
+                // if (c=='$') STATE=REGISTRE;
+                // printf("BB%d\n", c);
+                // if (c=='.') STATE=DIRECTIVE;
+                // printf("CC%d\n", STATE);
+                if (c=='"') {
+                    /* check si c'est pas un '"' seul */
+                    if (token[i+1]!='\0') STATE=STRING;
+                    //else TODO erreur;
+                    else printf("AAAAAAAAAAAAA4"); // en attendant
+                }
+
+                /* ... */
+
+                break;
+
+            // case REGISTRE:   //TODO erreur
+            //     /* check si la registre est pas "vide" */
+            //     if (c!='\0') return REGISTRE;
+            //     //else TODO erreur;
+            //     else printf("AAAAAAAAAAAAA1"); // en attendant
+            //     break;
+            //
+            // case DIRECTIVE:  //TODO erreur
+            //     /* check si la directive est pas "vide" */
+            //     printf("\ncoucocu\n");
+            //     if (c!='\0') return DIRECTIVE;
+            //     //else TODO erreur;
+            //     else printf("AAAAAAAAAAAAA2"); // en attendant
+            //     break;
+
+            case STRING: {   // accolade pour povoir déclarer une variable dans le case
+                /* check si la string est bien fermé par un '"' valide
+                   valide si nombre pair de '\' avant */
+                int n;   // nombre de '\' avant '"'
+                for ( n=0 ; token[len_tok-2-n]=='\\'; n++ );
+                if (token[len_tok-1] == '"' && !(n%2) ) return STRING;
+                //else //TODO erreur
+                else printf("AAAAAAAAAAAAA3"); // en attendant
+                break;
+            }
+
+        }
+        if (STATE==INIT) return -1;
+    }
+
+    return -1;
 }
