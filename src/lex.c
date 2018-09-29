@@ -56,7 +56,7 @@ char* getNextToken(char** p_token, char* start) {
     		if ( !inComment && *end == '"' ) inString = !inString;
             if ( inString && *end == '\\' ) {
                 end++;                  // on saute le prochain caractere
-                if (*end=='\0') break;  // sinon risque d'index out si '\\' est le dernier caractère de la ligne
+                if (*end=='\0') break;  // Sinon risque d'index out si '\\' est le dernier caractère de la ligne (on a suppr '\n' en fin de ligne)
                                         // exemple : ADD $t0, "example\              .
                                         // syntaxe fausse mais il faut prévoir les potentiels erreurs du developpeur
                                         // TODO MESSAGE D'ERREUR
@@ -95,7 +95,7 @@ void lex_read_line( char *line, int nline) {
 
         /* TODO ANALYSE LEX ICI     (token)    => gros switch sa mere */
         /* TODO ajouter dans liste (ou fifo) */
-        printf("%ld  ", strlen(token)); //DEBUG
+        printf("%ld\t", strlen(token)); //DEBUG
         puts(token); //DEBUG
 
         // TODO free(token) ???   non car mis dans une liste ??
@@ -129,8 +129,14 @@ void lex_load_file( char *file, unsigned int *nlines ) {
     while(!feof(fp)) {     // feof => test si EOF (end of file)
 
         /*read source code line-by-line */
-        if ( NULL != fgets( line, STRLEN-1, fp ) ) {        // pas besoin de mettre STRLEN-1 ("It stops when either (n-1) characters are read")
-                                                            // https://www.tutorialspoint.com/c_standard_library/c_function_fgets.htm
+        if ( NULL != fgets( line, STRLEN, fp ) ) {      // pas besoin de mettre STRLEN-1 ("It stops when either (n-1) characters are read")
+                                                        // https://www.tutorialspoint.com/c_standard_library/c_function_fgets.htm
+            /* test si la ligne n'etait pas trop longue */
+            if (line[strlen(line)-1] != '\n' ) {
+                //TODO erreur
+                printf("ligne trop long\n");
+            }
+
             line[strlen(line)-1] = '\0';  /* eat final '\n' */
             (*nlines)++;
 
