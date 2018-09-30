@@ -9,7 +9,6 @@
 #include <unistd.h>
 #include <string.h>
 
-
 #include <global.h>
 #include <notify.h>
 #include <lex.h>
