@@ -17,6 +17,7 @@
 #include <global.h>
 #include <notify.h>
 #include <lex.h>
+#include <queue.h>
 
 
 /* ATTENTION: getNextToken est juste un exemple -> il est à recoder completement !!! */
@@ -100,7 +101,7 @@ void lex_read_line( char *line, int nline, QUEUE Q) {
         printf("%ld\t", strlen(token)); //DEBUG
         puts(token); //DEBUG
 
-        Q = add_to_queue(token, type, nline, queue);
+        Q = add_to_queue(token, type, nline, Q);
 
         // TODO free(token) ???   non car mis dans une liste ??
     }
@@ -129,7 +130,7 @@ void lex_load_file( char *file, unsigned int *nlines ) {
     }
 
     *nlines = 0;
-    QUEUE liste_queue = new_queue;
+    QUEUE liste_queue = new_queue();
     while(!feof(fp)) {     // feof => test si EOF (end of file)
 
         /*read source code line-by-line */
@@ -144,7 +145,7 @@ void lex_load_file( char *file, unsigned int *nlines ) {
             (*nlines)++;
 
             if ( 0 != strlen(line) ) {
-                lex_read_line(line,*nlines, listequeue);
+                lex_read_line(line,*nlines, liste_queue);
                 // TODO free(line); ????
             }
         }
