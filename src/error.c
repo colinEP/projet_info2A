@@ -7,7 +7,10 @@
 #include <error.h>
 
 
-/* WARNING pos != column : pos = 0..len-1    et     column = 1..len */
+/* WARNING
+pos != column : pos = 0..len-1
+                column = 1..len
+*/
 void print_error(char* msg, unsigned int nline, int pos, char* line) {
 
     //int pos = 210; //tmp
@@ -20,7 +23,8 @@ void print_error(char* msg, unsigned int nline, int pos, char* line) {
     fprintf( stderr, "%s\n", msg );
 
 
-    if ( column > strlen(line) ) {
+    if ( column > strlen(line)+1 ) {  // +1 car la column peut aller à strlen(line)+1 pour afficher le curseur une column après la fin de la ligne
+                                      // pas de risque de seg fault car on affichera '\0' en dernier caractere
         /* normalement ne devrait jamais arriver */
         ERROR_MSG("Erreur de position : column > strlen(line)");
     }

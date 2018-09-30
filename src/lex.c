@@ -30,15 +30,14 @@
  */
 
 /* note that MIPS assembly supports distinctions between lower and upper case*/
-char* getNextToken(char** p_token, char* start) {
-    //char* start = current_line;
+char* getNextToken(char** p_token, char* start, unsigned int nline, char* line) {
     char* end=NULL;
     int token_size=0;
     int inComment = FALSE;
     int inString = FALSE;
 
     /* check input parameter*/
-    if (start ==NULL) return NULL;                           /* utilité ? */
+    if (start ==NULL) return NULL;                           /* utilité ? si ligne vide ? y'aura toujours le '\0'*/
 
     /* eats any blanks before the token*/
     while (*start!='\0' && isblank(*start)){
@@ -57,14 +56,18 @@ char* getNextToken(char** p_token, char* start) {
     		if ( !inComment && *end == '"' ) inString = !inString;
             if ( inString && *end == '\\' ) {
                 end++;                  // on saute le prochain caractere
-                if (*end=='\0') break;  // Sinon risque d'index out si '\\' est le dernier caractère de la ligne (on a suppr '\n' en fin de ligne)
+                if (*end=='\0') {       // Sinon risque d'index out si '\\' est le dernier caractère de la ligne (on a suppr '\n' en fin de ligne)
                                         // exemple : ADD $t0, "example\              .
                                         // syntaxe fausse mais il faut prévoir les potentiels erreurs du developpeur
-                                        // TODO MESSAGE D'ERREUR
+                    print_error("String non fermée", nline, end-1-line, line);
+                    //break;
+                }
             }
             end++;
         }
     }
+    /* si on est encore dans une string => la string n'est pas fermée => ERROR */
+    if (inString) print_error("String non fermée", nline, end-1-line, line);
 
     /*compute size : if zero there is no more token to extract*/
     token_size=end-start;
@@ -89,14 +92,15 @@ char* getNextToken(char** p_token, char* start) {
 void lex_read_line( char *line, int nline) {
     char* token = NULL;
     char* current_address=line;
+    int pos = 0;
 
 
     /* TODO : faire l'analyse lexical de chaque token ici et les ajouter dans une collection*/
-    while( (current_address= getNextToken(&token, current_address)) != NULL){
+    while( (current_address= getNextToken(&token, current_address, nline, line)) != NULL){
 
         /* TODO ANALYSE LEX ICI     (token)    => gros switch sa mere */
         /* TODO ajouter dans liste (ou fifo) */
-        int pos = (current_address-line) - strlen(token);
+        pos = (current_address-line)-strlen(token);
         int type = lex_analyse(token, nline, pos, line);
         if (type != -1) printf("%s  ",lex_type_string(type,TRUE) );
         else printf("           ");
@@ -104,6 +108,7 @@ void lex_read_line( char *line, int nline) {
         puts(token); //DEBUG
         // afficher en INFO_MSG
 
+        // TODO erreur si les fonctions renvoie rien
 
         // TODO free(token) ???   non car mis dans une liste ??
     }
@@ -161,7 +166,6 @@ void lex_load_file( char *file, unsigned int *nlines ) {
 int lex_analyse(char* token, unsigned int nline, int pos, char* line) {
     int STATE=INIT;
     char c;
-    int len_tok = strlen(token);
 
     int i;
     for (i=0 ; token[i]!='\0' ; i++) {
@@ -188,9 +192,9 @@ int lex_analyse(char* token, unsigned int nline, int pos, char* line) {
                 }
                 else if (c=='"') {
                     /* check si c'est pas un '"' seul */
-                    if (token[i+1]!='\0') STATE=STRING;
+                    if (token[i+1]!='\0') return STRING;  //on sait qu la string est conforme ("fermée") car check dans getNextToken
                     // else printf("  ERR_INIT_str\n");           //TODO erreur
-                    else print_error("test de fct erreur", nline, pos+i, line);
+                    else print_error("test de fct erreurBBB", nline, pos+i, line);
                 }
 
                 else if ( isalpha(c) || c=='_' ) STATE=SYMBOLE;
@@ -203,20 +207,9 @@ int lex_analyse(char* token, unsigned int nline, int pos, char* line) {
                 else if (isdigit(c)) STATE=DECIMAL;   // c!='0' forcement vrai avec le if d'avant
 
                 // else printf("  ERR_INIT\n");                   //TODO erreur
-                else print_error("test de fct erreur", nline, pos+i, line);
+                else print_error("AAAAAAAA", nline, pos+i, line);
 
                 break;
-
-            case STRING: {   // accolade pour povoir déclarer une variable dans le case
-                /* check si la string est bien fermé par un '"' valide
-                   valide si nombre pair de '\' avant */
-                int n;   // nombre de '\' avant '"'
-                for ( n=0 ; token[len_tok-2-n]=='\\'; n++ );
-                if ( token[len_tok-1]=='"' && !(n%2) ) return STRING;
-                // else printf("  ERR_STRING\n");                 //TODO erreur
-                else print_error("test de fct erreur", nline, pos+i, line);
-                break;
-            }
 
             case SYMBOLE:
                 if ( !isalnum(c) && c!='_' ) print_error("test de fct erreur", nline, pos+i, line);//printf("  ERR_SYMB\n");    //TODO erreur
@@ -226,9 +219,9 @@ int lex_analyse(char* token, unsigned int nline, int pos, char* line) {
                 if ( c=='x' || c=='X' ) STATE=HEXA;
                 else if ( isdigit(c) && c<'8' ) STATE=OCTAL;   // un octal commence par 0 puis des chiffres < 8
                 else if (c=='(') {
-                    if (token[i+1]=='$') STATE=AIBD;
+                    if (token[i+1]=='$') STATE=DEBUT_AIBD;
                     // else printf("  ERR_ZERO_aibd\n");          //TODO erreur
-                    else print_error("test de fct erreur", nline, pos+i, line);
+                    else print_error("test de fct erreur", nline, pos+i+1, line);
                 }
                 // else printf("  ERR_ZERO\n");                   //TODO erreur
                 else print_error("test de fct erreur", nline, pos+i, line);
@@ -236,54 +229,57 @@ int lex_analyse(char* token, unsigned int nline, int pos, char* line) {
 
             case HEXA:
                 if (c=='(') {
-                    if (token[i+1]=='$') STATE=AIBD;
+                    if (token[i+1]=='$') STATE=DEBUT_AIBD;
                     // else printf("  ERR_HEXA_aibd\n");          //TODO erreur
-                    else print_error("test de fct erreur", nline, pos+i, line);
+                    else print_error("test de fct erreur", nline, pos+i+1, line);
                 }
                 else if (!isxdigit(c)) print_error("test de fct erreur", nline, pos+i, line);//printf("  ERR_HEXA\n");          //TODO erreur
                 break;
 
             case OCTAL :
+                // WARNING est ce que ça peut etre un octal devant un AIBD ??
                 if ( c<'0' || c>'7' ) print_error("test de fct erreur", nline, pos+i, line);//printf("  ERR_OCTAL\n"); //TODO erreur
 
             case DECIMAL:
                 if (c=='(') {
-                    if (token[i+1]=='$') STATE=AIBD;
+                    if (token[i+1]=='$') STATE=DEBUT_AIBD;
                     // else printf("  ERR_DECIMAL_aibd\n");       //TODO erreur
-                    else print_error("test de fct erreur", nline, pos+i, line);
+                    else print_error("test de fct erreur", nline, pos+i+1, line);
                 }
                 else if (!isdigit(c)) print_error("test de fct erreur", nline, pos+i, line);//printf("  ERR_DECIMAL\n");        //TODO erreur
                 break;
 
-            case AIBD:  // Adressage Indirect avec Base et Déplacement
-                if (token[len_tok-1]==')') return AIBD;   // regarde pas l'intérieur des parentheses
-                // else printf("  ERR_AIBD\n");                   //TODO erreur
-                else print_error("test de fct erreur", nline, pos+i, line);
+            case DEBUT_AIBD:  // Adressage Indirect avec Base et Déplacement
+                if (c==')') {
+                    if (token[i+1]=='\0') return AIBD;
+                    else print_error("test de fct erreur", nline, pos+i+1, line);
+                }
                 break;
         }
     }
-    if ( STATE==ZERO || STATE==INIT ) return -1;               //TODO erreur et suppr return -1
+    if ( STATE==ZERO || STATE==INIT || STATE==DEBUT_AIBD) return -1;               //TODO erreur et suppr return -1
     return STATE;
 }
 
 
 
 char* lex_type_string(int type, int norm_len) {        // strdup   ????????
-    if (norm_len) {               // len == 9
-        if      (type==0)  return "INIT     ";
-        else if (type==1)  return "DEUX_PTS ";
-        else if (type==2)  return "VIRGULE  ";
-        else if (type==3)  return "MOINS    ";
-        else if (type==4)  return "COMMENT  ";
-        else if (type==5)  return "REGISTRE ";
-        else if (type==6)  return "DIRECTIVE";
-        else if (type==7)  return "STRING   ";
-        else if (type==8)  return "SYMBOLE  ";
-        else if (type==9)  return "ZERO     ";  //normalement impossible
-        else if (type==10) return "HEXA     ";
-        else if (type==11) return "OCTAL    ";
-        else if (type==12) return "DECIMAL  ";
-        else if (type==13) return "AIBD     ";
+    if (norm_len) {               // len == 11
+        if      (type==0)  return "INIT       ";
+        else if (type==1)  return "DEUX_PTS   ";
+        else if (type==2)  return "VIRGULE    ";
+        else if (type==3)  return "MOINS      ";
+        else if (type==4)  return "COMMENT    ";
+        else if (type==5)  return "REGISTRE   ";
+        else if (type==6)  return "DIRECTIVE  ";
+        else if (type==7)  return "STRING     ";
+        else if (type==8)  return "SYMBOLE    ";
+        else if (type==9)  return "ZERO       ";  //normalement impossible
+        else if (type==10) return "HEXA       ";
+        else if (type==11) return "OCTAL      ";
+        else if (type==12) return "DECIMAL    ";
+        else if (type==13) return "DEBUT_AIBD ";
+        else if (type==14) return "AIBD       ";
         else ;                                 //TODO erreur
     }
     else {
@@ -300,7 +296,8 @@ char* lex_type_string(int type, int norm_len) {        // strdup   ????????
         else if (type==10) return "HEXA";
         else if (type==11) return "OCTAL";
         else if (type==12) return "DECIMAL";
-        else if (type==13) return "AIBD";
+        else if (type==13) return "DEBUT_AIBD";
+        else if (type==14) return "AIBD";
         else ;                                 //TODO erreur
     }
     return NULL; //quand gestion erreur ok, plus besoin ?
