@@ -10,7 +10,7 @@ boucle       :
     NOP
     addi $t1 , $t1 , 1
     J boucle
-    NOP                                $
+    NOP
 byebye:
     JAL viteviteauru
     0

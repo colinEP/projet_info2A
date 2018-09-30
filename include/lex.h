@@ -34,7 +34,7 @@ void	lex_read_line( char *, int);
 void	lex_load_file( char *, unsigned int * );
 char* 	getNextToken( char** , char* );
 
-int   lex_analyse(char* token, unsigned int nline);
+int   lex_analyse(char* token, unsigned int nline, int pos, char* line);
 char* lex_type_string(int type, int normLen);
 
 #endif /* _LEX_H_ */

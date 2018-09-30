@@ -3,7 +3,7 @@
 
 
 
-void print_error(char* msg, unsigned int nline);
+void print_error(char* msg, unsigned int nline, int pos, char* line);
 
 
 
