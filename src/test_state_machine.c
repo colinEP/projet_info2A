@@ -22,6 +22,7 @@ void type_lex_test();
 
 void type_lex_test()
 {
+    printf("J'Y SUIS !\n");
     if (lex_analyse("01234567",0) != OCTAL)
     {
         printf("Erreur analyse pour les %d\n", OCTAL);
