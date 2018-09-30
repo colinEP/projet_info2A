@@ -18,6 +18,8 @@
 #include <notify.h>
 #include <lex.h>
 
+#include <error.h>
+
 
 /* ATTENTION: getNextToken est juste un exemple -> il est à recoder completement !!! */
 /**
@@ -180,7 +182,8 @@ int lex_analyse(char* token, unsigned int nline) {
                 else if (c=='.') {
                     /* check si la directive est pas "vide" */
                     if (token[i+1]!='\0') return DIRECTIVE;
-                    else printf("  ERR_INIT_direct\n");        //TODO erreur
+                    //else printf("  ERR_INIT_direct\n");        //TODO erreur
+                    else print_error("test de fct erreur", nline);
                 }
                 else if (c=='"') {
                     /* check si c'est pas un '"' seul */
@@ -250,7 +253,7 @@ int lex_analyse(char* token, unsigned int nline) {
                 break;
         }
     }
-    if ( STATE==ZERO || STATE==INIT ) return -1;             //TODO erreur et suppr return -1
+    if ( STATE==ZERO || STATE==INIT ) return -1;               //TODO erreur et suppr return -1
     return STATE;
 }
 
@@ -284,13 +287,12 @@ char* lex_type_string(int type, int norm_len) {        // strdup   ????????
         else if (type==6)  return "DIRECTIVE";
         else if (type==7)  return "STRING";
         else if (type==8)  return "SYMBOLE";
-        else if (type==9)  return "ZERO";         //normalement impossible
+        else if (type==9)  return "ZERO";       //normalement impossible
         else if (type==10) return "HEXA";
         else if (type==11) return "OCTAL";
         else if (type==12) return "DECIMAL";
         else if (type==13) return "AIBD";
         else ;                                 //TODO erreur
     }
-
-
+    return NULL; //quand gestion erreur ok, plus besoin ?
 }
