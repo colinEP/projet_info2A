@@ -10,7 +10,7 @@
 #include <queue.h>
 
 
-QUEUE add_to_queue(char* token, int type, int numline, QUEUE Q)
+QUEUE add_to_queue(QUEUE Q, char* token, int type, int numline)
 {
     LEXEM lex = calloc (1, sizeof(*lex));
     lex->nline = numline;

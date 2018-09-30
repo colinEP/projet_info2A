@@ -11,20 +11,28 @@
 #define _LEX_H_
 
 #include <stdio.h>
-#include <queue.h>
+//#include <queue.h>
 
 enum {INIT , DEUX_PTS , VIRGULE , MOINS , COMMENT , REGISTRE ,
 //     0         1         2        3        4         5
       DIRECTIVE , STRING , SYMBOLE , ZERO , HEXA , OCTAL ,
 //  ,     6         7         8       9      10     11
-      DECIMAL , DEBUT_AIBD , AIBD };   // AIBD = Adressage Indirect avec Base et Déplacement
-//      12          13       14
+      DECIMAL , DEBUT_AIBD , AIBD , NL };   // AIBD = Adressage Indirect avec Base et Déplacement
+//      12          13       14     15
 
 
+typedef struct {
+    int nline;
+    //int pos;
+    int lex_type;
+    //char* lex_type_print;
+    char* value;
+} *LEXEM;
 
+typedef struct queue *QUEUE;   // obligatoire sinon erreur !! MAIS POURQUOI !!!!
 
 QUEUE	lex_read_line( char *, int, QUEUE);
-void	lex_load_file( char *, unsigned int * );
+QUEUE	lex_load_file( char *, unsigned int * , QUEUE);
 char* 	getNextToken( char** , char* , unsigned int nline, char* line);
 
 int   lex_analyse(char* token, unsigned int nline, int pos, char* line);
