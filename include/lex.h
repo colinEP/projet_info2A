@@ -11,6 +11,7 @@
 #define _LEX_H_
 
 #include <stdio.h>
+#include <queue.h>
 
 enum {INIT , DEUX_PTS , VIRGULE , MOINS , COMMENT , REGISTRE ,
 //     0         1         2        3        4         5
@@ -21,16 +22,8 @@ enum {INIT , DEUX_PTS , VIRGULE , MOINS , COMMENT , REGISTRE ,
 
 
 
-typedef struct {
-    int nline;
-    //int pos;
-    int lex_type;
-    //char* lex_type_print;
-    char* value;
-} *LEXEM;
 
-
-void	lex_read_line( char *, int);
+QUEUE	lex_read_line( char *, int, QUEUE);
 void	lex_load_file( char *, unsigned int * );
 char* 	getNextToken( char** , char* , unsigned int nline, char* line);
 

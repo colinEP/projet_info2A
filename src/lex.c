@@ -17,6 +17,8 @@
 #include <global.h>
 #include <notify.h>
 #include <lex.h>
+#include <queue.h>
+#include <test_queue.h>
 
 #include <error.h>
 
@@ -89,7 +91,7 @@ char* getNextToken(char** p_token, char* start, unsigned int nline, char* line) 
  * @brief This function performs lexical analysis of one standardized line.
  *
  */
-void lex_read_line( char *line, int nline) {
+QUEUE lex_read_line( char *line, int nline, QUEUE Q) {
     char* token = NULL;
     char* current_address=line;
     int pos = 0;
@@ -108,14 +110,18 @@ void lex_read_line( char *line, int nline) {
         puts(token); //DEBUG
         // afficher en INFO_MSG
 
+
         // TODO erreur si les fonctions renvoie rien
+
+        Q = add_to_queue(token, type, nline, Q);
+
 
         // TODO free(token) ???   non car mis dans une liste ??
     }
 
     // TODO add NL lexeme a la fin
 
-    return;
+    return Q;
 }
 
 /**
@@ -137,7 +143,7 @@ void lex_load_file( char *file, unsigned int *nlines ) {
     }
 
     *nlines = 0;
-
+    QUEUE liste_queue = new_queue();
     while(!feof(fp)) {     // feof => test si EOF (end of file)
 
         /*read source code line-by-line */
@@ -152,12 +158,13 @@ void lex_load_file( char *file, unsigned int *nlines ) {
             line[strlen(line)-1] = '\0';  /* eat final '\n' */
 
             if ( 0 != strlen(line) ) {
-                lex_read_line(line,*nlines);
+                liste_queue = lex_read_line(line,*nlines, liste_queue);
                 // TODO free(line); ????
             }
         }
-    }
 
+    }
+    read_queue_lex(liste_queue);
     fclose(fp);
     return;
 }
@@ -197,7 +204,7 @@ int lex_analyse(char* token, unsigned int nline, int pos, char* line) {
                     else print_error("test de fct erreurBBB", nline, pos+i, line);
                 }
 
-                else if ( isalpha(c) || c=='_' ) STATE=SYMBOLE;
+                else if ( isalpha(c) || c=='_' ) STATE=SYMBOLE;  // un symb ne peut pzs commencer par un chiffre
 
                 else if (c=='0') {
                     /* check si c'est un 0 tout seul" */
