@@ -8,7 +8,7 @@
 #include <notify.h>
 #include <lex.h>
 #include <queue.h>
-#include <test_queue.h>
+#include <test.h>
 
 void read_queue_lex(QUEUE Q)
 {

@@ -1,9 +1,12 @@
 # TEST_RETURN_CODE = PASS
 # allons au ru
-.set noreorder    $t5
-.text
+.set noreorder   $t5
+200(
+!cou
+"sgqg\"
+.text   "test
     Lw $t0 ,      lunchtime
-    LW $6, -    200($7)
+    LW $6, -    200($7)4
     ADDI $t1,$zero,8
 boucle       :
     BEQ $t0 , $t1 , byebye
@@ -15,11 +18,13 @@ byebye:
     JAL viteviteauru
     0
     0x45af
-
+    0b1234
+    0x12sd
     04545
-
+    04582
     0($ded)
-
+    200($dee
+    200(7)
 .data
 lunchtime:
     .word 12
@@ -27,4 +32,4 @@ lunchtime:
     .asciiz "ils disent : \"au,: ru!\"\\\\\\\\"
 .bss
 menu:
-    .space 24
+    .space 24   "

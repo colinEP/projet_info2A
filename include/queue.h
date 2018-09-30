@@ -13,8 +13,8 @@ typedef struct queue
 } *QUEUE;
 
 
-typedef struct lexeme
-{
+
+typedef struct {
     int nline;
     //int pos;
     int lex_type;
@@ -23,11 +23,11 @@ typedef struct lexeme
 } *LEXEM;
 
 
+
+
 QUEUE add_to_queue(char* token, int type, int numline, QUEUE Q);
 
-
 QUEUE new_queue();
-
 
 QUEUE ajouter_fin(QUEUE l, LEXEM lex);
 

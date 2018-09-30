@@ -9,16 +9,9 @@
 #include <lex.h>
 #include <queue.h>
 
+#include <test.h>
 
-// enum {INIT , DEUX_PTS , VIRGULE , MOINS , COMMENT , REGISTRE ,
-// //     0         1         2        3        4         5
-//       DIRECTIVE , STRING , SYMBOLE , ZERO , HEXA , OCTAL ,
-// //  ,     6         7         8       9      10     11
-//       DECIMAL , AIBD };   // AIBD = Adressage Indirect avec Base et Déplacement
-// //      12       13
-//
 
-void type_lex_test();
 
 void type_lex_test()
 {
@@ -33,6 +26,7 @@ void type_lex_test()
         printf("Erreur analyse pour les %d\n", SYMBOLE);
     }
     else printf("analyse ok pour les %d\n", SYMBOLE);
+
 
     if (lex_analyse("0",0, 0, NULL) != DECIMAL) //type 0 impossible !
     {
@@ -99,6 +93,7 @@ void type_lex_test()
         printf("Erreur analyse pour les %d\n", AIBD);
     }
     else printf("analyse ok pour les %d\n", AIBD);
+
 
     // if (lex_analyse("200($789debut",0) != DEBUT_ADRESSAGE)
     // {

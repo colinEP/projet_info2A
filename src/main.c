@@ -12,7 +12,10 @@
 #include <global.h>
 #include <notify.h>
 #include <lex.h>
+#include <queue.h>
 
+#include <error.h>
+#include <test.h>
 
 /**
  * @param exec Name of executable.
