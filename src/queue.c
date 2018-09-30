@@ -1,4 +1,3 @@
-//#define _POSIX_C_SOURCE 200112L
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -17,7 +16,8 @@ QUEUE add_to_queue(char* token, int type, int numline, QUEUE Q)
     lex->nline = numline;
     lex->lex_type = type;
     lex->value = token;
-    ajouter_fin(Q, lex);
+    Q = ajouter_fin(Q, lex);
+    return Q;
 }
 
 
