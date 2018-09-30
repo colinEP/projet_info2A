@@ -149,6 +149,7 @@ void lex_load_file( char *file, unsigned int *nlines ) {
                 // TODO free(line); ????
             }
         }
+    read_queue_lex(liste_queue);
     }
 
     fclose(fp);

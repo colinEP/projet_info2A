@@ -12,7 +12,7 @@
 
 QUEUE add_to_queue(char* token, int type, int numline, QUEUE Q)
 {
-    LEXEM lex = calloc (1, sizeof(LEXEM));
+    LEXEM lex = calloc (1, sizeof(struct lexeme));
     lex->nline = numline;
     lex->lex_type = type;
     lex->value = token;
@@ -30,12 +30,12 @@ QUEUE ajouter_fin(QUEUE l, LEXEM lex) //à vérfier
 {
   if (l == NULL)
     {
-      l = calloc (1, sizeof(QUEUE));
+      l = calloc (1, sizeof(struct queue));
       l->element = lex;
       l->next = l;
     }
   QUEUE adresse_retour = l->next;
-  l->next = calloc (1, sizeof(QUEUE));
+  l->next = calloc (1, sizeof(struct queue));
   l = l->next;
   l->element = lex;
   l->next = adresse_retour;

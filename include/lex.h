@@ -22,15 +22,6 @@ enum {INIT , DEUX_PTS , VIRGULE , MOINS , COMMENT , REGISTRE ,
 
 
 
-// typedef struct
-// {
-//     int nline;
-//     //int pos;
-//     int lex_type;
-//     //char* lex_type_print;
-//     char* value;
-// } *LEXEM;
-
 void	lex_read_line( char *, int, QUEUE);
 void	lex_load_file( char *, unsigned int * );
 char* 	getNextToken( char** , char* );

@@ -13,7 +13,7 @@ typedef struct queue
 } *QUEUE;
 
 
-typedef struct
+typedef struct lexeme
 {
     int nline;
     //int pos;
