@@ -22,7 +22,7 @@ enum {INIT , DEUX_PTS , VIRGULE , MOINS , COMMENT , REGISTRE ,
 
 
 
-void	lex_read_line( char *, int, QUEUE);
+QUEUE	lex_read_line( char *, int, QUEUE);
 void	lex_load_file( char *, unsigned int * );
 char* 	getNextToken( char** , char* );
 

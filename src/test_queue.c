@@ -12,12 +12,17 @@
 
 void read_queue_lex(QUEUE Q)
 {
-    QUEUE first_memory = Q->next;
+    if (Q == NULL) printf("VIDE! \n");
+    Q = Q->next;
+    QUEUE first_memory = Q;
+    LEXEM lex = Q->element;
+    printf("lecture de la liste Queue : \n");
+    printf("valeur : %s type: %d numero de ligne : %d \n", lex->value, lex->lex_type, lex->nline);
     Q = Q->next;
     while (Q != first_memory)
     {
         LEXEM lex = Q->element;
-        printf("valeur : %s type: %d numero de ligne : %d ", lex->value, lex->lex_type, lex->nline);
+        printf("valeur : %s \ntype: %d \nnumero de ligne : %d \n", lex->value, lex->lex_type, lex->nline);
         Q = Q->next;
 
     }

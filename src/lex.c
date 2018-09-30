@@ -18,6 +18,7 @@
 #include <notify.h>
 #include <lex.h>
 #include <queue.h>
+#include <test_queue.h>
 
 
 /* ATTENTION: getNextToken est juste un exemple -> il est à recoder completement !!! */
@@ -85,7 +86,7 @@ char* getNextToken(char** p_token, char* start) {
  * @brief This function performs lexical analysis of one standardized line.
  *
  */
-void lex_read_line( char *line, int nline, QUEUE Q) {
+QUEUE lex_read_line( char *line, int nline, QUEUE Q) {
     char* token = NULL;
     char* current_address=line;
 
@@ -108,7 +109,7 @@ void lex_read_line( char *line, int nline, QUEUE Q) {
 
     // TODO add NL lexeme a la fin
 
-    return;
+    return Q;
 }
 
 /**
@@ -145,13 +146,13 @@ void lex_load_file( char *file, unsigned int *nlines ) {
             (*nlines)++;
 
             if ( 0 != strlen(line) ) {
-                lex_read_line(line,*nlines, liste_queue);
+                liste_queue = lex_read_line(line,*nlines, liste_queue);
                 // TODO free(line); ????
             }
         }
-    read_queue_lex(liste_queue);
-    }
 
+    }
+    read_queue_lex(liste_queue);
     fclose(fp);
     return;
 }
