@@ -1,6 +1,5 @@
-Squelette de code de l'assembleur MIPS du projet info PHELMA.
-Le code fourni permet d'acquérir des chaînes de caractères d'un fichier et de les afficher à l'écran. 
-Votre tâche sera de le compléter.  
+Le code fourni permet d'ouvrir un document, et d'afficher à l'écran les différents léxèmes qui le composent, avec leur type et leur numéro de ligne. Ces léxèmes avec leurs informations sont également stockés dans une liste chaînée, renvoyée par lex_load_file.   
+
 
 Le répertoire est organisé ainsi : 
 .
