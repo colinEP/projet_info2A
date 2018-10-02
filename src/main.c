@@ -42,6 +42,15 @@ void print_usage( char *exec ) {
  */
 int main ( int argc, char *argv[] ) {
 
+
+    if ( !strcmp(argv[argc-1], "-t") ) {
+
+        /* ---------------- TEST ----------------*/
+        type_lex_test();
+
+        exit( EXIT_SUCCESS );
+    }
+
     unsigned int 	nlines 	= 0;
     char         	 *file 	= NULL;
 
@@ -74,18 +83,14 @@ int main ( int argc, char *argv[] ) {
 
     LIST list_lex = new_list();
 
-//type_lex_test(); TODO
 
     /* ---------------- do the lexical analysis -------------------*/
     INFO_MSG("Début de l'analyse lexical");
     list_lex = lex_load_file( file, &nlines , list_lex );
-//read_ TODO
 
     DEBUG_MSG("source code got %d lines",nlines);
 
 
-    /* ---------------- TEST ----------------*/
-    //type_lex_test();  //DEBUG
 
     INFO_MSG("Affichage du résultat de l'analyse lexical");
     print_list_lex(list_lex);
