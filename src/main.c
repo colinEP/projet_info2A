@@ -72,8 +72,10 @@ int main ( int argc, char *argv[] ) {
 
     QUEUE list_lex = new_queue();  //WARNING pour l'instant une queue mais apres une list
 
+    type_lex_test();
+
     /* ---------------- do the lexical analysis -------------------*/
-    list_lex = lex_load_file( file, &nlines , liste_queue );
+    list_lex = lex_load_file( file, &nlines , list_lex );
     read_queue_lex(list_lex);      //DEBUG
 
     DEBUG_MSG("source code got %d lines",nlines);

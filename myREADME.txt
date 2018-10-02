@@ -1,18 +1,17 @@
-Squelette de code de l'assembleur MIPS du projet info PHELMA.
-Le code fourni permet d'acquérir des chaînes de caractères d'un fichier et de les afficher à l'écran. 
-Votre tâche sera de le compléter.  
+Le code fourni permet d'ouvrir un document, et d'afficher à l'écran les différents léxèmes qui le composent, avec leur type et leur numéro de ligne. Ces léxèmes avec leurs informations sont également stockés dans une liste chaînée, renvoyée par lex_load_file.   
+
 
 Le répertoire est organisé ainsi : 
 .
 ├── tests
 │   └── miam_sujet.s
+│   └──	test_queue.c
+│   └──	test_state_machine.c
 ├── src
 │   ├── main.c
 │   └── lex.c
 │   └──	error.c
 │   └──	queue.c	
-│   └──	test_queue.c
-│   └──	test_state_machine.c
 
 ├── include
 │   ├── notify.h
@@ -29,7 +28,7 @@ Le répertoire est organisé ainsi :
 └── Doxyfile
 
 - tests : contient les fichiers pour tester le programme 
-- src : qui contient le code C de votre interpréteur.      
+- src : qui contient le code C de votre interpréteutr.      
 - include : qui contient toutes les définitions de types et prototypes de votre programme. Lisez attentivement les headers avant de commencer à coder et de les modifier.
 - doc : contient la documentation et le répertoire ou stocker les rapports de livrable.
 - README.txt : ce document
