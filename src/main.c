@@ -42,7 +42,7 @@ void print_usage( char *exec ) {
  */
 int main ( int argc, char *argv[] ) {
 
-
+    /*   ./as-mips -t   permet de lancer les tests */
     if ( !strcmp(argv[argc-1], "-t") ) {
 
         /* ---------------- TEST ----------------*/

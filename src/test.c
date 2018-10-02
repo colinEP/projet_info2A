@@ -11,7 +11,7 @@
 
 #include <test.h>
 
-
+/*    ./as-mips -t     permet de lancer les tests */
 
 void type_lex_test()
 {
