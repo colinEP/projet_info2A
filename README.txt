@@ -64,8 +64,7 @@ ajouter -DVERBOSE aux CFLAGS dans le Makefile
 
 --- Génération de l'archive
 
-Tapez "make archive". Vous aurez produit un fichier se terminant par "tgz". C'est l'archive
-que vous nous enverrez par email.
+Tapez "make archive". Vous aurez produit un fichier se terminant par "tgz".
 
 
 --- Documentation du code

@@ -54,7 +54,7 @@ docu :
 
 clean :
 	$(RM) $(TARGET) $(SRCDIR)/*.orig $(SRCDIR)/*.dbg $(SRCDIR)/*.rls $(GARBAGE)
-	$(RM) -r $(DOCDIR)/*
+#	$(RM) -r $(DOCDIR)/*
 
 archive :
 	make clean
