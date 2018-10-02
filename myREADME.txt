@@ -5,13 +5,14 @@ Le répertoire est organisé ainsi :
 .
 ├── tests
 │   └── miam_sujet.s
-│   └──	test_queue.c
-│   └──	test_state_machine.c
+
 ├── src
 │   ├── main.c
 │   └── lex.c
 │   └──	error.c
 │   └──	queue.c	
+│   └──	test_queue.c
+│   └──	test_state_machine.c
 
 ├── include
 │   ├── notify.h
@@ -28,12 +29,15 @@ Le répertoire est organisé ainsi :
 └── Doxyfile
 
 - tests : contient les fichiers pour tester le programme 
-- src : qui contient le code C de votre interpréteutr.      
+- src : qui contient le code C de votre interpréteur et les fonctions de test.      
 - include : qui contient toutes les définitions de types et prototypes de votre programme. Lisez attentivement les headers avant de commencer à coder et de les modifier.
 - doc : contient la documentation et le répertoire ou stocker les rapports de livrable.
 - README.txt : ce document
 - Makefile pour compiler soit en mode debug (afficher les traces du programme) soit en mode release (produit final)
 - Doxyfile : fichier de configuration du générateur automatique de documentation doxygen
+
+
+
 
 --- pour compiler le code en mode debug (il créé l'exécutable 'as-mips' qui affiche les traces)
 $ make debug 
