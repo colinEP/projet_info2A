@@ -12,10 +12,12 @@
 #include <global.h>
 #include <notify.h>
 #include <lex.h>
-#include <queue.h>
+#include <queue_list.h>
 #include <test.h>
 
 #include <error.h>
+
+#include <assert.h>
 
 
 /**
@@ -48,7 +50,7 @@ int main ( int argc, char *argv[] ) {
     // WARNING_MSG("Un message WARNING_MSG !");
     //
     // /* macro INFO_MSG : uniquement si compilé avec -DVERBOSE. Cf. Makefile*/
-     INFO_MSG("Un message INFO_MSG : Debut du programme %s", argv[0]);
+    INFO_MSG("Debut du programme %s", argv[0]);
     //
     // /* macro DEBUG_MSG : uniquement si compilé avec -DDEBUG (ie : compilation avec make debug). Cf. Makefile */
     // DEBUG_MSG("Un message DEBUG_MSG !");
@@ -70,19 +72,27 @@ int main ( int argc, char *argv[] ) {
     }
 
 
-    QUEUE list_lex = new_queue();  //WARNING pour l'instant une queue mais apres une list
+    LIST list_lex = new_list();
 
     /* ---------------- do the lexical analysis -------------------*/
-    list_lex = lex_load_file( file, &nlines , liste_queue );
-    read_queue_lex(list_lex);      //DEBUG
+    INFO_MSG("Début de l'analyse lexical");
+    list_lex = lex_load_file( file, &nlines , list_lex );
+
 
     DEBUG_MSG("source code got %d lines",nlines);
 
-    /* ---------------- Free memory and terminate -------------------*/
 
-    /* TODO free everything properly */
-
+    /* ---------------- TEST ----------------*/
     //type_lex_test();  //DEBUG
 
+    INFO_MSG("Affichage du résultat de l'analyse lexical");
+    print_list_lex(list_lex);      //DEBUG
+
+
+    /* ---------------- Free memory and terminate -------------------*/
+    INFO_MSG("Libération de la mémoire");
+    free_list_lex(list_lex);
+
+    INFO_MSG("Fin du programme %s", argv[0]);
     exit( EXIT_SUCCESS );
 }

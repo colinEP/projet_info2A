@@ -11,7 +11,7 @@
 pos != column : pos = 0..len-1
                 column = 1..len
 */
-void print_error(char* msg, unsigned int nline, int pos, char* line) {
+void print_error_lex(char* msg, unsigned int nline, int pos, char* line) {
 
     //int pos = 210; //tmp
     int column = pos+1;
@@ -47,9 +47,6 @@ void print_error(char* msg, unsigned int nline, int pos, char* line) {
     fprintf( stderr, "%c[%d;%dm", 0x1B, STYLE_BOLD, COLOR_RED );  // set style ans color
     fprintf( stderr, "^\n");
     fprintf( stderr, "%c[%dm", 0x1B, 0 );  // reset style and color
-
-
-
 
     exit( EXIT_FAILURE );
 }

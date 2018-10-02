@@ -17,13 +17,13 @@
 #include <global.h>
 #include <notify.h>
 #include <lex.h>
-#include <queue.h>
+#include <queue_list.h>
 #include <test.h>
 
 #include <error.h>
 
 
-/* ATTENTION: getNextToken est juste un exemple -> il est à recoder completement !!! */
+
 /**
  * @param token The pointeur to the lexeme to be extracted.
  * @param start The address from which the analysis must be performed.
@@ -61,7 +61,7 @@ char* getNextToken(char** p_token, char* start, unsigned int nline, char* line) 
                 if (*end=='\0') {       // Sinon risque d'index out si '\\' est le dernier caractère de la ligne (on a suppr '\n' en fin de ligne)
                                         // exemple : ADD $t0, "example\              .
                                         // syntaxe fausse mais il faut prévoir les potentiels erreurs du developpeur
-                    print_error("string non fermée", nline, end-1-line, line);
+                    print_error_lex("string non fermée", nline, end-1-line, line);
                     //break;
                 }
             }
@@ -69,12 +69,12 @@ char* getNextToken(char** p_token, char* start, unsigned int nline, char* line) 
         }
     }
     /* si on est encore dans une string => la string n'est pas fermée => ERROR */
-    if (inString) print_error("string non fermée", nline, end-1-line, line);
+    if (inString) print_error_lex("string non fermée", nline, end-1-line, line);
 
     /*compute size : if zero there is no more token to extract*/
     token_size=end-start;
     if (token_size>0){
-        *p_token = calloc(token_size+1,sizeof(*start));         /* WARNING WHAT ??? calloc sur deja un calloc ? ou est le free  => ok c'est un pointeur du token (qui est deja un pointer)*/
+        *p_token = calloc(token_size+1,sizeof(*start));
         strncpy(*p_token,start,token_size);
         (*p_token)[token_size]='\0';
         return end;
@@ -91,36 +91,26 @@ char* getNextToken(char** p_token, char* start, unsigned int nline, char* line) 
  * @brief This function performs lexical analysis of one standardized line.
  *
  */
-QUEUE lex_read_line( char *line, int nline, QUEUE Q) {
+QUEUE lex_read_line( char *line, int nline, QUEUE list_lex) {
     char* token = NULL;
     char* current_address=line;
     int pos = 0;
 
-
-    /* TODO : faire l'analyse lexical de chaque token ici et les ajouter dans une collection*/
     while( (current_address= getNextToken(&token, current_address, nline, line)) != NULL){
 
-        /* TODO ANALYSE LEX ICI     (token)    => gros switch sa mere */
-        /* TODO ajouter dans liste (ou fifo) */
         pos = (current_address-line)-strlen(token);
         int type = lex_analyse(token, nline, pos, line);
-        if (type != -1) printf("%s  ",lex_type_string(type,TRUE) );
-        else printf("           ");
-        printf("%ld\t", strlen(token)); //DEBUG
-        puts(token); //DEBUG
-        // afficher en INFO_MSG
 
+        list_lex = add_to_queue(list_lex, token, type, nline);
 
-        // TODO erreur si les fonctions renvoient rien
-
-        Q = add_to_queue(Q, token, type, nline);
-
-        // TODO free(token) ???   non car mis dans une liste ??
+        /* Une fois le token utilisé, il faut le free */
+        free(token);
     }
-    // WARNING a voir si c'est utile pour la suite ... sinon on peut l'elever facilement
-    Q = add_to_queue(Q, "\\n", 15, nline);
 
-    return Q;
+    // WARNING a voir si c'est utile pour la suite ... sinon on peut l'enlever facilement
+    list_lex = add_to_queue(list_lex, "\\n", 15, nline);
+
+    return list_lex;
 }
 
 /**
@@ -130,11 +120,15 @@ QUEUE lex_read_line( char *line, int nline, QUEUE Q) {
  * @brief This function loads an assembly code from a file into memory.
  *
  */
-QUEUE lex_load_file( char *file, unsigned int *nlines , QUEUE liste_queue) {
+QUEUE lex_load_file( char *file, unsigned int *nlines , QUEUE list_lex) {
+    /* Pour povoir ajouter en queue plus facilemant,
+       on traite list_lex comme si c'était une QUEUE.
+       On le mettra sous forme de LIST avec de renvoyer list_lex */
 
     FILE        *fp   = NULL;
     char         line[STRLEN]; /* original source line */
 
+    INFO_MSG("Ouverture du fichier assembleur à compiler");
     fp = fopen( file, "r" );
     if ( NULL == fp ) {
         /*macro ERROR_MSG : message d'erreur puis fin de programme ! */
@@ -157,14 +151,16 @@ QUEUE lex_load_file( char *file, unsigned int *nlines , QUEUE liste_queue) {
             line[strlen(line)-1] = '\0';  /* eat final '\n' */
 
             if ( 0 != strlen(line) ) {
-                liste_queue = lex_read_line(line,*nlines, liste_queue);
-                // TODO free(line); ????
+                list_lex = lex_read_line(line,*nlines, list_lex);
             }
         }
-
     }
     fclose(fp);
-    return liste_queue;
+
+    /* rétablissement de la QUEUE sous forme de LIST */
+    list_lex = queue_to_list(list_lex);
+
+    return list_lex;
 }
 
 
@@ -186,12 +182,12 @@ int lex_analyse(char* token, unsigned int nline, int pos, char* line) {
                 else if (c=='$') {
                     /* check si le registre est pas "vide" */
                     if (token[i+1]!='\0') return REGISTRE;
-                    else print_error("[ERR_INIT_REG] register name expected after '$'", nline, pos+i, line);
+                    else print_error_lex("[ERR_INIT_REG] register name expected after '$'", nline, pos+i, line);
                 }
                 else if (c=='.') {
                     /* check si la directive est pas "vide" */
                     if (token[i+1]!='\0') return DIRECTIVE;
-                    else print_error("[ERR_INIT_DIR] directive name excepted after '.'", nline, pos+i, line);
+                    else print_error_lex("[ERR_INIT_DIR] directive name excepted after '.'", nline, pos+i, line);
                 }
                 else if ( isalpha(c) || c=='_' ) STATE=SYMBOLE;  // un symb ne peut pas commencer par un chiffre
                 else if (c=='0') {
@@ -200,11 +196,11 @@ int lex_analyse(char* token, unsigned int nline, int pos, char* line) {
                     else STATE=ZERO;
                 }
                 else if (isdigit(c)) STATE=DECIMAL;   // c!='0' forcement vrai avec le if d'avant
-                else print_error("[ERR_INIT] character unexpected", nline, pos+i, line);
+                else print_error_lex("[ERR_INIT] character unexpected", nline, pos+i, line);
                 break;
 
             case SYMBOLE:
-                if ( !isalnum(c) && c!='_' ) print_error("[ERR_SYMBOLE] character unexpected in symbole", nline, pos+i, line);
+                if ( !isalnum(c) && c!='_' ) print_error_lex("[ERR_SYMBOLE] character unexpected in symbole", nline, pos+i, line);
                 break;
 
             case ZERO:
@@ -212,36 +208,36 @@ int lex_analyse(char* token, unsigned int nline, int pos, char* line) {
                 else if ( c>='0' && c<'8' ) STATE=OCTAL;   // un octal commence par 0 puis des chiffres < 8
                 else if (c=='(') {
                     if (token[i+1]=='$') STATE=DEBUT_AIBD;
-                    else print_error("[ERR_ZERO] register expected in '()' for \"Adressage indirect avec base et déplacement\"", nline, pos+i+1, line);
+                    else print_error_lex("[ERR_ZERO] register expected in '()' for \"Adressage indirect avec base et déplacement\"", nline, pos+i+1, line);
                 }
-                else print_error("[ERR_ZERO] character unexpected after '0'", nline, pos+i, line);
+                else print_error_lex("[ERR_ZERO] character unexpected after '0'", nline, pos+i, line);
                 break;
 
             case HEXA:
                 if (c=='(') {
                     if (token[i+1]=='$') STATE=DEBUT_AIBD;
-                    else print_error("[ERR_HEXA] register expected in '()' for \"Adressage indirect avec base et déplacement\"", nline, pos+i+1, line);
+                    else print_error_lex("[ERR_HEXA] register expected in '()' for \"Adressage indirect avec base et déplacement\"", nline, pos+i+1, line);
                 }
-                else if (!isxdigit(c)) print_error("[ERR_HEXA] character unexpected for hexa number", nline, pos+i, line);
+                else if (!isxdigit(c)) print_error_lex("[ERR_HEXA] character unexpected for hexa number", nline, pos+i, line);
                 break;
 
             case OCTAL :
                 // WARNING est ce que ça peut etre un octal devant un AIBD ??
-                if ( c<'0' || c>'7' ) print_error("[ERR_OCTAL] character unexpected for octal number", nline, pos+i, line);
+                if ( c<'0' || c>'7' ) print_error_lex("[ERR_OCTAL] character unexpected for octal number", nline, pos+i, line);
                 break;
 
             case DECIMAL:
                 if (c=='(') {
                     if (token[i+1]=='$') STATE=DEBUT_AIBD;
-                    else print_error("[ERR_DECIMAL] register expected in '()' for \"Adressage indirect avec base et déplacement\"", nline, pos+i+1, line);
+                    else print_error_lex("[ERR_DECIMAL] register expected in '()' for \"Adressage indirect avec base et déplacement\"", nline, pos+i+1, line);
                 }
-                else if (!isdigit(c)) print_error("[ERR_DECIMAL] character unexpected for decimal number", nline, pos+i, line);
+                else if (!isdigit(c)) print_error_lex("[ERR_DECIMAL] character unexpected for decimal number", nline, pos+i, line);
                 break;
 
             case DEBUT_AIBD:  // Adressage Indirect avec Base et Déplacement
                 if (c==')') {
                     if (token[i+1]=='\0') return AIBD;
-                    else print_error("[ERR_AIBD] expected nothing after ')' for \"Adressage indirect avec base et déplacement\"", nline, pos+i+1, line);
+                    else print_error_lex("[ERR_AIBD] expected nothing after ')' for \"Adressage indirect avec base et déplacement\"", nline, pos+i+1, line);
                 }
                 break;
         }
