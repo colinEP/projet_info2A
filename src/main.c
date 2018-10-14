@@ -18,6 +18,7 @@
 #include <error.h>
 
 #include <assert.h>
+#include <dictionnaire.h>
 
 
 /**
@@ -82,7 +83,7 @@ int main ( int argc, char *argv[] ) {
 
 
     LIST list_lex = new_list();
-
+    open_dict("dictionnaire.txt"); //TEST DICO
 
     /* ---------------- do the lexical analysis -------------------*/
     INFO_MSG("Début de l'analyse lexical");
