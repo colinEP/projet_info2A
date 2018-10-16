@@ -84,7 +84,15 @@ int main ( int argc, char *argv[] ) {
 
 
     LIST list_lex = new_list();
-    open_dict("dictionnaire.txt"); //TEST DICO
+
+
+    /* ---------------- test du dictionnaire -------------------*/ //FONCTIONNE
+    LIST dictionnaire = open_dict("dictionnaire.txt");
+    int nb_arg = 0;
+    int Retour;
+    Retour = look_for_inst("GAA", dictionnaire, &nb_arg);
+
+
 
     /* ---------------- do the lexical analysis -------------------*/
     INFO_MSG("Début de l'analyse lexical");

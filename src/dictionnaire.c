@@ -11,13 +11,12 @@
 #include <dictionnaire.h>
 
 #include <error.h>
-
 #include <assert.h>
 
 
 
 
-QUEUE open_dict(char *file) //fonctionne ! 
+QUEUE open_dict(char *file) //fonctionne !
 {
     FILE *fp = NULL;
     char inst[10];
@@ -26,53 +25,63 @@ QUEUE open_dict(char *file) //fonctionne !
 
     fp = fopen( file, "r" );
     //printf (" ----LISTE INSTRUCTIONS----\n");
-    if (fp != NULL)
-    {
-        while (fscanf (fp, "%s %d", inst, &nb_arg) != EOF)
-            {
-                //printf (" Instruction %s et arguments: %d \n", inst, nb_arg); // pour tester
-                list_dico = add_definition(list_dico, nb_arg, inst);
-            }
+
+    if ( NULL == fp ) {
+        /*macro ERROR_MSG : message d'erreur puis fin de programme ! */
+        ERROR_MSG("Error while trying to open %s file --- Aborts",file);
     }
+
+    while (fscanf (fp, "%s %d", inst, &nb_arg) != EOF)
+        {
+            //printf (" Instruction %s et arguments: %d \n", inst, nb_arg); // pour tester
+            list_dico = add_definition(list_dico, nb_arg, inst);
+        }
+
     read_queue_word(list_dico); // test
     list_dico = queue_to_list(list_dico); // peu optimisé ?
+
     return list_dico;
 }
 
 
 
-int look_for_inst(char* lex, QUEUE l_dico) //renvoit 1 si instruction trouvée, 0 sinon
+int look_for_inst(char* lex, LIST l_dico, int* pnb_arg) //renvoit 1 si instruction trouvée, 0 sinon
 {
-    return 0;
+    if (l_dico == NULL)
+    {
+        printf("Erreur, liste dictionnaire vide !\n"); //message d'erreur ??
+        return 0;
+    }
+
+    int a;
+    int i = 0;
+    while (l_dico != NULL)
+    {
+        a = strcmp(((WORD) l_dico->element)->instruction, lex); // conversion en WORD de (dico->element)
+        i ++;
+        if (a == 0)
+
+        {
+            *pnb_arg = ((WORD) l_dico->element)->arg;
+            printf("valeur arguments : %d et compteur de boucle %d\n", *pnb_arg, i);
+            return 1; //alors l'instruction a été trouvée !
+        }
+        l_dico = l_dico->next;
+    }
+
+    return 0; //oups ! instruction non trouvée
 }
 
 
 
 
-QUEUE add_definition ( QUEUE Q, int nb_arg, char* inst) // ressemble fortement à add_to_queue
+
+
+QUEUE add_definition ( QUEUE Q, int nb_arg, char* inst) // EVENTUELLEMENT A METTRE DANS LE CODE AVEC SEUL APPEL A ajouter_fin
 {
     WORD def = calloc (1, sizeof(def));
     def->arg = nb_arg;
     def->instruction = strdup(inst);
-    Q = ajouter_def_fin(Q, def);
+    Q = ajouter_fin(Q, def);
     return Q;
-}
-
-
-
-QUEUE ajouter_def_fin(QUEUE Q, WORD def) // quasi idem que ajouter_fin
-{
-  if (Q == NULL)
-    {
-      Q = calloc (1, sizeof(Q));
-      Q->element = def;
-      Q->next = Q;
-      return Q;
-    }
-  QUEUE adresse_retour = Q->next;
-  Q->next = calloc (1, sizeof(*Q));
-  Q = Q->next;
-  Q->element = def;
-  Q->next = adresse_retour;
-  return Q;
 }
