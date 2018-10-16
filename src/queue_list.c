@@ -10,16 +10,7 @@
 #include <queue_list.h>
 
 
-QUEUE add_to_queue(QUEUE Q, char* token, int type, int numline)
-{
-    LEXEM lex = calloc (1, sizeof(*lex));
-    lex->nline = numline;
-    lex->lex_type = type;
-    lex->value = strdup(token);
-    Q = ajouter_fin(Q, lex);
 
-    return Q;
-}
 
 
 QUEUE new_queue()
@@ -42,6 +33,17 @@ QUEUE ajouter_fin(QUEUE Q, LEXEM lex) //à vérfier
   Q->element = lex;
   Q->next = adresse_retour;
   return Q;
+}
+
+QUEUE add_to_queue(QUEUE Q, char* token, int type, int numline)
+{
+    LEXEM lex = calloc (1, sizeof(*lex));
+    lex->nline = numline;
+    lex->lex_type = type;
+    lex->value = strdup(token);
+    Q = ajouter_fin(Q, lex);
+
+    return Q;
 }
 
 

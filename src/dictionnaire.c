@@ -17,22 +17,24 @@
 
 
 
-QUEUE open_dict(char *file)
+QUEUE open_dict(char *file) //fonctionne ! 
 {
     FILE *fp = NULL;
     char inst[10];
     int nb_arg;
-    FILE l_dico;
     QUEUE list_dico = new_queue();
 
     fp = fopen( file, "r" );
+    //printf (" ----LISTE INSTRUCTIONS----\n");
     if (fp != NULL)
     {
-        fscanf (fp, "%s %d", inst, &nb_arg);
-        printf (" instruction %s et arguments: %d", inst, nb_arg); // pour tester
-        list_dico = add_definition(list_dico, nb_arg, inst); // fonction à créer
+        while (fscanf (fp, "%s %d", inst, &nb_arg) != EOF)
+            {
+                //printf (" Instruction %s et arguments: %d \n", inst, nb_arg); // pour tester
+                list_dico = add_definition(list_dico, nb_arg, inst);
+            }
     }
-
+    read_queue_word(list_dico); // test
     list_dico = queue_to_list(list_dico); // peu optimisé ?
     return list_dico;
 }

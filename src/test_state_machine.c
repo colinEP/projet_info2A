@@ -7,7 +7,6 @@
 #include <global.h>
 #include <notify.h>
 #include <lex.h>
-#include <queue.h>
 
 #include <test.h>
 

@@ -5,7 +5,6 @@
 //#include <lex.h>
 
 
-
 typedef struct queue
 {
   void* element;
