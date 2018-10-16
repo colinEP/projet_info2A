@@ -17,6 +17,7 @@
 #include <dictionnaire.h>
 
 #include <error.h>
+#include <etiq.h>
 
 #include <assert.h>
 
@@ -95,6 +96,8 @@ int main ( int argc, char *argv[] ) {
 
     INFO_MSG("Affichage du résultat de l'analyse lexical");
     print_list_lex(list_lex);
+
+    build_tab_etiq(list_lex);
 
 
     /* ---------------- Free memory and terminate -------------------*/
