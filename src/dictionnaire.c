@@ -8,31 +8,69 @@
 #include <lex.h>
 #include <queue_list.h>
 #include <test.h>
+#include <dictionnaire.h>
 
 #include <error.h>
 
 #include <assert.h>
-#include <dictionnaire.h>
 
 
-void open_dict(char *file, LISTE l_dico)
+
+
+QUEUE open_dict(char *file)
 {
     FILE *fp = NULL;
     char inst[10];
     int nb_arg;
     FILE l_dico;
+    QUEUE list_dico = new_queue();
 
     fp = fopen( file, "r" );
     if (fp != NULL)
     {
         fscanf (fp, "%s %d", inst, &nb_arg);
         printf (" instruction %s et arguments: %d", inst, nb_arg); // pour tester
-        add_to_list(l_dico, inst, nb_arg); // fonction à créer
+        list_dico = add_definition(list_dico, nb_arg, inst); // fonction à créer
     }
+
+    list_dico = queue_to_list(list_dico); // peu optimisé ?
+    return list_dico;
 }
 
 
-int look_for_inst(char* lex, LISTE l_dico)
+
+int look_for_inst(char* lex, QUEUE l_dico) //renvoit 1 si instruction trouvée, 0 sinon
 {
-    
+    return 0;
+}
+
+
+
+
+QUEUE add_definition ( QUEUE Q, int nb_arg, char* inst) // ressemble fortement à add_to_queue
+{
+    WORD def = calloc (1, sizeof(def));
+    def->arg = nb_arg;
+    def->instruction = strdup(inst);
+    Q = ajouter_def_fin(Q, def);
+    return Q;
+}
+
+
+
+QUEUE ajouter_def_fin(QUEUE Q, WORD def) // quasi idem que ajouter_fin
+{
+  if (Q == NULL)
+    {
+      Q = calloc (1, sizeof(Q));
+      Q->element = def;
+      Q->next = Q;
+      return Q;
+    }
+  QUEUE adresse_retour = Q->next;
+  Q->next = calloc (1, sizeof(*Q));
+  Q = Q->next;
+  Q->element = def;
+  Q->next = adresse_retour;
+  return Q;
 }

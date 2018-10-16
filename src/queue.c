@@ -27,7 +27,7 @@ QUEUE new_queue()
   return NULL;
 }
 
-QUEUE ajouter_fin(QUEUE Q, LEXEM lex) //à vérfier
+QUEUE ajouter_fin(QUEUE Q, LEXEM lex) 
 {
   if (Q == NULL)
     {

@@ -5,12 +5,6 @@
 //#include <lex.h>
 
 
-// typedef struct queue
-// {
-//   void * element;
-//   struct queue* next;
-//
-// } *QUEUE;
 
 typedef struct queue
 {

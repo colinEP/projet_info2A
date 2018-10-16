@@ -14,11 +14,11 @@
 #include <lex.h>
 #include <queue_list.h>
 #include <test.h>
+#include <dictionnaire.h>
 
 #include <error.h>
 
 #include <assert.h>
-#include <dictionnaire.h>
 
 
 /**
