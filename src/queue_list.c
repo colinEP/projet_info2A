@@ -18,22 +18,25 @@ QUEUE new_queue()
   return NULL;
 }
 
-QUEUE ajouter_fin(QUEUE Q, LEXEM lex) //à vérfier
+
+QUEUE ajouter_fin(QUEUE Q, void* element) //à vérfier
 {
   if (Q == NULL)
     {
       Q = calloc (1, sizeof(*Q));
-      Q->element = lex;
+      Q->element = element;
       Q->next = Q;
       return Q;
     }
   QUEUE adresse_retour = Q->next;
   Q->next = calloc (1, sizeof(*Q));
   Q = Q->next;
-  Q->element = lex;
+  Q->element = element;
   Q->next = adresse_retour;
   return Q;
 }
+
+
 
 QUEUE add_to_queue(QUEUE Q, char* token, int type, int numline)
 {
@@ -45,7 +48,6 @@ QUEUE add_to_queue(QUEUE Q, char* token, int type, int numline)
 
     return Q;
 }
-
 
 
 LIST new_list() {

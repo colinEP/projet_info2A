@@ -17,7 +17,7 @@ QUEUE add_to_queue(QUEUE Q, char* token, int type, int numline);
 
 QUEUE new_queue();
 
-QUEUE ajouter_fin(QUEUE l, LEXEM lex);
+QUEUE ajouter_fin(QUEUE l, void* structure);
 
 
 typedef QUEUE LIST;
