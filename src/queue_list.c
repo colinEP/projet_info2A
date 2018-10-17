@@ -46,7 +46,7 @@ QUEUE ajouter_fin(QUEUE Q, LEXEM lex) //à vérfier
 
 
 
-/* Semble modifier la queue */
+
 void read_queue_lex(QUEUE Q)
 {
     QUEUE q = Q;
