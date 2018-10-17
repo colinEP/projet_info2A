@@ -16,7 +16,7 @@
 
 
 
-QUEUE open_dict(char *file) //fonctionne !
+QUEUE open_dict(char *file) //fonctionne ! Cette fonction ouvre le dictionnaire et stocke les instructions et leur nb arg dans une liste renvoyée
 {
     FILE *fp = NULL;
     char inst[10];
@@ -45,12 +45,11 @@ QUEUE open_dict(char *file) //fonctionne !
 
 
 
-int look_for_inst(char* lex, LIST l_dico, int* pnb_arg) //renvoit 1 si instruction trouvée, 0 sinon
+int look_for_inst(char* lex, LIST l_dico, int* pnb_arg) //renvoit 1 si instruction lex trouvée dans le dictionnaire, 0 sinon
 {
     if (l_dico == NULL)
     {
-        printf("Erreur, liste dictionnaire vide !\n"); //message d'erreur ??
-        return 0;
+        ERROR_MSG("Erreur, liste dictionnaire vide !\n");
     }
 
     int a;
