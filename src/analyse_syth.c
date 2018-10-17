@@ -9,12 +9,29 @@
 #include <queue_list.h>
 #include <test.h>
 #include <dictionnaire.h>
+#include <etiq.h>
 
 #include <error.h>
 #include <assert.h>
 
 enum{TEXT, DATA, BSS, NONE};
 
+
+int check_instruction(char* lex, LIST dictionnaire)
+{
+    int val;
+    int nb_arg_needed;
+    val = look_for_inst(lex, dictionnaire, &nb_arg_needed);
+    if (val == 0)
+        {
+            ERROR_MSG("Erreur, instruction %s non valable !\n", lex); // rajout num de ligne ?
+        }
+    return nb_arg_needed;
+
+
+
+
+}
 
 void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_table, LIST list_lex )
 {
@@ -29,6 +46,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
         int section = NONE ;
         LEXEM lexem = NULL;
         int type_lexem;
+        char* val_lexem;
         LIST* current_list = NULL; // est-ce que cela peut nous poser de soucis ??
         int nb_arg_ligne = 0;
         int nb_arg_needed = 0;
@@ -39,7 +57,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
             ERROR_MSG("Erreur, liste lexemes a analyser vide !\n");
         }
 
-        symb_table = build_tab_etiq(LIST list_lex ); //cette fonction rempli la table des symboles avec les etiquettes et la renvoit
+        symb_table = build_tab_etiq(list_lex ); //cette fonction rempli la table des symboles avec les etiquettes et la renvoit
 
 
         // --- deuxième parcours de la liste ----
@@ -74,7 +92,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                 case SYMBOLE: // les symboles peuvent être des instr, des declarations d'etiq ou des appels d'etiq
 
                     //si définition d'étiquette, on ignore superbement
-                    if ( ( (LEXEM)((LIST)(list_lex->next))->element)->lex_type) == DEUX_PTS)
+                    if ( ( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == DEUX_PTS)
                          {
                              list_lex = list_lex->next; // on va passer les DEUX_PTS parce que du coup ils ne nous importent pas
                              break;
@@ -92,15 +110,15 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                     nb_arg_needed = check_instruction(val_lexem, dictionnaire); // cherche l'instruction dans le dico et renvoit le nombre d'arguments necessaires
                     if (nb_arg_needed==0)
                     {
-                        add_to_list(current_list, lexem, 0); //a créer ! Dans le cas du NOP, pas d'arguments.
+                        //add_to_list(current_list, lexem, 0); //fonction a créer ! Dans le cas du NOP, pas d'arguments.
                     }
                     // créer une fonction qui vérifie le nombre d'arguments qui suivent en effet cette instruction (si non nul)
 
 
-                case LN:
+                case NL:
                     if (nb_arg_ligne != nb_arg_needed)
                     {
-                        ERROR_MSG("Erreur, mauvais nombre d'arguments pour instruction !\n"; //retrouver cette instruction pour erreur ou la ligne
+                        ERROR_MSG("Erreur, mauvais nombre d'arguments pour instruction !\n"); //retrouver cette instruction pour erreur ou la ligne
                     }
                     nb_arg_ligne = 0;
                     nb_arg_needed= 0;
@@ -112,22 +130,4 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
         }
 
         return;
-
-}
-
-
-
-
-
-
-int check_instruction(char* lex, LIST dictionnaire)
-{
-    int val;
-    int nb_arg_needed;
-    val = look_for_inst(lex, dictionnaire, &nb_arg_needed);
-    if (val == 0)
-        {
-            ERROR_MSG("Erreur, instruction %s non valable !\n", lex); // rajout num de ligne ?
-        }
-    return nb_arg_needed;
 }
