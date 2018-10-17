@@ -38,31 +38,6 @@ QUEUE ajouter_fin(QUEUE Q, void* element) //à vérfier
 
 
 
-<<<<<<< HEAD
-
-void read_queue_lex(QUEUE Q)
-{
-    QUEUE q = Q;
-    if (q == NULL) printf("VIDE! \n");
-    q = q->next;
-    QUEUE first_memory = q;
-    LEXEM lex = q->element;
-    printf("lecture de la liste Queue : \n");
-    printf("valeur : %s type: %d numero de ligne : %d \n", lex->value, lex->lex_type, lex->nline);
-    q = q->next;
-    while (q != first_memory)
-    {
-        LEXEM lex = q->element;
-        printf("valeur : %s \ntype: %d \nnumero de ligne : %d \n", lex->value, lex->lex_type, lex->nline);
-        q = q->next;
-
-    }
-    return;
-}
-
-
-
-=======
 QUEUE add_to_queue(QUEUE Q, char* token, int type, int numline)
 {
     LEXEM lex = calloc (1, sizeof(*lex));
@@ -75,7 +50,6 @@ QUEUE add_to_queue(QUEUE Q, char* token, int type, int numline)
 }
 
 
->>>>>>> 53dbb7bc4bcdbdc18c8b9344c0563c764896a5e4
 LIST new_list() {
   return NULL;
 }
