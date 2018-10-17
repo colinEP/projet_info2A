@@ -38,7 +38,7 @@ QUEUE ajouter_fin(QUEUE Q, void* element) //à vérfier
 
 
 
-QUEUE add_to_queue(QUEUE Q, char* token, int type, int numline)
+QUEUE add_to_queue_lex(QUEUE Q, char* token, int type, int numline)
 {
     LEXEM lex = calloc (1, sizeof(*lex));
     lex->nline = numline;
@@ -61,10 +61,11 @@ LIST queue_to_list( QUEUE q ) {
 }
 
 
+
 /** Cette fonction n'est pas générique pour le type abstrait list
  *  Elle libère seulement les listes de lexeme
  */
-void free_list_lex(QUEUE l) {
+void free_list_lex(LIST l) {
     if (l==NULL) return;
 	else {
 		free_list_lex( l->next);

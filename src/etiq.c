@@ -16,7 +16,7 @@
 
 
 
-LIST build_tab_etiq( LIST list_lex ) {
+LIST build_list_etiq( LIST list_lex ) {
     LIST tab_etiq = new_list();
 
     LEXEM lex;
@@ -30,7 +30,8 @@ LIST build_tab_etiq( LIST list_lex ) {
     for ( l=list_lex ; l!=NULL ; l=l->next ) {
         lex = (LEXEM) l->element;
         if ( lex->lex_type==SYMBOLE) {
-            if (l->next!=NULL) {
+            if (l->next!=NULL) {  // normalement il aura toujours un \n à la fin,
+                                  // mais on sait jamais (si on ne rajoute plus le \n à la fin de chaque ligne)
                 if ( ((LEXEM) l->next->element)->lex_type==DEUX_PTS) {
                     // ajoute à tab_etiq
                     printf("%d   %s\n", lex->nline, lex->value);
@@ -44,4 +45,22 @@ LIST build_tab_etiq( LIST list_lex ) {
     }
 
     return tab_etiq;
+}
+
+enum {NONE, TEXT, DATA, BSS}
+
+void section_counter( LEXEM lex , int curr_section, int* text_counter, int* data_counter, int* bss_counter ) {
+
+    if // .text
+    else if
+    else if
+    else
+        if // no comm
+        if // no none
+
+    if // \n
+
+
+    //pas compter les comm
+    return section;
 }
