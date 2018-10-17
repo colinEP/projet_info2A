@@ -46,6 +46,29 @@ QUEUE ajouter_fin(QUEUE Q, LEXEM lex) //à vérfier
 
 
 
+/* Semble modifier la queue */
+void read_queue_lex(QUEUE Q)
+{
+    QUEUE q = Q;
+    if (q == NULL) printf("VIDE! \n");
+    q = q->next;
+    QUEUE first_memory = q;
+    LEXEM lex = q->element;
+    printf("lecture de la liste Queue : \n");
+    printf("valeur : %s type: %d numero de ligne : %d \n", lex->value, lex->lex_type, lex->nline);
+    q = q->next;
+    while (q != first_memory)
+    {
+        LEXEM lex = q->element;
+        printf("valeur : %s \ntype: %d \nnumero de ligne : %d \n", lex->value, lex->lex_type, lex->nline);
+        q = q->next;
+
+    }
+    return;
+}
+
+
+
 LIST new_list() {
   return NULL;
 }
@@ -55,6 +78,7 @@ LIST queue_to_list( QUEUE q ) {
     q->next=NULL;
     return l;
 }
+
 
 /** Cette fonction n'est pas générique pour le type abstrait list
  *  Elle libère seulement les listes de lexeme
