@@ -14,8 +14,10 @@
 #include <lex.h>
 #include <queue_list.h>
 #include <test.h>
+#include <dictionnaire.h>
 
 #include <error.h>
+#include <etiq.h>
 
 #include <assert.h>
 
@@ -84,6 +86,14 @@ int main ( int argc, char *argv[] ) {
     LIST list_lex = new_list();
 
 
+    /* ---------------- test du dictionnaire -------------------*/ //FONCTIONNE
+    LIST dictionnaire = open_dict("dictionnaire.txt");
+    int nb_arg = 0;
+    int Retour;
+    Retour = look_for_inst("GAA", dictionnaire, &nb_arg);
+
+
+
     /* ---------------- do the lexical analysis -------------------*/
     INFO_MSG("Début de l'analyse lexical");
     list_lex = lex_load_file( file, &nlines , list_lex );
@@ -94,6 +104,8 @@ int main ( int argc, char *argv[] ) {
 
     INFO_MSG("Affichage du résultat de l'analyse lexical");
     print_list_lex(list_lex);
+
+    build_tab_etiq(list_lex);
 
 
     /* ---------------- Free memory and terminate -------------------*/
