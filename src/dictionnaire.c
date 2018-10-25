@@ -61,8 +61,8 @@ int look_for_inst(char* lex, LIST l_dico, int* pnb_arg) //renvoit 1 si instructi
         if (a == 0)
 
         {
-            *pnb_arg = ((WORD) l_dico->element)->arg;
             printf("valeur arguments : %d et compteur de boucle %d\n", *pnb_arg, i);
+            *pnb_arg = ((WORD) l_dico->element)->arg;
             return 1; //alors l'instruction a été trouvée !
         }
         l_dico = l_dico->next;

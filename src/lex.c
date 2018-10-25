@@ -176,7 +176,7 @@ int lex_analyse(char* token, unsigned int nline, int pos, char* line) {
             case INIT:
                 if      (c==':') return DEUX_PTS;
                 else if (c==',') return VIRGULE;
-                else if (c=='-') return MOINS;//TODO erreur
+                else if (c=='-') return MOINS;
                 else if (c=='#') return COMMENT;
                 else if (c=='"') return STRING;  // on sait que la string est conforme ("fermée") car check dans getNextToken
                 else if (c=='$') {

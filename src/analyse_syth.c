@@ -17,7 +17,7 @@
 enum{TEXT, DATA, BSS, NONE};
 
 
-int check_instruction(char* lex, LIST dictionnaire)
+int check_instruction(char* lex, LIST dictionnaire) // vérifie que l'instruction existe et renvoit son nb d'arg = INUTILE ?
 {
     int val;
     int nb_arg_needed;
@@ -27,9 +27,6 @@ int check_instruction(char* lex, LIST dictionnaire)
             ERROR_MSG("Erreur, instruction %s non valable !\n", lex); // rajout num de ligne ?
         }
     return nb_arg_needed;
-
-
-
 
 }
 
@@ -50,23 +47,18 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
         LIST* current_list = NULL; // est-ce que cela peut nous poser de soucis ??
         int nb_arg_ligne = 0;
         int nb_arg_needed = 0;
+        val = 0 ; // variable pour look_for_inst
+
+
 
         // --- premier parcours de la liste ----
-        if (list_lex == NULL)
-        {
-            ERROR_MSG("Erreur, liste lexemes a analyser vide !\n");
-        }
 
-        symb_table = build_tab_etiq(list_lex ); //cette fonction rempli la table des symboles avec les etiquettes et la renvoit
-
-
-        // --- deuxième parcours de la liste ----
         while (list_lex != NULL)
         {   lexem = list_lex-> element;
             type_lexem = lexem->lex_type;
             val_lexem = lexem->value;
 
-            if (type_lexem == SYMBOLE)
+            if (type_lexem == DIRECTIVE)
             {
                 // ---- modification de la section et de la liste courante ----
                 if (strcmp(val_lexem, ".data") == 0)
@@ -84,35 +76,47 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                     section = TEXT;
                     *current_list = list_instr;
                 }
-
+                // passer au suivant
             }
 
             switch (type_lexem)
             {
                 case SYMBOLE: // les symboles peuvent être des instr, des declarations d'etiq ou des appels d'etiq
 
-                    //si définition d'étiquette, on ignore superbement
-                    if ( ( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == DEUX_PTS)
+                    // ---cas 1 : une instruction ?
+                    val = look_for_inst(lex, dictionnaire, &nb_arg_needed);
+
+                    if (val == 1) //ci c'est une instruction
+                    {
+                        if (section != TEXT) // pas d'instruction possible hors de la section .Text
+                            {
+                                ERROR_MSG("Erreur, instruction dans mauvaise section !\n");
+                            }
+
+                        //add_to_list(current_list, lexem, nb_arg_needed); //fonction a créer !
+
+                        break;
+                    }
+
+                    // si on arrive ici, c'est que ce n'est pas une instruction
+
+                    // ----cas 2 : une déclaration d'étiquette
+                    if ( ( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == DEUX_PTS) // c'est une déclaration d'étiquette
                          {
+                             // check qu'elle n'a pas déjà été définie
+                             // ajout dans symb_table
                              list_lex = list_lex->next; // on va passer les DEUX_PTS parce que du coup ils ne nous importent pas
                              break;
                          }
 
-                    // sinon chercher dans la liste des etiquettes
-                    // faire une fonction comme celle qui cherche dans le dico et compter un arg
+                    // sinon ce n'est pas une définition d'étiquette et il faut chercher dans la liste des etiquettes
+                    // en fct de si elle est trouvée ou pas, mettre à jour une variable True/False
+                    // compter un argument
 
-
-                    // sinon ce doit être une instruction
-                    if (section != TEXT) // pas d'instruction possible hors de la section .Text
-                        {
-                            ERROR_MSG("Erreur, instruction dans mauvaise section !\n");
-                        }
-                    nb_arg_needed = check_instruction(val_lexem, dictionnaire); // cherche l'instruction dans le dico et renvoit le nombre d'arguments necessaires
-                    if (nb_arg_needed==0)
+                    else
                     {
-                        //add_to_list(current_list, lexem, 0); //fonction a créer ! Dans le cas du NOP, pas d'arguments.
+                        // defined_etiq = fonction_chercher_dans_symb_table; (true ou false)
                     }
-                    // créer une fonction qui vérifie le nombre d'arguments qui suivent en effet cette instruction (si non nul)
 
 
                 case NL:
@@ -128,6 +132,15 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
         list_lex = list_lex->next;
         }
+
+        // --- deuxième parcours de la liste ----
+        if (list_lex == NULL)
+        {
+            ERROR_MSG("Erreur, liste lexemes a analyser vide !\n");
+        }
+
+        symb_table = build_tab_etiq(list_lex ); //cette fonction remplie la table des symboles avec les etiquettes et la renvoit
+
 
         return;
 }
