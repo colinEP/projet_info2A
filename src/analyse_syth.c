@@ -15,6 +15,7 @@
 #include <assert.h>
 
 enum{TEXT, DATA, BSS, NONE};
+enum{INIT, INSTRUCTION, PWORD, PBYTE, PASCIIZ, PSPACE}
 
 
 int check_instruction(char* lex, LIST dictionnaire) // vérifie que l'instruction existe et renvoit son nb d'arg = INUTILE ?
@@ -79,44 +80,123 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                 // passer au suivant
             }
 
-            switch (type_lexem)
+            int S = INIT;
+
+            switch (S)
             {
-                case SYMBOLE: // les symboles peuvent être des instr, des declarations d'etiq ou des appels d'etiq
+                case INIT: // cas lexeme de début de ligne
 
-                    // ---cas 1 : une instruction ?
-                    val = look_for_inst(lex, dictionnaire, &nb_arg_needed);
+                // ------------ CASE S = INIT -----------------
+                    switch(type_lexem) {
+                        case SYMBOLE:
+                        // cas 1 : une déclaration d'étiquette ? (on commence par ce cas car certaines etiquettes ont le même nom que des instructions)
+                            if ( ( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == DEUX_PTS) {
+                                 // check qu'elle n'a pas déjà été définie
+                                 // ajout dans symb_table
+                                 list_lex = list_lex->next; // on va passer les DEUX_PTS parce que du coup ils ne nous importent pas
+                                 break;
+                             }
 
-                    if (val == 1) //ci c'est une instruction
-                    {
-                        if (section != TEXT) // pas d'instruction possible hors de la section .Text
+                             // cas 2 : une instruction ?
+                            val = look_for_inst(lex, dictionnaire, &nb_arg_needed);
+                            if (val == 1)
                             {
-                                ERROR_MSG("Erreur, instruction dans mauvaise section !\n");
+                                if (section != TEXT) // pas d'instruction possible hors de la section .Text
+                                    {
+                                        ERROR_MSG("Erreur, instruction dans mauvaise section !\n");
+                                    }
+                                //add_to_list(current_list, lexem, nb_arg_needed); //fonction a créer !
+                                S = INSTRUCTION;
+                                break;
+                            }
+                            // cas 3
+                            else { // c'est une erreur car une ligne ne peut pas commencer par un appel d'etiquette !
+                                ERROR_MSG("Erreur, symbole non valide en debut de ligne !\n");
                             }
 
-                        //add_to_list(current_list, lexem, nb_arg_needed); //fonction a créer !
 
-                        break;
+                        case COMMENT: //on ne considère pas les commentaires, on ne les stocke pas
+
+                            if (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL)) {
+                                list_lex = list_lex->next; // on saute le NL qui suit
+                                S = INIT;
+                                break;
+                            }
+
+                            ERROR_MSG("Erreur, après le commentaire !\n"); // est-ce possible ???
+
+
+                        case DIRECTIVE:
+                            if (section == DATA ){
+                                if (strcmp(val_lexem, ".word") == 0){
+                                    S = PWORD;
+                                    break;
+                                }
+                                if (strcmp(val_lexem, ".byte") == 0){
+                                    S = PBYTE;
+                                    break;
+                                }
+                                if (strcmp(val_lexem, ".asciiz") == 0){
+                                    S = PASCIIZ;
+                                    break;
+                                }
+                                if (strcmp(val_lexem, ".set") == 0){
+                                    list_lex = (LIST)(list_lex->next)->next; // on saute l'argument et le NL qui suit ??
+                                    break;
+                                }
+                                else{
+                                    ERROR_MSG("Directive inconnue ou dans mauvaise section !\n"); // est-ce possible ???
+                                }
+                            }
+
+                            if (section == BSS ){
+                                if (strcmp(val_lexem, ".space") == 0){
+                                    S = PSPACE;
+                                    break;
+                                }
+                                if (strcmp(val_lexem, ".set") == 0){ // peut-il y avoir un set ici ??
+                                    list_lex = (LIST)(list_lex->next)->next; // on saute l'argument et le NL qui suit ??
+                                    break;
+                                }
+
+                                else {
+                                    ERROR_MSG("Directive inconnue ou dans mauvaise section !\n"); // est-ce possible ???
+                                }
+                            }
+
+                            if (section == TEXT ){
+                                if (strcmp(val_lexem, ".word") == 0){
+                                    S = PWORD;
+                                    break;
+                                }
+                                if (strcmp(val_lexem, ".byte") == 0){
+                                    S = PBYTE;
+                                    break;
+                                }
+                                if (strcmp(val_lexem, ".asciiz") == 0){
+                                    S = PASCIIZ;
+                                    break;
+                                }
+                                if (strcmp(val_lexem, ".space") == 0){
+                                    S = PSPACE;
+                                    break;
+                                }
+                                if (strcmp(val_lexem, ".set") == 0){
+                                    list_lex = (LIST)(list_lex->next)->next; // on saute l'argument et le NL qui suit ??
+                                    break;
+                                }
+
+                                else{
+                                    ERROR_MSG("Directive inconnue ou dans mauvaise section !\n"); // est-ce possible ???
+                                }
+                            }
+
+                        default :
+                            ERROR_MSG("Element non acceptable en debut de ligne !\n");
                     }
+                    break;
 
-                    // si on arrive ici, c'est que ce n'est pas une instruction
-
-                    // ----cas 2 : une déclaration d'étiquette
-                    if ( ( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == DEUX_PTS) // c'est une déclaration d'étiquette
-                         {
-                             // check qu'elle n'a pas déjà été définie
-                             // ajout dans symb_table
-                             list_lex = list_lex->next; // on va passer les DEUX_PTS parce que du coup ils ne nous importent pas
-                             break;
-                         }
-
-                    // sinon ce n'est pas une définition d'étiquette et il faut chercher dans la liste des etiquettes
-                    // en fct de si elle est trouvée ou pas, mettre à jour une variable True/False
-                    // compter un argument
-
-                    else
-                    {
-                        // defined_etiq = fonction_chercher_dans_symb_table; (true ou false)
-                    }
+                        // ------------ FIN CASE S = INIT -----------------
 
 
                 case NL:
@@ -127,8 +207,8 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                     nb_arg_ligne = 0;
                     nb_arg_needed= 0;
 
-            }
 
+            }
 
         list_lex = list_lex->next;
         }
