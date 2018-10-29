@@ -4,12 +4,16 @@
 typedef struct {
     char* name;
     int nline;
-    //section
-    //decalage
+    int section;
+    int decalage;
 }* ETIQ;
 
 
 LIST build_tab_etiq( LIST list_lex );
+
+
+int look_for_etiq( LIST symb_table, char* lexem);
+LIST add_to_symb_table(char* etiq, int decalage, int line, int section, LIST symb_table);
 
 
 #endif

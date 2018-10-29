@@ -19,6 +19,8 @@ QUEUE new_queue();
 
 QUEUE ajouter_fin(QUEUE l, void* structure);
 
+LIST add_to_list(LIST L, void* element);
+
 
 typedef QUEUE LIST;
 

@@ -11,8 +11,6 @@
 
 
 
-
-
 QUEUE new_queue()
 {
   return NULL;
@@ -47,6 +45,22 @@ QUEUE add_to_queue(QUEUE Q, char* token, int type, int numline)
     Q = ajouter_fin(Q, lex);
 
     return Q;
+}
+
+
+LIST add_to_list(LIST L, void* element) //à vérfier
+{
+  if (L == NULL)
+    {
+      L = calloc (1, sizeof(*L));
+      L->element = element;
+      L->next = NULL;
+      return L;
+    }
+  LIST new_list = calloc (1, sizeof(*new_list));
+  new_list-> element = element;
+  new_list-> next = L;
+  return new_list;
 }
 
 

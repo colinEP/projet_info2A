@@ -69,10 +69,14 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                         case SYMBOLE:
                         // cas 1 : une déclaration d'étiquette ? (on commence par ce cas car certaines etiquettes ont le même nom que des instructions)
                             if ( ( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == DEUX_PTS) {
-                                 // check qu'elle n'a pas déjà été définie
-                                 // ajout dans symb_table
-                                 list_lex = list_lex->next; // on va passer les DEUX_PTS
-                                 {
+                                if (look_for_etiq(symb_table, val_lexem) == 1){
+                                    ERROR_MSG("Redefinition d'etiquette !\n");
+                                }
+                                symb_table = add_to_symb_table(val_lexem, int decalage, int line, section, symb_table);
+
+                                list_lex = list_lex->next; // on va passer les DEUX_PTS
+
+                                {
                                  if (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL) {
                                      list_lex = list_lex->next; // on saute le NL qui suit
                                      S = START;
@@ -251,7 +255,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
                         if (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == VIRGULE) {
                             // stocke le lexem actuel dans la liste comme argument
-                            // prendre en considération le - !
+                            // prendre en considération le "-" !
                             nb_arg_ligne = nb_arg_ligne + 1;
                             list_lex = list_lex->next; // on saute la virgule qui suit
                             S = INSTRUCTION;
@@ -282,8 +286,11 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                     ERROR_MSG("Element non acceptable apres un .word !\n");
                 }
                 // autres case directives to do
+
+
             }
         } // fin switch
+
         previous_type_lexem = type_lexem; // on garde en mémoire pour le cas du MOINS
         list_lex = list_lex->next;
     } // fin while
