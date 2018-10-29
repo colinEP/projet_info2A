@@ -15,21 +15,21 @@
 #include <assert.h>
 
 enum{TEXT, DATA, BSS, NONE};
-enum{START, INSTRUCTION, PWORD, PBYTE, PASCIIZ, PSPACE};
+typedef enum{START, INSTRUCTION, PWORD, PBYTE, PASCIIZ, PSPACE, LABEL} operand_type; //est-ce que cela a du sens de rajouter LABEL là dedans?
 
 
-int check_instruction(char* lex, LIST dictionnaire) // vérifie que l'instruction existe et renvoit son nb d'arg = INUTILE ?
-{
-    int val;
-    int nb_arg_needed;
-    val = look_for_inst(lex, dictionnaire, &nb_arg_needed);
-    if (val == 0)
-        {
-            ERROR_MSG("Erreur, instruction %s non valable !\n", lex); // rajout num de ligne ?
-        }
-    return nb_arg_needed;
-
-}
+// int check_instruction(char* lex, LIST dictionnaire) // vérifie que l'instruction existe et renvoit son nb d'arg = INUTILE ?
+// {
+//     int val;
+//     int nb_arg_needed;
+//     val = look_for_inst(lex, dictionnaire, &nb_arg_needed);
+//     if (val == 0)
+//         {
+//             ERROR_MSG("Erreur, instruction %s non valable !\n", lex); // rajout num de ligne ?
+//         }
+//     return nb_arg_needed;
+//
+// }
 
 void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_table, LIST list_lex )
 {
@@ -72,7 +72,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                                 if (look_for_etiq(symb_table, val_lexem) == 1){
                                     ERROR_MSG("Redefinition d'etiquette !\n");
                                 }
-                                symb_table = add_to_symb_table(val_lexem, int decalage, int line, section, symb_table);
+                                symb_table = add_to_symb_table(val_lexem, decalage, line, section, symb_table);
 
                                 list_lex = list_lex->next; // on va passer les DEUX_PTS
 
@@ -97,7 +97,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                                     {
                                         ERROR_MSG("Erreur, instruction dans mauvaise section !\n");
                                     }
-                                //add_to_list(current_list, lexem, nb_arg_needed); //fonction a créer !
+                                list_instr =  add_to_list_instr(lexem, decalage, nb_arg_needed, list_instr); // check !
                                 S = INSTRUCTION;
                                 break;
                             }
@@ -254,15 +254,16 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                         }
 
                         if (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == VIRGULE) {
-                            // stocke le lexem actuel dans la liste comme argument
                             // prendre en considération le "-" !
+                            list_instr = fill_arguments(lexem, list_instr, previous_type_lexem);
                             nb_arg_ligne = nb_arg_ligne + 1;
                             list_lex = list_lex->next; // on saute la virgule qui suit
                             S = INSTRUCTION;
                             break;
                         }
                         if ((( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL)|| (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == COMMENT) ) {
-                            // stocke le lexem actuel dans la liste comme argument
+                            // prendre en considération le "-" !
+                            list_instr = fill_arguments(lexem, list_instr, previous_type_lexem);
                             nb_arg_ligne = nb_arg_ligne + 1;
                             if (nb_arg_ligne != nb_arg_needed)
                             {
@@ -282,10 +283,38 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
                 case PWORD:
 
-                if ((type_lexem == VIRGULE) || (type_lexem == DEUX_PTS) || (type_lexem == DIRECTIVE) || (type_lexem == STRING)){
-                    ERROR_MSG("Element non acceptable apres un .word !\n");
-                }
-                // autres case directives to do
+                    if ((type_lexem == VIRGULE) || (type_lexem == DEUX_PTS) || (type_lexem == DIRECTIVE) || (type_lexem == STRING)){
+                        ERROR_MSG("Element non acceptable apres un .word !\n");
+                    }
+
+                    if (type_lexem == SYMBOLE){ // recherche étiquette dans symb_table
+                        if (look_for_etiq(symb_table, lexem) == 1){
+                            // mettre à jour une variable qui indique que l'étiquette est bien déjà définie
+                        }
+                        // mettre à jour une variable qui indique que l'étiquette n'est pas (encore) définie
+                    }
+
+                    if ((type_lexem == HEXA) || (type_lexem == OCTAL) || (type_lexem == DECIMAL) || (type_lexem == AIBD)|| (type_lexem == REGISTRE)){
+                        if ( (( (LEXEM)((LIST)(list_lex->next))->element) ->lex_type) == VIRGULE ) {
+                            //Stockage
+                            // mise à jour nb arg
+                            // considère le cas MOINS
+                            // etc.
+                        }
+                        if ((( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL)|| (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == COMMENT) ) {
+                            // Stockage
+                            // mise à jour nb arg
+                            // considère le cas MOINS
+                            // etc.
+                            // check nb arg
+                            S = START;
+                            nb_arg_ligne = 0;
+                            nb_arg_needed= 0;
+                        }
+                    }
+
+
+                // autres case directives to do idem
 
 
             }

@@ -12,6 +12,8 @@ typedef struct queue
 
 } *QUEUE;
 
+typedef QUEUE LIST;
+
 
 QUEUE add_to_queue(QUEUE Q, char* token, int type, int numline);
 
@@ -22,7 +24,6 @@ QUEUE ajouter_fin(QUEUE l, void* structure);
 LIST add_to_list(LIST L, void* element);
 
 
-typedef QUEUE LIST;
 
 LIST new_list();
 LIST queue_to_list( QUEUE q );

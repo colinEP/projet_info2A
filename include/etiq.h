@@ -9,6 +9,8 @@ typedef struct {
 }* ETIQ;
 
 
+
+
 LIST build_tab_etiq( LIST list_lex );
 
 
