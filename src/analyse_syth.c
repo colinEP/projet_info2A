@@ -15,7 +15,7 @@
 #include <assert.h>
 
 enum{TEXT, DATA, BSS, NONE};
-enum{INIT, INSTRUCTION, PWORD, PBYTE, PASCIIZ, PSPACE}
+enum{START, INSTRUCTION, PWORD, PBYTE, PASCIIZ, PSPACE};
 
 
 int check_instruction(char* lex, LIST dictionnaire) // vérifie que l'instruction existe et renvoit son nb d'arg = INUTILE ?
@@ -38,18 +38,19 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
         dictionnaire = open_dict("dictionnaire.txt");
 
         // --- initialisation des variables ----
-        int dec_data = 0;
+        int dec_data = 0; //décalage
         int dec_bss = 0;
         int dec_txt = 0;
         int section = NONE ;
         LEXEM lexem = NULL;
         int type_lexem;
+        int previous_type_lexem;
         char* val_lexem;
         LIST* current_list = NULL; // est-ce que cela peut nous poser de soucis ??
         int nb_arg_ligne = 0;
         int nb_arg_needed = 0;
-        val = 0 ; // variable pour look_for_inst
-
+        int val = 0 ; // variable pour look_for_inst
+        int S = START;
 
 
         // --- premier parcours de la liste ----
@@ -59,46 +60,33 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
             type_lexem = lexem->lex_type;
             val_lexem = lexem->value;
 
-            if (type_lexem == DIRECTIVE)
-            {
-                // ---- modification de la section et de la liste courante ----
-                if (strcmp(val_lexem, ".data") == 0)
-                {
-                    section = DATA;
-                    *current_list = list_data;
-                }
-                if (strcmp(val_lexem, ".bss") == 0)
-                {
-                    section = BSS;
-                    *current_list = list_bss;
-                }
-                if (strcmp(val_lexem, ".text") == 0)
-                {
-                    section = TEXT;
-                    *current_list = list_instr;
-                }
-                // passer au suivant
-            }
-
-            int S = INIT;
-
             switch (S)
             {
-                case INIT: // cas lexeme de début de ligne
+                case START: // cas lexeme de début de ligne
 
-                // ------------ CASE S = INIT -----------------
+                // ------------ CASE S = START -----------------
                     switch(type_lexem) {
                         case SYMBOLE:
                         // cas 1 : une déclaration d'étiquette ? (on commence par ce cas car certaines etiquettes ont le même nom que des instructions)
                             if ( ( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == DEUX_PTS) {
                                  // check qu'elle n'a pas déjà été définie
                                  // ajout dans symb_table
-                                 list_lex = list_lex->next; // on va passer les DEUX_PTS parce que du coup ils ne nous importent pas
-                                 break;
+                                 list_lex = list_lex->next; // on va passer les DEUX_PTS
+                                 {
+                                 if (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL) {
+                                     list_lex = list_lex->next; // on saute le NL qui suit
+                                     S = START;
+                                     break;
+                                 }
+
+                                 else {
+                                     ERROR_MSG("Erreur, elements non valides apres un symbole deux-points !\n");
+                                 }
+
                              }
 
                              // cas 2 : une instruction ?
-                            val = look_for_inst(lex, dictionnaire, &nb_arg_needed);
+                            val = look_for_inst(val_lexem, dictionnaire, &nb_arg_needed);
                             if (val == 1)
                             {
                                 if (section != TEXT) // pas d'instruction possible hors de la section .Text
@@ -117,9 +105,8 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
                         case COMMENT: //on ne considère pas les commentaires, on ne les stocke pas
 
-                            if (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL)) {
+                            if (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL) {
                                 list_lex = list_lex->next; // on saute le NL qui suit
-                                S = INIT;
                                 break;
                             }
 
@@ -127,6 +114,40 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
 
                         case DIRECTIVE:
+
+                            // ---- modification de la section et de la liste courante ----
+                            if (strcmp(val_lexem, ".data") == 0){
+                                section = DATA;
+                                *current_list = list_data;
+                                if ( ( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL) {
+                                     list_lex = list_lex-> next; // on va passer la NL
+                                     break;
+                                }
+                                ERROR_MSG("invalide element apres un .data !\n");
+                            }
+
+                            if (strcmp(val_lexem, ".bss") == 0){
+                                section = BSS;
+                                *current_list = list_bss;
+                                if ( ( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL) {
+                                     list_lex = list_lex-> next; // on va passer la NL
+                                     break;
+                                }
+                                ERROR_MSG("invalide element apres un .bss !\n");
+                            }
+
+                            if (strcmp(val_lexem, ".text") == 0){
+                                section = TEXT;
+                                *current_list = list_instr;
+                                if ( ( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL) {
+                                     list_lex = list_lex-> next; // on va passer la NL
+                                     break;
+                                }
+                                ERROR_MSG("invalide element apres un .text !\n");
+                            }
+
+
+                            // ---- autres directives ----
                             if (section == DATA ){
                                 if (strcmp(val_lexem, ".word") == 0){
                                     S = PWORD;
@@ -196,22 +217,76 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                     }
                     break;
 
-                        // ------------ FIN CASE S = INIT -----------------
+                        // ------------ FIN CASE S = START -----------------
 
-
-                case NL:
-                    if (nb_arg_ligne != nb_arg_needed)
-                    {
-                        ERROR_MSG("Erreur, mauvais nombre d'arguments pour instruction !\n"); //retrouver cette instruction pour erreur ou la ligne
+                case INSTRUCTION:
+                    if ((type_lexem == VIRGULE) || (type_lexem == DEUX_PTS)  || (type_lexem == DIRECTIVE) || (type_lexem == STRING)){
+                        ERROR_MSG("Element non acceptable apres une instruction !\n");
                     }
-                    nb_arg_ligne = 0;
-                    nb_arg_needed= 0;
+
+                    if (type_lexem == MOINS){
+                        break;
+                    }
+
+                    else {
+                        if (((type_lexem == NL)||(type_lexem == COMMENT)) && (previous_type_lexem != MOINS)) { // aucun argument apres l'instruction ou apres la virgule
+                            if ((nb_arg_ligne == nb_arg_needed) && (previous_type_lexem != VIRGULE)) // cas où 0 arg
+                            {
+                                if (type_lexem == COMMENT){
+                                    list_lex = list_lex->next; // on saute le NL qui suit
+                                }
+                                S = START;
+                                nb_arg_ligne = 0;
+                                nb_arg_needed= 0;
+                                break;
+                            }
+                            if ((nb_arg_ligne == nb_arg_needed) && (previous_type_lexem == VIRGULE)) {
+                                ERROR_MSG("Virgule de trop !\n");
+                            }
+                            if (previous_type_lexem == VIRGULE) {
+                                ERROR_MSG("Argument manquant (ou de trop) apres instruction!\n");
+                            }
+
+                        }
+
+                        if (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == VIRGULE) {
+                            // stocke le lexem actuel dans la liste comme argument
+                            // prendre en considération le - !
+                            nb_arg_ligne = nb_arg_ligne + 1;
+                            list_lex = list_lex->next; // on saute la virgule qui suit
+                            S = INSTRUCTION;
+                            break;
+                        }
+                        if ((( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL)|| (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == COMMENT) ) {
+                            // stocke le lexem actuel dans la liste comme argument
+                            nb_arg_ligne = nb_arg_ligne + 1;
+                            if (nb_arg_ligne != nb_arg_needed)
+                            {
+                                ERROR_MSG("Erreur, mauvais nombre d'arguments pour instruction !\n");
+                            }
+                            list_lex = list_lex->next; // on saute la NL qui suit
+                            S = START;
+                            nb_arg_ligne = 0;
+                            nb_arg_needed= 0;
+                            break;
+                        }
+                        else {
+                            ERROR_MSG("Virgule manquante apres un argument !\n");
+                        }
+                    }
 
 
+                case PWORD:
+
+                if ((type_lexem == VIRGULE) || (type_lexem == DEUX_PTS) || (type_lexem == DIRECTIVE) || (type_lexem == STRING)){
+                    ERROR_MSG("Element non acceptable apres un .word !\n");
+                }
+                // autres case directives to do
             }
-
+        } // fin switch
+        previous_type_lexem = type_lexem; // on garde en mémoire pour le cas du MOINS
         list_lex = list_lex->next;
-        }
+    } // fin while
 
         // --- deuxième parcours de la liste ----
         if (list_lex == NULL)
