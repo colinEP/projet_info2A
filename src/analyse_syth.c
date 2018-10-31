@@ -10,12 +10,13 @@
 #include <test.h>
 #include <dictionnaire.h>
 #include <etiq.h>
+#include <fct_analyse_1.h>
+#include <analyse_synth.h>
 
 #include <error.h>
 #include <assert.h>
 
-enum{TEXT, DATA, BSS, NONE};
-typedef enum{START, INSTRUCTION, PWORD, PBYTE, PASCIIZ, PSPACE, LABEL} operand_type; //est-ce que cela a du sens de rajouter LABEL là dedans?
+enum{TEXT, PDATA, BSS, NONE};
 
 
 // int check_instruction(char* lex, LIST dictionnaire) // vérifie que l'instruction existe et renvoit son nb d'arg = INUTILE ?
@@ -121,7 +122,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
                             // ---- modification de la section et de la liste courante ----
                             if (strcmp(val_lexem, ".data") == 0){
-                                section = DATA;
+                                section = PDATA;
                                 *current_list = list_data;
                                 if ( ( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL) {
                                      list_lex = list_lex-> next; // on va passer la NL
@@ -152,7 +153,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
 
                             // ---- autres directives ----
-                            if (section == DATA ){
+                            if (section == PDATA ){
                                 if (strcmp(val_lexem, ".word") == 0){
                                     S = PWORD;
                                     break;
@@ -288,7 +289,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                     }
 
                     if (type_lexem == SYMBOLE){ // recherche étiquette dans symb_table
-                        if (look_for_etiq(symb_table, lexem) == 1){
+                        if (look_for_etiq(symb_table, val_lexem) == 1){
                             // mettre à jour une variable qui indique que l'étiquette est bien déjà définie
                         }
                         // mettre à jour une variable qui indique que l'étiquette n'est pas (encore) définie

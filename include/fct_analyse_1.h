@@ -1,6 +1,8 @@
 #ifndef _FCT_ANALYSE_H_
 #define _FCT_ANALYSE_H_
 
+typedef enum{START, INSTRUCTION, PWORD, PBYTE, PASCIIZ, PSPACE, LABEL} operand_type; //est-ce que cela a du sens de rajouter LABEL là dedans?
+
 typedef struct{
     operand_type type;
     union {
@@ -34,4 +36,7 @@ typedef struct {
 INSTR new_instr();
 LIST add_to_list_instr(LEXEM l, int dec, int nbarg, LIST list_instr);
 LIST fill_arguments(LEXEM lexem, LIST list_instr, int previous_type_lexem);
-LIST add_to_current_list(operand_type type_op, void value, int dec, int line, LIST current_list);
+LIST add_to_current_list(operand_type type_op, void* pvalue, int dec, int line, LIST current_list);
+data_op fill_val_op(void* pvalue, operand_type type_op);
+
+#endif

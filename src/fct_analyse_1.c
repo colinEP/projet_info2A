@@ -9,6 +9,8 @@
 #include <lex.h>
 #include <queue_list.h>
 #include <test.h>
+#include <fct_analyse_1.h>
+#include <analyse_synth.h>
 
 #include <etiq.h>
 
@@ -34,16 +36,39 @@ LIST add_to_list_instr(LEXEM l, int dec, int nbarg, LIST list_instr)
      return list_instr;
  }
 
+data_op fill_val_op(void* pvalue, operand_type type_op)
+{
+    data_op D = calloc (1, sizeof(*D));
+    D->type = type_op;
+    switch(D->type)
+       {
+           case PWORD:
+               D->val.PWORD = (*(int*)pvalue);
+               break;
+           case PBYTE:
+               D->val.PBYTE = *(char*)pvalue;
+               break;
+           case PASCIIZ:
+               D->val.PASCIIZ = (char*)pvalue;
+               break;
+           case PSPACE:
+               D->val.PSPACE = (*(unsigned int*)pvalue);
+               break;
+           case LABEL:
+               D->val.LABEL = (char*)pvalue;
+               break;
+       }
+    return D;
+}
 
-LIST add_to_current_list(operand_type type_op, void value, int dec, int line, LIST current_list){ //arg quel type pour value ??
-    DATA data = calloc(1, sizeof(*data));
-    data-> decalage = dec;
-    data-> line = line;
-    data -> D -> type = type_op;
-    // comment stocker value ???? -> le convertir ici ou le prendre comme un void*
-    current_list = add_to_list(current_list, data);
-    return current_list;
 
+LIST add_to_current_list(operand_type type_op, void* pvalue, int dec, int line, LIST current_list){ // FONCTIONNE
+   DATA data = calloc(1, sizeof(*data));
+   data-> decalage = dec;
+   data-> line = line;
+   data -> D = fill_val_op(pvalue, type_op);
+   current_list = add_to_list(current_list, data);
+   return current_list;
 }
 
 
