@@ -10,16 +10,20 @@
 #include <test.h>
 #include <dictionnaire.h>
 #include <etiq.h>
+#include <analyse_synth.h>
 
 #include <error.h>
 #include <assert.h>
 
 
-analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_table, LIST list_lex ) // fonction à tester
 
 
-void test_analyse{
 
-    // il nous faut une liste de lexèmes sur laquelle travailler
-
+void test_analyse(LIST list_lex){
+    LIST list_instr = NULL;
+    LIST list_data = NULL;
+    LIST list_bss = NULL;
+    LIST symb_table = NULL;
+    analyse_synth(list_instr, list_data, list_bss, symb_table, list_lex );
+    return;
 }

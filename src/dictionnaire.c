@@ -37,7 +37,7 @@ QUEUE open_dict(char *file) //fonctionne ! Cette fonction ouvre le dictionnaire 
             list_dico = add_definition(list_dico, nb_arg, inst);
         }
 
-    read_queue_word(list_dico); // test
+    //read_queue_word(list_dico); // test
     list_dico = queue_to_list(list_dico); // peu optimisé ?
 
     return list_dico;

@@ -36,18 +36,20 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 {
 
         LIST dictionnaire;
-        dictionnaire = open_dict("dictionnaire.txt");
+        dictionnaire = open_dict("dictionnaire.txt"); // pas de seg fault
 
         // --- initialisation des variables ----
         int dec_data = 0; //décalage
         int dec_bss = 0;
         int dec_txt = 0;
+        int* pdecalage = NULL;
         int section = NONE ;
         LEXEM lexem = NULL;
         int type_lexem;
         int previous_type_lexem;
         char* val_lexem;
-        LIST* current_list = NULL; // est-ce que cela peut nous poser de soucis ??
+        int line;
+        LIST* pcurrent_list = NULL; // considérer le cas où il est à NULL alors qu'on rentre dans une autre instruction que definition de SECTION
         int nb_arg_ligne = 0;
         int nb_arg_needed = 0;
         int val = 0 ; // variable pour look_for_inst
@@ -60,11 +62,11 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
         {   lexem = list_lex-> element;
             type_lexem = lexem->lex_type;
             val_lexem = lexem->value;
+            line = lexem -> nline;
 
             switch (S)
             {
                 case START: // cas lexeme de début de ligne
-
                 // ------------ CASE S = START -----------------
                     switch(type_lexem) {
                         case SYMBOLE:
@@ -73,7 +75,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                                 if (look_for_etiq(symb_table, val_lexem) == 1){
                                     ERROR_MSG("Redefinition d'etiquette !\n");
                                 }
-                                symb_table = add_to_symb_table(val_lexem, decalage, line, section, symb_table);
+                                symb_table = add_to_symb_table(val_lexem, *pdecalage, line, section, symb_table);
 
                                 list_lex = list_lex->next; // on va passer les DEUX_PTS
 
@@ -98,7 +100,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                                     {
                                         ERROR_MSG("Erreur, instruction dans mauvaise section !\n");
                                     }
-                                list_instr =  add_to_list_instr(lexem, decalage, nb_arg_needed, list_instr); // check !
+                                list_instr =  add_to_list_instr(lexem, *pdecalage, nb_arg_needed, list_instr); // check !
                                 S = INSTRUCTION;
                                 break;
                             }
@@ -120,12 +122,15 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
                         case DIRECTIVE:
 
+                            printf("je suis en 1 !\n");
                             // ---- modification de la section et de la liste courante ----
                             if (strcmp(val_lexem, ".data") == 0){
                                 section = PDATA;
-                                *current_list = list_data;
+                                *pcurrent_list = list_data;
+                                *pdecalage = dec_data;
                                 if ( ( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL) {
                                      list_lex = list_lex-> next; // on va passer la NL
+                                     S = START;
                                      break;
                                 }
                                 ERROR_MSG("invalide element apres un .data !\n");
@@ -133,9 +138,11 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
                             if (strcmp(val_lexem, ".bss") == 0){
                                 section = BSS;
-                                *current_list = list_bss;
+                                *pcurrent_list = list_bss;
+                                *pdecalage = dec_bss;
                                 if ( ( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL) {
                                      list_lex = list_lex-> next; // on va passer la NL
+                                     S = START;
                                      break;
                                 }
                                 ERROR_MSG("invalide element apres un .bss !\n");
@@ -143,9 +150,11 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
                             if (strcmp(val_lexem, ".text") == 0){
                                 section = TEXT;
-                                *current_list = list_instr;
+                                *pcurrent_list = list_instr;
+                                *pdecalage = dec_txt;
                                 if ( ( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL) {
                                      list_lex = list_lex-> next; // on va passer la NL
+                                     S = START;
                                      break;
                                 }
                                 ERROR_MSG("invalide element apres un .text !\n");
@@ -288,25 +297,25 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                         ERROR_MSG("Element non acceptable apres un .word !\n");
                     }
 
-                    if (type_lexem == SYMBOLE){ // recherche étiquette dans symb_table
-                        if (look_for_etiq(symb_table, val_lexem) == 1){
-                            // mettre à jour une variable qui indique que l'étiquette est bien déjà définie
+                    if (type_lexem == SYMBOLE) { // recherche étiquette dans symb_table
+                        *pcurrent_list = add_to_current_list(LABEL, val_lexem, *pdecalage, line, *pcurrent_list);// stocke. Par defaut etiq_def est à 0;
+                        if (look_for_etiq(symb_table, val_lexem) == 0){ // si etiq deja définie
+                             ((DATA)((*pcurrent_list)->element))->etiq_def = 1;
                         }
-                        // mettre à jour une variable qui indique que l'étiquette n'est pas (encore) définie
                     }
 
                     if ((type_lexem == HEXA) || (type_lexem == OCTAL) || (type_lexem == DECIMAL) || (type_lexem == AIBD)|| (type_lexem == REGISTRE)){
                         if ( (( (LEXEM)((LIST)(list_lex->next))->element) ->lex_type) == VIRGULE ) {
-                            //Stockage
+                            // conversion
+                            // Stockage : *pcurrent_list = add_to_current_list(PWORD, "valeur", decalage, ligne, *pcurrent_list);
                             // mise à jour nb arg
                             // considère le cas MOINS
-                            // etc.
                         }
                         if ((( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL)|| (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == COMMENT) ) {
-                            // Stockage
+                            // conversion
+                            // Stockage : *pcurrent_list = add_to_current_list(PWORD, "valeur", decalage, ligne, *pcurrent_list);
                             // mise à jour nb arg
                             // considère le cas MOINS
-                            // etc.
                             // check nb arg
                             S = START;
                             nb_arg_ligne = 0;

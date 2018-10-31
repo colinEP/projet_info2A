@@ -15,6 +15,8 @@
 #include <queue_list.h>
 #include <test.h>
 #include <dictionnaire.h>
+#include <test_analyse.h>
+#include <analyse_synth.h>
 
 #include <error.h>
 #include <etiq.h>
@@ -98,6 +100,7 @@ int main ( int argc, char *argv[] ) {
     INFO_MSG("Début de l'analyse lexical");
     list_lex = lex_load_file( file, &nlines , list_lex );
 
+
     DEBUG_MSG("source code got %d lines",nlines);
 
 
@@ -105,8 +108,8 @@ int main ( int argc, char *argv[] ) {
     INFO_MSG("Affichage du résultat de l'analyse lexical");
     print_list_lex(list_lex);
 
-    build_tab_etiq(list_lex);
-
+    /* ---------------- do the grammatical analysis -------------------*/
+    test_analyse(list_lex);
 
     /* ---------------- Free memory and terminate -------------------*/
     INFO_MSG("Libération de la mémoire");
