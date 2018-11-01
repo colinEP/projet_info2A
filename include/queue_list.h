@@ -29,6 +29,5 @@ LIST new_list();
 LIST queue_to_list( QUEUE q );
 void free_list_lex( QUEUE l );
 void free_lex( void* lex );
-void print_list_lex( LIST l );
 
 #endif

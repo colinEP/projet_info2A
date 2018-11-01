@@ -41,4 +41,5 @@ LIST add_to_current_list(operand_type type_op, void* pvalue, int dec, int line, 
 DATA new_data();
 data_op fill_val_op(void* pvalue, operand_type type_op);
 
+
 #endif

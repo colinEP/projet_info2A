@@ -12,25 +12,13 @@
 #include <etiq.h>
 #include <fct_analyse_1.h>
 #include <analyse_synth.h>
+#include <print_functions.h>
 
 #include <error.h>
 #include <assert.h>
 
 enum{TEXT, PDATA, BSS, NONE};
 
-
-// int check_instruction(char* lex, LIST dictionnaire) // vérifie que l'instruction existe et renvoit son nb d'arg = INUTILE ?
-// {
-//     int val;
-//     int nb_arg_needed;
-//     val = look_for_inst(lex, dictionnaire, &nb_arg_needed);
-//     if (val == 0)
-//         {
-//             ERROR_MSG("Erreur, instruction %s non valable !\n", lex); // rajout num de ligne ?
-//         }
-//     return nb_arg_needed;
-//
-// }
 
 void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_table, LIST list_lex )
 {
@@ -54,11 +42,15 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
         int nb_arg_needed = 0;
         int val = 0 ; // variable pour look_for_inst
         int S = START;
-
+        // LIST l_inst, l_data, l_bss, s_tab; // pour stocker le pointeur du début
+        // l_inst = list_instr;
+        // l_bss = list_bss;
+        // l_data = list_data;
+        // s_tab = symb_table;
 
         // --- premier parcours de la liste ----
 
-        while (list_lex != NULL)
+        while (list_lex != NULL)                    // au gbd, changement de type_lexem entre ligne 63 et ligne 72
         {   lexem = list_lex-> element;
             type_lexem = lexem->lex_type;
             val_lexem = lexem->value;
@@ -79,6 +71,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
                                 list_lex = list_lex->next; // on va passer les DEUX_PTS
 
+
                                 {
                                  if (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL) {
                                      list_lex = list_lex->next; // on saute le NL qui suit
@@ -90,10 +83,12 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                                      ERROR_MSG("Erreur, elements non valides apres un symbole deux-points !\n");
                                  }
 
-                             }
+                                }
+                            }
 
                              // cas 2 : une instruction ?
                             val = look_for_inst(val_lexem, dictionnaire, &nb_arg_needed);
+
                             if (val == 1)
                             {
                                 if (section != TEXT) // pas d'instruction possible hors de la section .Text
@@ -120,14 +115,18 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                             ERROR_MSG("Erreur, après le commentaire !\n"); // est-ce possible ???
 
 
+                        case NL: //on ne considère pas les commentaires, on ne les stocke pas
+
+                            break;
+
+
                         case DIRECTIVE:
 
-                            printf("je suis en 1 !\n");
                             // ---- modification de la section et de la liste courante ----
                             if (strcmp(val_lexem, ".data") == 0){
                                 section = PDATA;
-                                *pcurrent_list = list_data;
-                                *pdecalage = dec_data;
+                                pcurrent_list = &list_data;
+                                pdecalage = &dec_data;
                                 if ( ( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL) {
                                      list_lex = list_lex-> next; // on va passer la NL
                                      S = START;
@@ -138,8 +137,8 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
                             if (strcmp(val_lexem, ".bss") == 0){
                                 section = BSS;
-                                *pcurrent_list = list_bss;
-                                *pdecalage = dec_bss;
+                                pcurrent_list = &list_bss;
+                                pdecalage = &dec_bss;
                                 if ( ( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL) {
                                      list_lex = list_lex-> next; // on va passer la NL
                                      S = START;
@@ -150,8 +149,8 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
                             if (strcmp(val_lexem, ".text") == 0){
                                 section = TEXT;
-                                *pcurrent_list = list_instr;
-                                *pdecalage = dec_txt;
+                                pcurrent_list = &list_instr;
+                                pdecalage = &dec_txt;
                                 if ( ( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL) {
                                      list_lex = list_lex-> next; // on va passer la NL
                                      S = START;
@@ -327,20 +326,24 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                 // autres case directives to do idem
 
 
-            }
+
         } // fin switch
 
         previous_type_lexem = type_lexem; // on garde en mémoire pour le cas du MOINS
         list_lex = list_lex->next;
+        //printf("ligne %d \n", line );
+
     } // fin while
 
-        // --- deuxième parcours de la liste ----
-        if (list_lex == NULL)
-        {
-            ERROR_MSG("Erreur, liste lexemes a analyser vide !\n");
-        }
+    print_list_instr(list_instr);
 
-        symb_table = build_tab_etiq(list_lex ); //cette fonction remplie la table des symboles avec les etiquettes et la renvoit
+        // --- deuxième parcours de la liste ----
+        //if (list_lex == NULL)
+        //{
+        //    ERROR_MSG("Erreur, liste lexemes a analyser vide !\n");
+        //}
+
+        //symb_table = build_tab_etiq(list_lex ); //cette fonction remplie la table des symboles avec les etiquettes et la renvoit
 
 
         return;

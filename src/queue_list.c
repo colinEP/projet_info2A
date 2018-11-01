@@ -93,18 +93,3 @@ void free_lex(void* lex_ambigu) {
     LEXEM lex = (LEXEM)lex_ambigu;
     free(lex->value);
 }
-
-
-void print_list_lex( LIST l ) {
-    LIST p;
-    LEXEM lex;
-    printf("\n====== Liste des lexemes ======\n");
-    printf("\n       |            |\n");
-    printf(" nline |    Type    |    Value\n");
-    printf("       |            |\n");
-    for ( p=l ; p!=NULL ; p=p->next ) {
-        lex = p->element;
-        //printf("valeur : %s\ntype: %s  \nnum_ligne : %d \n\n", lex->value, lex_type_string(lex->lex_type, TRUE), lex->nline);
-        printf("   %d \t  %s  %s\n", lex->nline , lex_type_string(lex->lex_type, TRUE) , lex->value);
-    }
-}

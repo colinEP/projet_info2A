@@ -11,6 +11,7 @@
 #include <test.h>
 #include <fct_analyse_1.h>
 #include <analyse_synth.h>
+#include <print_functions.h>
 
 #include <etiq.h>
 

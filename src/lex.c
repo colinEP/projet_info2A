@@ -19,6 +19,7 @@
 #include <lex.h>
 #include <queue_list.h>
 #include <test.h>
+#include <print_functions.h>
 
 #include <error.h>
 

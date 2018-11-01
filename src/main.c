@@ -9,6 +9,8 @@
 #include <unistd.h>
 #include <string.h>
 
+#include <ctype.h>
+
 #include <global.h>
 #include <notify.h>
 #include <lex.h>
@@ -17,6 +19,7 @@
 #include <dictionnaire.h>
 #include <test_analyse.h>
 #include <analyse_synth.h>
+#include <print_functions.h>
 
 #include <error.h>
 #include <etiq.h>
