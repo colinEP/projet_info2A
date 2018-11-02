@@ -11,5 +11,7 @@ void read_queue_word(QUEUE Q);
 
 void read_queue_lex(QUEUE Q);
 
+void print_list_data( LIST l );
+
 
 #endif

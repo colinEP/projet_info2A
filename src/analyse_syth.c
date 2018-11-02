@@ -93,7 +93,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                                         printf("ERREUR LIGNE : %d\n", line);
                                         ERROR_MSG("Erreur, instruction dans mauvaise section !\n");
                                     }
-                                list_instr =  add_to_list_instr(lexem, *pdecalage, nb_arg_needed, list_instr); // check !
+                                list_instr =  add_to_list_instr(lexem, *pdecalage, nb_arg_needed, list_instr);
                                 S = INSTRUCTION;
                                 break;
                             }
@@ -335,32 +335,127 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
                     if (type_lexem == SYMBOLE) { // recherche étiquette dans symb_table
                         *pcurrent_list = add_to_current_list(LABEL, val_lexem, *pdecalage, line, *pcurrent_list);// stocke. Par defaut etiq_def est à 0;
-                        if (look_for_etiq(symb_table, val_lexem) == 0){ // si etiq deja définie
+                        if (look_for_etiq(symb_table, val_lexem) == 1){ // si etiq deja définie
                              ((DATA)((*pcurrent_list)->element))->etiq_def = 1;
+                        }
+                        if ( (( (LEXEM)((LIST)(list_lex->next))->element) ->lex_type) == VIRGULE ) {
+                            list_lex = list_lex->next; // on saute la virgule qui suit
+                            break;
+                        }
+                        if ((( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL)|| (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == COMMENT) ) {
+                            list_lex = list_lex->next; // on saute la NL qui suit
+                            S = START;
+                            nb_arg_ligne = 0;
+                            nb_arg_needed= 0;
+                            break;
+                        }
+                        else {
+                            printf("ERREUR LIGNE : %d\n", line);
+                            ERROR_MSG("Element invalide apres un argument !\n");
                         }
                     }
 
                     if ((type_lexem == HEXA) || (type_lexem == OCTAL) || (type_lexem == DECIMAL) || (type_lexem == AIBD)|| (type_lexem == REGISTRE)){
+                        // conversion
+                        // considère le cas previous_type_lexem = MOINS
+                        // Stockage : *pcurrent_list = add_to_current_list(PWORD, "valeur", decalage, ligne, *pcurrent_list);
+
                         if ( (( (LEXEM)((LIST)(list_lex->next))->element) ->lex_type) == VIRGULE ) {
-                            // conversion
-                            // Stockage : *pcurrent_list = add_to_current_list(PWORD, "valeur", decalage, ligne, *pcurrent_list);
-                            // mise à jour nb arg
-                            // considère le cas MOINS
+                            list_lex = list_lex->next; // on saute la virgule qui suit
+                            break;
                         }
                         if ((( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL)|| (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == COMMENT) ) {
-                            // conversion
-                            // Stockage : *pcurrent_list = add_to_current_list(PWORD, "valeur", decalage, ligne, *pcurrent_list);
-                            // mise à jour nb arg
-                            // considère le cas MOINS
-                            // check nb arg
+                            list_lex = list_lex->next; // on saute la NL qui suit
                             S = START;
                             nb_arg_ligne = 0;
                             nb_arg_needed= 0;
+                            break;
+                        }
+                        else {
+                            printf("ERREUR LIGNE : %d\n", line);
+                            ERROR_MSG("Virgule manquante apres un argument !\n");
                         }
                     }
 
+                case PASCIIZ:
 
-                // autres case directives to do idem
+                        if (type_lexem == STRING) {
+                            // CONVERSION TO DO ! car pour l'instant on stocke : ""chaine de char""
+                            *pcurrent_list = add_to_current_list(PASCIIZ, val_lexem, *pdecalage, line, *pcurrent_list);
+                            if ( (( (LEXEM)((LIST)(list_lex->next))->element) ->lex_type) == VIRGULE ) {
+                                list_lex = list_lex->next; // on saute la virgule qui suit
+                                break;
+                            }
+                            if ((( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL)|| (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == COMMENT) ) {
+                                list_lex = list_lex->next; // on saute la NL qui suit
+                                S = START;
+                                nb_arg_ligne = 0;
+                                nb_arg_needed= 0;
+                                break;
+                            }
+                            else {
+                                printf("ERREUR LIGNE : %d\n", line);
+                                ERROR_MSG("Element invalide apres un argument !\n");
+                            }
+                        }
+
+                        if (type_lexem == SYMBOLE) { // recherche étiquette dans symb_table
+                            *pcurrent_list = add_to_current_list(LABEL, val_lexem, *pdecalage, line, *pcurrent_list);// stocke. Par defaut etiq_def est à 0;
+                            if (look_for_etiq(symb_table, val_lexem) == 1){ // si etiq deja définie
+                                 ((DATA)((*pcurrent_list)->element))->etiq_def = 1;
+                            }
+                            if ( (( (LEXEM)((LIST)(list_lex->next))->element) ->lex_type) == VIRGULE ) {
+                                list_lex = list_lex->next; // on saute la virgule qui suit
+                                break;
+                            }
+                            if ((( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL)|| (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == COMMENT) ) {
+                                list_lex = list_lex->next; // on saute la NL qui suit
+                                S = START;
+                                nb_arg_ligne = 0;
+                                nb_arg_needed= 0;
+                                break;
+                            }
+                            else {
+                                printf("ERREUR LIGNE : %d\n", line);
+                                ERROR_MSG("Element invalide apres un argument !\n");
+                            }
+                        }
+
+                        else {
+                            printf("ERREUR LIGNE : %d\n", line);
+                            ERROR_MSG("Element non acceptable apres un .asciiz !\n");
+                        }
+
+                case PSPACE :
+
+                    // Seuls les entiers non signés sont acceptés
+                    if (previous_type_lexem == MOINS)
+                    {
+                        printf("ERREUR LIGNE : %d\n", line);
+                        ERROR_MSG("Seuls entier non signes acceptes apres .space !\n");
+                    }
+
+                    if (type_lexem == SYMBOLE) { // recherche étiquette dans symb_table --> il faudra vérifier que son type CONVIENT
+                        *pcurrent_list = add_to_current_list(LABEL, val_lexem, *pdecalage, line, *pcurrent_list);// stocke. Par defaut etiq_def est à 0;
+                        if (look_for_etiq(symb_table, val_lexem) == 1){ // si etiq deja définie
+                             ((DATA)((*pcurrent_list)->element))->etiq_def = 1;
+                        }
+                        break;
+                    }
+
+                    if ((type_lexem == VIRGULE) || (type_lexem == DEUX_PTS) || (type_lexem == DIRECTIVE) || (type_lexem == STRING)){
+                        printf("ERREUR LIGNE : %d\n", line);
+                        ERROR_MSG("Element non acceptable apres un .word !\n");
+                    }
+
+
+                    // autres cas : faut il tout convertir aussi et les accepter ???
+
+                case PBYTE:
+                        break; // a changer
+
+
+                // autres cas ?
 
 
 
@@ -373,6 +468,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
     print_list_instr(list_instr);
     print_symb_table(symb_table);
+    print_list_data(list_data);
 
         // --- deuxième parcours de la liste ----
         //if (list_lex == NULL)

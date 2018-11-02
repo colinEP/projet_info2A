@@ -91,6 +91,8 @@ int main ( int argc, char *argv[] ) {
     LIST list_lex = new_list();
 
 
+    
+
     /* ---------------- test du dictionnaire -------------------*/ //FONCTIONNE
     LIST dictionnaire = open_dict("dictionnaire.txt");
     int nb_arg = 0;

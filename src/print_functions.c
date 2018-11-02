@@ -120,3 +120,15 @@ void print_symb_table( LIST l ) {
     }
     return;
 }
+
+
+void print_list_data( LIST l ) {
+    printf("\n====== Liste des .data ======\n");
+
+    while (l!= NULL)
+    {
+        printf(" decalage : %d  etiq_def: %d  op_type: %d\n", ((DATA)(l->element))-> decalage, ((DATA)(l->element))-> etiq_def,  (((data_op)(((DATA)(l->element))-> D))->type ));
+        l = l->next;
+    }
+    return;
+}

@@ -110,6 +110,12 @@ LIST fill_arguments(LEXEM lexem, LIST list_instr, int previous_type_lexem)
  }
 
 
+
+// conversion()
+// {
+//
+// }
+
  char *mystrcat( char *start, char *addend )
 {
 	size_t slen = strlen( start );
