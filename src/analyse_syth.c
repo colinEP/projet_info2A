@@ -42,15 +42,10 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
         int nb_arg_needed = 0;
         int val = 0 ; // variable pour look_for_inst
         int S = START;
-        // LIST l_inst, l_data, l_bss, s_tab; // pour stocker le pointeur du début
-        // l_inst = list_instr;
-        // l_bss = list_bss;
-        // l_data = list_data;
-        // s_tab = symb_table;
 
         // --- premier parcours de la liste ----
 
-        while (list_lex != NULL)                    // au gbd, changement de type_lexem entre ligne 63 et ligne 72
+        while (list_lex != NULL)
         {   lexem = list_lex-> element;
             type_lexem = lexem->lex_type;
             val_lexem = lexem->value;
@@ -65,6 +60,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                         // cas 1 : une déclaration d'étiquette ? (on commence par ce cas car certaines etiquettes ont le même nom que des instructions)
                             if ( ( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == DEUX_PTS) {
                                 if (look_for_etiq(symb_table, val_lexem) == 1){
+                                    printf("ERREUR LIGNE : %d\n", line);
                                     ERROR_MSG("Redefinition d'etiquette !\n");
                                 }
                                 symb_table = add_to_symb_table(val_lexem, *pdecalage, line, section, symb_table);
@@ -80,6 +76,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                                  }
 
                                  else {
+                                     printf("ERREUR LIGNE : %d\n", line);
                                      ERROR_MSG("Erreur, elements non valides apres un symbole deux-points !\n");
                                  }
 
@@ -93,6 +90,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                             {
                                 if (section != TEXT) // pas d'instruction possible hors de la section .Text
                                     {
+                                        printf("ERREUR LIGNE : %d\n", line);
                                         ERROR_MSG("Erreur, instruction dans mauvaise section !\n");
                                     }
                                 list_instr =  add_to_list_instr(lexem, *pdecalage, nb_arg_needed, list_instr); // check !
@@ -101,6 +99,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                             }
                             // cas 3
                             else { // c'est une erreur car une ligne ne peut pas commencer par un appel d'etiquette !
+                                printf("ERREUR LIGNE : %d\n", line);
                                 ERROR_MSG("Erreur, symbole non valide en debut de ligne !\n");
                             }
 
@@ -112,6 +111,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                                 break;
                             }
 
+                            printf("ERREUR LIGNE : %d\n", line);
                             ERROR_MSG("Erreur, après le commentaire !\n"); // est-ce possible ???
 
 
@@ -132,6 +132,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                                      S = START;
                                      break;
                                 }
+                                printf("ERREUR LIGNE : %d\n", line);
                                 ERROR_MSG("invalide element apres un .data !\n");
                             }
 
@@ -144,6 +145,8 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                                      S = START;
                                      break;
                                 }
+
+                                printf("ERREUR LIGNE : %d\n", line);
                                 ERROR_MSG("invalide element apres un .bss !\n");
                             }
 
@@ -156,8 +159,22 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                                      S = START;
                                      break;
                                 }
+
+                                printf("ERREUR LIGNE : %d\n", line);
                                 ERROR_MSG("invalide element apres un .text !\n");
                             }
+
+                            // ----cas du .set ---
+
+                            if (strcmp(val_lexem, ".set") == 0){
+                                if ( ( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) != NL) {
+                                     list_lex = list_lex-> next; // on va passer l'argument
+                                }
+                                S = START;
+                                list_lex = list_lex->next; // on saute le NL qui suit
+                                break;
+                            }
+
 
 
                             // ---- autres directives ----
@@ -175,10 +192,15 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                                     break;
                                 }
                                 if (strcmp(val_lexem, ".set") == 0){
-                                    list_lex = (LIST)(list_lex->next)->next; // on saute l'argument et le NL qui suit ??
+                                    if ( ( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) != NL) {
+                                         list_lex = list_lex-> next; // on va passer l'argument
+                                    }
+                                    S = START;
+                                    list_lex = list_lex->next; // on saute le NL qui suit
                                     break;
                                 }
                                 else{
+                                    printf("ERREUR LIGNE : %d\n", line);
                                     ERROR_MSG("Directive inconnue ou dans mauvaise section !\n"); // est-ce possible ???
                                 }
                             }
@@ -189,11 +211,16 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                                     break;
                                 }
                                 if (strcmp(val_lexem, ".set") == 0){ // peut-il y avoir un set ici ??
-                                    list_lex = (LIST)(list_lex->next)->next; // on saute l'argument et le NL qui suit ??
+                                    if ( ( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) != NL) {
+                                         list_lex = list_lex-> next; // on va passer l'argument
+                                    }
+                                    S = START;
+                                    list_lex = list_lex->next; // on saute le NL qui suit
                                     break;
                                 }
 
                                 else {
+                                    printf("ERREUR LIGNE : %d\n", line);
                                     ERROR_MSG("Directive inconnue ou dans mauvaise section !\n"); // est-ce possible ???
                                 }
                             }
@@ -216,16 +243,22 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                                     break;
                                 }
                                 if (strcmp(val_lexem, ".set") == 0){
-                                    list_lex = (LIST)(list_lex->next)->next; // on saute l'argument et le NL qui suit ??
+                                    if ( ( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) != NL) {
+                                         list_lex = list_lex-> next; // on va passer l'argument
+                                    }
+                                    S = START;
+                                    list_lex = list_lex->next; // on saute le NL qui suit
                                     break;
                                 }
 
                                 else{
+                                    printf("ERREUR LIGNE : %d\n", line);
                                     ERROR_MSG("Directive inconnue ou dans mauvaise section !\n"); // est-ce possible ???
                                 }
                             }
 
                         default :
+                            printf("ERREUR LIGNE : %d\n", line);
                             ERROR_MSG("Element non acceptable en debut de ligne !\n");
                     }
                     break;
@@ -234,6 +267,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
                 case INSTRUCTION:
                     if ((type_lexem == VIRGULE) || (type_lexem == DEUX_PTS)  || (type_lexem == DIRECTIVE) || (type_lexem == STRING)){
+                        printf("ERREUR LIGNE : %d\n", line);
                         ERROR_MSG("Element non acceptable apres une instruction !\n");
                     }
 
@@ -254,16 +288,17 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                                 break;
                             }
                             if ((nb_arg_ligne == nb_arg_needed) && (previous_type_lexem == VIRGULE)) {
+                                printf("ERREUR LIGNE : %d\n", line);
                                 ERROR_MSG("Virgule de trop !\n");
                             }
                             if (previous_type_lexem == VIRGULE) {
+                                printf("ERREUR LIGNE : %d\n", line);
                                 ERROR_MSG("Argument manquant (ou de trop) apres instruction!\n");
                             }
 
                         }
 
                         if (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == VIRGULE) {
-                            // prendre en considération le "-" !
                             list_instr = fill_arguments(lexem, list_instr, previous_type_lexem);
                             nb_arg_ligne = nb_arg_ligne + 1;
                             list_lex = list_lex->next; // on saute la virgule qui suit
@@ -271,11 +306,11 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                             break;
                         }
                         if ((( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL)|| (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == COMMENT) ) {
-                            // prendre en considération le "-" !
                             list_instr = fill_arguments(lexem, list_instr, previous_type_lexem);
                             nb_arg_ligne = nb_arg_ligne + 1;
                             if (nb_arg_ligne != nb_arg_needed)
                             {
+                                printf("ERREUR LIGNE : %d\n", line);
                                 ERROR_MSG("Erreur, mauvais nombre d'arguments pour instruction !\n");
                             }
                             list_lex = list_lex->next; // on saute la NL qui suit
@@ -285,6 +320,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                             break;
                         }
                         else {
+                            printf("ERREUR LIGNE : %d\n", line);
                             ERROR_MSG("Virgule manquante apres un argument !\n");
                         }
                     }
@@ -293,6 +329,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                 case PWORD:
 
                     if ((type_lexem == VIRGULE) || (type_lexem == DEUX_PTS) || (type_lexem == DIRECTIVE) || (type_lexem == STRING)){
+                        printf("ERREUR LIGNE : %d\n", line);
                         ERROR_MSG("Element non acceptable apres un .word !\n");
                     }
 
@@ -331,11 +368,11 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
         previous_type_lexem = type_lexem; // on garde en mémoire pour le cas du MOINS
         list_lex = list_lex->next;
-        //printf("ligne %d \n", line );
 
     } // fin while
 
     print_list_instr(list_instr);
+    print_symb_table(symb_table);
 
         // --- deuxième parcours de la liste ----
         //if (list_lex == NULL)

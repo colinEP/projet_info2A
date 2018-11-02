@@ -40,6 +40,7 @@ LIST fill_arguments(LEXEM lexem, LIST list_instr, int previous_type_lexem);
 LIST add_to_current_list(operand_type type_op, void* pvalue, int dec, int line, LIST current_list);
 DATA new_data();
 data_op fill_val_op(void* pvalue, operand_type type_op);
+char *mystrcat( char *start, char *addend );
 
 
 #endif

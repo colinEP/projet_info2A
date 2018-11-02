@@ -85,8 +85,11 @@ LIST add_to_current_list(operand_type type_op, void* pvalue, int dec, int line, 
 
 LIST fill_arguments(LEXEM lexem, LIST list_instr, int previous_type_lexem)
 {
-    // considérer le cas où prévious_type_lexeme est un MOINS !!!
-     if (((INSTR)(list_instr->element))->arg1 == NULL){  // à mettre sous forme d'une fonction
+    if (previous_type_lexem == MOINS)
+    {
+        lexem->value = strdup(mystrcat("-", lexem->value));
+    }
+    if (((INSTR)(list_instr->element))->arg1 == NULL){  // à mettre sous forme d'une fonction
          ((INSTR)(list_instr->element))->arg1 = lexem;
      }
      else {
@@ -97,8 +100,22 @@ LIST fill_arguments(LEXEM lexem, LIST list_instr, int previous_type_lexem)
              if (((INSTR)(list_instr->element))->arg3 == NULL){
                  ((INSTR)(list_instr->element))->arg3 = lexem;
              }
-             else ERROR_MSG("Trop d'arguments !\n");
+             else {
+                 printf("ERREUR LIGNE : %d\n", lexem->nline);
+                 ERROR_MSG("Trop d'arguments !\n");
+             }
          }
      }
      return list_instr;
  }
+
+
+ char *mystrcat( char *start, char *addend )
+{
+	size_t slen = strlen( start );
+	size_t alen = strlen( addend );
+	char   *str = calloc( 1, slen+alen+1 );
+	memcpy( str, start, slen );
+	memcpy( str+slen, addend, alen ); // ajout du \0 automatique !
+  return str;
+}

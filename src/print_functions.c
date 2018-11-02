@@ -78,8 +78,8 @@ void print_list_lex( LIST l ) {
 
 void print_list_instr( LIST l ) {
     INSTR I;
-    printf("\n====== Liste des Instructions ======\n");
-    printf("\n        |          |          |\n");
+    printf("\n====== Liste des instructions ======\n");
+    printf("\n          |          |          |\n");
     printf(" valeur   |  arg1    |  arg2    |  arg 3\n");
     printf("          |          |          |\n");
 
@@ -101,7 +101,21 @@ void print_list_instr( LIST l ) {
         else a3 = strdup(((char*)((LEXEM)(I->arg3))->value)) ;
 
 
-        printf(" %s\t\t%s\t  %s\t   %s\n", val, a1, a2, a3);
+        printf(" %s\t  %s\t\t  %s\t   %s\n", val, a1, a2, a3);
+        l = l->next;
+    }
+    return;
+}
+
+void print_symb_table( LIST l ) {
+    printf("\n====== Table des symboles ======\n");
+    printf("\n          |             |           \n");
+    printf(" name     |  section    |   line   \n");
+    printf("          |             |          \n");
+
+    while (l!= NULL)
+    {
+        printf(" %s\t\t %d\t   %d\n", ((ETIQ)(l->element))-> name, ((ETIQ)(l->element))-> section,  ((ETIQ)(l->element))-> nline );
         l = l->next;
     }
     return;

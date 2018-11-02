@@ -23,11 +23,12 @@ QUEUE ajouter_fin(QUEUE l, void* structure);
 
 LIST add_to_list(LIST L, void* element);
 
-
-
 LIST new_list();
+
 LIST queue_to_list( QUEUE q );
+
 void free_list_lex( QUEUE l );
+
 void free_lex( void* lex );
 
 #endif
