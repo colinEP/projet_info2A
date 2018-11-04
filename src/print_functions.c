@@ -78,10 +78,10 @@ void print_list_lex( LIST l ) {
 
 void print_list_instr( LIST l ) {
     INSTR I;
-    printf("\n====== Liste des instructions ======\n");
-    printf("\n          |          |          |\n");
-    printf(" valeur   |  arg1    |  arg2    |  arg 3    |  etiq_def\n");
-    printf("          |          |          |           |\n");
+    printf("\n====== Liste des instructions ====== \n \n");
+    // printf("\n          |          |          |\n");
+    // printf(" valeur   |  arg1    |  arg2    |  arg 3    |  etiq_def\n");
+    // printf("          |          |          |           |\n");
 
     while (l!= NULL)
     {
@@ -89,19 +89,19 @@ void print_list_instr( LIST l ) {
         char* a1;
         char* a2;
         char* a3;
-        char* val = ((LEXEM)(I->lex))->value ;
-        if ((I->arg1) == NULL) a1 = strdup("NONE");
-        else a1 = strdup(((char*)((LEXEM)(I->arg1))->value)) ;
+        //char* val = ((LEXEM)(((ARG_INST)(I->arg1))->lex))->value ;
+        if (((I->arg1)->lex) == NULL) a1 = strdup("NONE");
+        else a1 = strdup(((char*)(((LEXEM)(((ARG_INST)(I->arg1))->lex))->value))) ;
 
-        if ((I->arg2)== NULL) a2 = strdup("NONE");
-        else a2 = strdup(((char*)((LEXEM)(I->arg2))->value)) ;
-
-
-        if ((I->arg3) == NULL)   a3 = strdup("NONE");
-        else a3 = strdup(((char*)((LEXEM)(I->arg3))->value)) ;
+        if (((I->arg2)->lex)== NULL) a2 = strdup("NONE");
+        else a2 = strdup(((char*)(((LEXEM)(((ARG_INST)(I->arg2))->lex))->value)))  ;
 
 
-        printf(" %s\t  %s\t\t  %s\t   %s\t  %d\n", val, a1, a2, a3, I->etiq_def);
+        if (((I->arg3)->lex) == NULL)   a3 = strdup("NONE");
+        else a3 = strdup(((char*)(((LEXEM)(((ARG_INST)(I->arg3))->lex))->value)))  ;
+
+
+        printf(" Instruction : %s \n Arg1 : %s  %d  \n Arg2: %s  %d \n Arg3: %s  %d \n\n", ((LEXEM)(I->lex))->value, a1, ((ARG_INST)(I->arg1))->etiq_def, a2,((ARG_INST)(I->arg2))->etiq_def, a3,((ARG_INST)(I->arg3))->etiq_def);
         l = l->next;
     }
     return;

@@ -24,7 +24,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 {
 
         LIST dictionnaire;
-        dictionnaire = open_dict("dictionnaire.txt"); // pas de seg fault
+        dictionnaire = open_dict("dictionnaire.txt");
 
         // --- initialisation des variables ----
         int dec_data = 0; //décalage
@@ -298,16 +298,20 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
                         }
                         if ((( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL)|| (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == COMMENT) || (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == VIRGULE)) {
-                            list_instr = fill_arguments(lexem, list_instr, previous_type_lexem);
+
                             nb_arg_ligne = nb_arg_ligne + 1;
 
                             if (type_lexem == SYMBOLE){ // cas etiquette
                                 if (look_for_etiq(symb_table, val_lexem) == 1){         // si cette etiq est deja définie
-                                     ((INSTR)((list_instr)->element))->etiq_def = 1;
+                                     list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 1);
                                 }
+                                else  list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 0);  // si cette etiq n'est PAS deja définie
+
+                                break;
                             }
 
                             if (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == VIRGULE) {
+                                list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, -1);
                                 S = INSTRUCTION;
                                 list_lex = list_lex->next; // saute NL
                                 break;
@@ -318,6 +322,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                                     printf("ERREUR LIGNE : %d\n", line);
                                     ERROR_MSG("Erreur, mauvais nombre d'arguments pour instruction !\n");
                                 }
+                                list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, -1);
                                 S = START;
                                 nb_arg_ligne = 0;
                                 nb_arg_needed= 0;
@@ -478,7 +483,16 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
     print_symb_table(symb_table);
     print_list_data(list_data);
 
-    // --- deuxième parcours de la liste ----
+    // --- deuxième parcours : on cherche les étiquettes ----
+
+    // list_instr
+    look_for_undefined_etiq_in_instr(list_instr, symb_table);
+
+    // list_data
+    look_for_undefined_etiq_in_data(list_data, symb_table);
+
+    // list_bss
+    look_for_undefined_etiq_in_data(list_bss, symb_table);
 
 
 

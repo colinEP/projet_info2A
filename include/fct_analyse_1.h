@@ -25,22 +25,29 @@ typedef struct {
 
 typedef struct {
     LEXEM lex;
+    int etiq_def;
+}* ARG_INST;
+
+
+typedef struct {
+    LEXEM lex;
     int nb_arg;
     int decalage;
-    int etiq_def;
-    LEXEM arg1; // à changer ?
-    LEXEM arg2;
-    LEXEM arg3;
+    ARG_INST arg1;
+    ARG_INST arg2;
+    ARG_INST arg3;
 }* INSTR;
 
 
 
 INSTR new_instr();
 LIST add_to_list_instr(LEXEM l, int dec, int nbarg, LIST list_instr);
-LIST fill_arguments(LEXEM lexem, LIST list_instr, int previous_type_lexem);
+LIST fill_arguments(LEXEM lexem, LIST list_instr, int previous_type_lexem, int etiq_definition);
 LIST add_to_current_list(operand_type type_op, void* pvalue, int dec, int line, LIST current_list);
 DATA new_data();
 data_op fill_val_op(void* pvalue, operand_type type_op);
+void look_for_undefined_etiq_in_data(LIST l, LIST symb_table);
+void look_for_undefined_etiq_in_instr(LIST l, LIST symb_table);
 char *mystrcat( char *start, char *addend );
 
 
