@@ -11,8 +11,6 @@
 
 
 
-
-
 QUEUE new_queue()
 {
   return NULL;
@@ -50,6 +48,22 @@ QUEUE add_to_queue_lex(QUEUE Q, char* token, int type, int numline)
 }
 
 
+LIST add_to_list(LIST L, void* element) //à vérfier
+{
+  if (L == NULL)
+    {
+      L = calloc (1, sizeof(*L));
+      L->element = element;
+      L->next = NULL;
+      return L;
+    }
+  LIST new_list = calloc (1, sizeof(*new_list));
+  new_list-> element = element;
+  new_list-> next = L;
+  return new_list;
+}
+
+
 LIST new_list() {
   return NULL;
 }
@@ -80,19 +94,4 @@ void free_list_lex(LIST l) {
 void free_lex(void* lex_ambigu) {
     LEXEM lex = (LEXEM)lex_ambigu;
     free(lex->value);
-}
-
-
-void print_list_lex( LIST l ) {
-    LIST p;
-    LEXEM lex;
-    printf("\n====== Liste des lexemes ======\n");
-    printf("\n       |            |\n");
-    printf(" nline |    Type    |    Value\n");
-    printf("       |            |\n");
-    for ( p=l ; p!=NULL ; p=p->next ) {
-        lex = p->element;
-        //printf("valeur : %s\ntype: %s  \nnum_ligne : %d \n\n", lex->value, lex_type_string(lex->lex_type, TRUE), lex->nline);
-        printf("   %d \t  %s  %s\n", lex->nline , lex_type_string(lex->lex_type, TRUE) , lex->value);
-    }
 }

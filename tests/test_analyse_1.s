@@ -12,7 +12,7 @@ boucle:
     J boucle
     NOP
 byebye:
-    JAL viteviteauru
+    JAL boucle
 
 .data
 lunchtime:

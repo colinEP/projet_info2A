@@ -11,10 +11,10 @@ typedef struct
 
 QUEUE open_dict(char *file);
 
-int look_for_inst(char* lex, LIST l_dico, int* nb_arg);
+int look_for_inst(char* lex_init, LIST l_dico, int* nb_arg);
 
 QUEUE add_definition ( QUEUE Q, int nb_arg, char* instruction);
 
-
+char* put_in_uppercase (char* chaine);
 
 #endif
