@@ -101,14 +101,14 @@ QUEUE lex_read_line( char *line, int nline, QUEUE list_lex) {
         pos = (current_address-line)-strlen(token);
         int type = lex_analyse(token, nline, pos, line);
 
-        list_lex = add_to_queue(list_lex, token, type, nline);
+        list_lex = add_to_queue_lex(list_lex, token, type, nline);
 
         /* Une fois le token utilisé, il faut le free */
         free(token);
     }
 
     // WARNING a voir si c'est utile pour la suite ... sinon on peut l'enlever facilement
-    list_lex = add_to_queue(list_lex, "\\n", 15, nline);
+    list_lex = add_to_queue_lex(list_lex, "\\n", 15, nline);
 
     return list_lex;
 }

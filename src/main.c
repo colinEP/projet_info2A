@@ -17,7 +17,7 @@
 #include <dictionnaire.h>
 
 #include <error.h>
-#include <etiq.h>
+//#include <etiq.h>
 
 #include <assert.h>
 
@@ -105,9 +105,14 @@ int main ( int argc, char *argv[] ) {
     INFO_MSG("Affichage du résultat de l'analyse lexical");
     print_list_lex(list_lex);
 
-    build_tab_etiq(list_lex);
+    //build_tab_etiq(list_lex);
 
-
+    char* str = ((LEXEM)list_lex->element)->value;
+    str = "ils : \n\"au ru!\"";
+    printf("%s\n", str);
+    char* tmp;
+    printf("%d\n", strlen(str));
+    printf("%d\n", sprintf(tmp, str));
     /* ---------------- Free memory and terminate -------------------*/
     INFO_MSG("Libération de la mémoire");
     free_list_lex(list_lex);

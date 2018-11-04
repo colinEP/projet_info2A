@@ -9,7 +9,7 @@
 #include <queue_list.h>
 #include <test.h>
 #include <dictionnaire.h>
-#include <etiq.h>
+//#include <etiq.h>
 
 #include <error.h>
 #include <assert.h>
@@ -57,7 +57,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
             ERROR_MSG("Erreur, liste lexemes a analyser vide !\n");
         }
 
-        symb_table = build_tab_etiq(list_lex ); //cette fonction rempli la table des symboles avec les etiquettes et la renvoit
+        //symb_table = build_tab_etiq(list_lex ); //cette fonction rempli la table des symboles avec les etiquettes et la renvoit
 
 
         // --- deuxième parcours de la liste ----
