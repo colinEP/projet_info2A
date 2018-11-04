@@ -276,7 +276,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                     }
 
                     else {
-                        if (((type_lexem == NL)||(type_lexem == COMMENT)) && (previous_type_lexem != MOINS)) { // aucun argument apres l'instruction ou apres la virgule
+                        if (((type_lexem == NL)||(type_lexem == COMMENT)) && (previous_type_lexem != MOINS)) { // plus d'argument apres l'instruction ou apres la virgule
                             if ((nb_arg_ligne == nb_arg_needed) && (previous_type_lexem != VIRGULE)) // cas où 0 arg
                             {
                                 if (type_lexem == COMMENT){
@@ -297,28 +297,36 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                             }
 
                         }
+                        if ((( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL)|| (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == COMMENT) || (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == VIRGULE)) {
+                            list_instr = fill_arguments(lexem, list_instr, previous_type_lexem);
+                            nb_arg_ligne = nb_arg_ligne + 1;
 
-                        if (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == VIRGULE) {
-                            list_instr = fill_arguments(lexem, list_instr, previous_type_lexem);
-                            nb_arg_ligne = nb_arg_ligne + 1;
-                            list_lex = list_lex->next; // on saute la virgule qui suit
-                            S = INSTRUCTION;
-                            break;
-                        }
-                        if ((( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL)|| (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == COMMENT) ) {
-                            list_instr = fill_arguments(lexem, list_instr, previous_type_lexem);
-                            nb_arg_ligne = nb_arg_ligne + 1;
-                            if (nb_arg_ligne != nb_arg_needed)
-                            {
-                                printf("ERREUR LIGNE : %d\n", line);
-                                ERROR_MSG("Erreur, mauvais nombre d'arguments pour instruction !\n");
+                            if (type_lexem == SYMBOLE){ // cas etiquette
+                                if (look_for_etiq(symb_table, val_lexem) == 1){         // si cette etiq est deja définie
+                                     ((INSTR)((list_instr)->element))->etiq_def = 1;
+                                }
                             }
-                            list_lex = list_lex->next; // on saute la NL qui suit
-                            S = START;
-                            nb_arg_ligne = 0;
-                            nb_arg_needed= 0;
-                            break;
+
+                            if (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == VIRGULE) {
+                                S = INSTRUCTION;
+                                list_lex = list_lex->next; // saute NL
+                                break;
+                            }
+                            if ((( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL)|| (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == COMMENT) ) {
+                                if (nb_arg_ligne != nb_arg_needed)
+                                {
+                                    printf("ERREUR LIGNE : %d\n", line);
+                                    ERROR_MSG("Erreur, mauvais nombre d'arguments pour instruction !\n");
+                                }
+                                S = START;
+                                nb_arg_ligne = 0;
+                                nb_arg_needed= 0;
+                                list_lex = list_lex->next; // saute Virgule
+                                break;
+                            }
+
                         }
+
                         else {
                             printf("ERREUR LIGNE : %d\n", line);
                             ERROR_MSG("Virgule manquante apres un argument !\n");
@@ -432,7 +440,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                     if (previous_type_lexem == MOINS)
                     {
                         printf("ERREUR LIGNE : %d\n", line);
-                        ERROR_MSG("Seuls entier non signes acceptes apres .space !\n");
+                        ERROR_MSG("Seuls entiers non signes acceptes apres .space !\n");
                     }
 
                     if (type_lexem == SYMBOLE) { // recherche étiquette dans symb_table --> il faudra vérifier que son type CONVIENT
@@ -470,13 +478,8 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
     print_symb_table(symb_table);
     print_list_data(list_data);
 
-        // --- deuxième parcours de la liste ----
-        //if (list_lex == NULL)
-        //{
-        //    ERROR_MSG("Erreur, liste lexemes a analyser vide !\n");
-        //}
+    // --- deuxième parcours de la liste ----
 
-        //symb_table = build_tab_etiq(list_lex ); //cette fonction remplie la table des symboles avec les etiquettes et la renvoit
 
 
         return;

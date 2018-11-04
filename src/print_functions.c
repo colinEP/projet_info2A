@@ -80,8 +80,8 @@ void print_list_instr( LIST l ) {
     INSTR I;
     printf("\n====== Liste des instructions ======\n");
     printf("\n          |          |          |\n");
-    printf(" valeur   |  arg1    |  arg2    |  arg 3\n");
-    printf("          |          |          |\n");
+    printf(" valeur   |  arg1    |  arg2    |  arg 3    |  etiq_def\n");
+    printf("          |          |          |           |\n");
 
     while (l!= NULL)
     {
@@ -101,7 +101,7 @@ void print_list_instr( LIST l ) {
         else a3 = strdup(((char*)((LEXEM)(I->arg3))->value)) ;
 
 
-        printf(" %s\t  %s\t\t  %s\t   %s\n", val, a1, a2, a3);
+        printf(" %s\t  %s\t\t  %s\t   %s\t  %d\n", val, a1, a2, a3, I->etiq_def);
         l = l->next;
     }
     return;

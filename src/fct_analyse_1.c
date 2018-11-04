@@ -21,6 +21,7 @@
 
 INSTR new_instr(){ //initialisation de la cellule instruction
     INSTR I = calloc(1, sizeof(*I));
+    I->etiq_def = 0; // initialisation de la variable qui indique si etiquette definie dans symb_tab
     I-> arg1 = NULL;
     I-> arg2 = NULL;
     I-> arg3 = NULL;

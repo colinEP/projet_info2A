@@ -11,7 +11,7 @@ typedef struct {
 
 
 
-LIST build_tab_etiq( LIST list_lex );
+//LIST build_tab_etiq( LIST list_lex );
 
 
 int look_for_etiq( LIST symb_table, char* lexem);

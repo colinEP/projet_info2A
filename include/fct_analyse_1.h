@@ -27,6 +27,7 @@ typedef struct {
     LEXEM lex;
     int nb_arg;
     int decalage;
+    int etiq_def;
     LEXEM arg1; // à changer ?
     LEXEM arg2;
     LEXEM arg3;

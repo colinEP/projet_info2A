@@ -95,6 +95,7 @@ char* put_in_uppercase (char* chaine)
 
 
 
+
 QUEUE add_definition ( QUEUE Q, int nb_arg, char* inst) // EVENTUELLEMENT A METTRE DANS LE CODE AVEC SEUL APPEL A ajouter_fin
 {
     WORD def = calloc (1, sizeof(def));
