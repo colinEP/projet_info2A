@@ -21,8 +21,9 @@
 
 QUEUE open_dict(char *file) //fonctionne ! Cette fonction ouvre le dictionnaire et stocke les instructions et leur nb arg dans une liste renvoyée
 {
+    int nline = 1;
     FILE *fp = NULL;
-    char inst[10];
+    char inst[16];  // taille max des instructions = 14   (voir boucle while ci-dessous)
     int nb_arg;
     QUEUE list_dico = new_queue();
 
@@ -34,10 +35,17 @@ QUEUE open_dict(char *file) //fonctionne ! Cette fonction ouvre le dictionnaire 
         ERROR_MSG("Error while trying to open %s file --- Aborts",file);
     }
 
-    while (fscanf (fp, "%s %d", inst, &nb_arg) != EOF)
+    while (fscanf (fp, "%15s %d", inst, &nb_arg) != EOF)
+    // on recupère au plus les 15 premiers caracteres de l'inst => pas de risque de buffer-overflow
         {
-            //printf (" Instruction %s et arguments: %d \n", inst, nb_arg); // pour tester
-            list_dico = add_definition(list_dico, nb_arg, inst);
+            fscanf (fp,"%*[^\n]");      // si buffer excedent, on le vide
+            if ( strlen(inst) == 15) {  // test si taille inst trop longue
+                ERROR_MSG("Instruction dans le dico (line %d) trop longue (length max = 14 characters)", nline);
+            }
+
+            //printf (" Instruction %s et arguments: %d \n", inst, nb_arg); // pour DEBUG
+            list_dico = add_definition(list_dico, nb_arg, put_in_uppercase(inst) );
+            nline++;
         }
 
     //read_queue_word(list_dico); // test
@@ -60,7 +68,7 @@ int look_for_inst(char* lex_init, LIST l_dico, int* pnb_arg) //renvoit 1 si inst
     // --- conversion en majuscules ---
     char* lex;
     lex = strdup(lex_init); // pour ne pas modifier la chaine initiale
-    lex = put_in_uppercase (lex);
+    lex = put_in_uppercase(lex);
 
     while (l_dico != NULL)
     {
@@ -84,9 +92,9 @@ char* put_in_uppercase (char* chaine)
 {
     int lgr = strlen(chaine);
     int i;
-    for ( i=0; i <lgr ; i ++) {
+    for (i=0 ; i <lgr ; i++) {
         char c = chaine[i];
-        if ((c>= 'a') && (c<='z')){
+        if ((c>= 'a') && (c<='z')) {
             chaine[i] = c - 32; // on met en majuscule
         }
     }

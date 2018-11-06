@@ -243,7 +243,7 @@ int lex_analyse(char* token, unsigned int nline, int pos, char* line) {
                 break;
         }
     }
-    if ( STATE==ZERO || STATE==INIT || STATE==DEBUT_AIBD) return -1;               //TODO erreur et suppr return -1
+    if ( STATE==ZERO || STATE==INIT || STATE==DEBUT_AIBD) ERROR_MSG("Problème dans la machine à état : renvoie un état impossible (num_etat = %d)", STATE);
     return STATE;
 }
 

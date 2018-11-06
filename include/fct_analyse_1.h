@@ -30,7 +30,7 @@ typedef struct {
 
 
 typedef struct {
-    LEXEM lex;
+    LEXEM lex;   //NOTE utiliser name car confusion avec lex ci dessus
     int nb_arg;
     int decalage;
     ARG_INST arg1;

@@ -1,11 +1,11 @@
 # TEST_RETURN_CODE = PASS
 # allons au ru
 .set noreorder
-.text
+.text #comm
     Lw $t0 , lunchtime
     LW $6, -200($7)
     ADDI $t1,$zero,8
-boucle:
+boucle: #comm2
     BEQ $t0 , $t1 , byebye
     NOP
     addi $t1 , $t1 , 1

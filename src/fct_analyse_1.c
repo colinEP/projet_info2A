@@ -127,33 +127,37 @@ void look_for_undefined_etiq_in_instr(LIST l, LIST symb_table){
 
     INSTR I;
     while (l!= NULL){
-         int a = 0;
-         I = l->element;
+        int a = 0;
+        I = l->element;
 
-         if ( ((ARG_INST)(I->arg1))->etiq_def == 0 ) {
-                 a = look_for_etiq(symb_table, ((LEXEM)(((ARG_INST)(I->arg1))->lex))->value);
-                 if (a == 0){                        // etiq non trouvée donc non déf
-                     printf("ERREUR LIGNE : %d\n", ((LEXEM)(((ARG_INST)(I->arg1))->lex))->nline);
-                     ERROR_MSG("Usage d'une etiquette non definie !\n");
-                 }
-         }
-         if ( ((ARG_INST)(I->arg2))->etiq_def == 0 ) {
-                 a = look_for_etiq(symb_table, ((LEXEM)(((ARG_INST)(I->arg2))->lex))->value);
-                 if (a == 0){                        // etiq non trouvée donc non déf
-                     printf("ERREUR LIGNE : %d\n", ((LEXEM)(((ARG_INST)(I->arg2))->lex))->nline);
-                     ERROR_MSG("Usage d'une etiquette non definie !\n");
-                 }
-         }
-         if ( ((ARG_INST)(I->arg3))->etiq_def == 0 ) {
-                 a = look_for_etiq(symb_table, ((LEXEM)(((ARG_INST)(I->arg3))->lex))->value);
-                 if (a == 0){                        // etiq non trouvée donc non déf
-                     printf("ERREUR LIGNE : %d\n", ((LEXEM)(((ARG_INST)(I->arg3))->lex))->nline);
-                     ERROR_MSG("Usage d'une etiquette non definie !\n");
-                 }
-         }
-         l = l->next;
-     }
-     return;
+        // NOTE peut etre mettre a 1 m^eme si inutile
+
+
+        if ( ((ARG_INST)(I->arg1))->etiq_def == 0 ) {
+                //a = look_for_etiq(symb_table, ((LEXEM)(((ARG_INST)(I->arg1))->lex))->value);
+                a = look_for_etiq(symb_table, I->arg1->lex->value );
+                if (a == 0){                        // etiq non trouvée donc non déf
+                    printf("ERREUR LIGNE : %d\n", ((LEXEM)(((ARG_INST)(I->arg1))->lex))->nline);
+                    ERROR_MSG("Usage d'une etiquette non definie !\n");
+                }
+        }
+        if ( ((ARG_INST)(I->arg2))->etiq_def == 0 ) {
+                a = look_for_etiq(symb_table, ((LEXEM)(((ARG_INST)(I->arg2))->lex))->value);
+                if (a == 0){                        // etiq non trouvée donc non déf
+                    printf("ERREUR LIGNE : %d\n", ((LEXEM)(((ARG_INST)(I->arg2))->lex))->nline);
+                    ERROR_MSG("Usage d'une etiquette non definie !\n");
+                }
+        }
+        if ( ((ARG_INST)(I->arg3))->etiq_def == 0 ) {
+                a = look_for_etiq(symb_table, ((LEXEM)(((ARG_INST)(I->arg3))->lex))->value);
+                if (a == 0){                        // etiq non trouvée donc non déf
+                    printf("ERREUR LIGNE : %d\n", ((LEXEM)(((ARG_INST)(I->arg3))->lex))->nline);
+                    ERROR_MSG("Usage d'une etiquette non definie !\n");
+                }
+        }
+        l = l->next;
+    }
+    return;
 }
 
 
@@ -174,8 +178,8 @@ void look_for_undefined_etiq_in_data(LIST l, LIST symb_table){
         }
         l = l->next;
 
-     }
-     return;
+    }
+    return;
 }
 
 
@@ -188,12 +192,12 @@ void look_for_undefined_etiq_in_data(LIST l, LIST symb_table){
 
 
 
- char *mystrcat( char *start, char *addend )
+char *mystrcat( char *start, char *addend )
 {
 	size_t slen = strlen( start );
 	size_t alen = strlen( addend );
 	char   *str = calloc( 1, slen+alen+1 );
 	memcpy( str, start, slen );
 	memcpy( str+slen, addend, alen ); // ajout du \0 automatique !
-  return str;
+    return str;
 }
