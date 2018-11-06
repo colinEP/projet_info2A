@@ -38,44 +38,44 @@ INSTR new_instr(){ //initialisation de la cellule instruction
 }
 
 LIST add_to_list_instr(LEXEM l, int dec, int nbarg, LIST list_instr)
- {
-     INSTR I = new_instr();
-     I-> decalage = dec;
-     I-> nb_arg = nbarg;
-     I-> lex = l;
-     list_instr = add_to_list(list_instr, I);
-     return list_instr;
- }
+{
+    INSTR I = new_instr();
+    I-> decalage = dec;
+    I-> nb_arg = nbarg;
+    I-> lex = l;
+    list_instr = add_to_list(list_instr, I);
+    return list_instr;
+}
 
 
- DATA new_data(){ //initialisation de la cellule DATA
-     DATA data = calloc(1, sizeof(*data));
-     data->etiq_def = 0; // initialisation de la variable qui indique si etiquette definie dans symb_tab
-     return data;
- }
+DATA new_data(){ //initialisation de la cellule DATA
+    DATA data = calloc(1, sizeof(*data));
+    data->etiq_def = 0; // initialisation de la variable qui indique si etiquette definie dans symb_tab
+    return data;
+}
 
 data_op fill_val_op(void* pvalue, operand_type type_op)
 {
     data_op D = calloc (1, sizeof(*D));
     D->type = type_op;
     switch(D->type)
-       {
-           case PWORD:
-               D->val.PWORD = (*(int*)pvalue);
-               break;
-           case PBYTE:
-               D->val.PBYTE = *(char*)pvalue;
-               break;
-           case PASCIIZ:
-               D->val.PASCIIZ = (char*)pvalue;
-               break;
-           case PSPACE:
-               D->val.PSPACE = (*(unsigned int*)pvalue);
-               break;
-           case LABEL:
-               D->val.LABEL = (char*)pvalue;
-               break;
-       }
+        {
+            case PWORD:
+                D->val.PWORD = (*(int*)pvalue);
+                break;
+            case PBYTE:
+                D->val.PBYTE = *(char*)pvalue;
+                break;
+            case PASCIIZ:
+                D->val.PASCIIZ = (char*)pvalue;
+                break;
+            case PSPACE:
+                D->val.PSPACE = (*(unsigned int*)pvalue);
+                break;
+            case LABEL:
+                D->val.LABEL = (char*)pvalue;
+                break;
+        }
     return D;
 }
 
