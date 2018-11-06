@@ -11,7 +11,7 @@ boucle: #comm2
     addi $t1 , $t1 , 1
     J boucle
     NOP
-byebye:
+byebye: test :
     JAL boucle
 
 .data

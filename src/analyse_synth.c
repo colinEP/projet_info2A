@@ -41,7 +41,6 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
     LIST* pcurrent_list = NULL; // considérer le cas où il est à NULL alors qu'on rentre dans une autre instruction que definition de SECTION
     int nb_arg_ligne = 0;
     int nb_arg_needed = 0;
-    //int val = 0 ; // variable pour look_for_inst
     int S = START;
 
     // --- premier parcours de la liste ----
@@ -67,10 +66,12 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
             /* ------------ CASE S = START ----------------- */
                 switch(type_lexem) {
                     case SYMBOLE:
+                        if (section==NONE) {  // sinon risque de pointeur vers NULL ( pdecalage / pcurrent_list )
+                            printf("ERREUR LIGNE : %d\n", line);
+                            ERROR_MSG("Erreur, aucune section définie !\n");
+                        }
                         // cas 1 : une déclaration d'étiquette ? (on commence par ce cas car certaines etiquettes ont le même nom que des instructions)
-                        //if ( ( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == DEUX_PTS) {
                         if ( ( (LEXEM)(list_lex->next->element))->lex_type == DEUX_PTS) {
-                            //if (look_for_etiq(symb_table, val_lexem) == 1){
                             if (look_for_etiq(symb_table, val_lexem)) {
                                 printf("ERREUR LIGNE : %d\n", line);
                                 ERROR_MSG("Redefinition d'etiquette !\n");
@@ -79,32 +80,10 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                             symb_table = add_to_symb_table(val_lexem, *pdecalage, line, section, symb_table);
 
                             list_lex = list_lex->next; // on va passer les DEUX_PTS
-                            //NOTE pourquoi pas ->next->next
-
-                            if ( ( ( (LEXEM)(list_lex->next->element))->lex_type == NL) || ( ( (LEXEM)(list_lex->next->element))->lex_type == COMMENT) ) {
-                                list_lex = list_lex-> next; // on va passer le NL ou le COMMENT (on sera dans le case(NL) )
-                                S = START;  // inutile ?
-                                break;
-                            }
-
-
-                            // WARNING NOTE WARNING TODO TODO TODO
-                            // WARNING NOTE WARNING TODO TODO TODO
-                            // il peut y avoir plusieur étiquette a la suite !!!!!! ou l'instruction
-                            // => ne pas test si NL mais passer direct au prochain case
-                            // non faut sauter le NL
-                            // WARNING NOTE WARNING TODO TODO TODO
-                            // WARNING NOTE WARNING TODO TODO TODO
-                            else {
-                                printf("ERREUR LIGNE : %d\n", line);
-                                ERROR_MSG("Erreur, elements non valides apres un symbole deux-points !\n");
-                            }
+                            break;
                         }
 
                         // cas 2 : une instruction ?
-
-                        //val = look_for_inst(val_lexem, dictionnaire, &nb_arg_needed);
-                        //if (val == 1)
                         if ( look_for_inst(val_lexem, dictionnaire, &nb_arg_needed) )   // le else sert a rien normalement
                         {
                             if (section != TEXT) // pas d'instruction possible hors de la section .Text
@@ -119,12 +98,10 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                         // cas 3 : erreur CAR LIGNE VIDE DEJA IGNORE DANS L'ANALYSE LEXICAL
                         else { // c'est une erreur car une ligne ne peut pas commencer par un appel d'etiquette !
                             printf("ERREUR LIGNE : %d\n", line);
-                            ERROR_MSG("Erreur, symbole non valide en debut de ligne !\n");
+                            ERROR_MSG("Erreur, symbole non valide en debut de ligne ! (debut après étiquette)\n");
                         }
 
                     case COMMENT: //on ne considère pas les commentaires, on ne les stocke pas
-
-                        //if (( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL) {
                         if ( ( (LEXEM)(list_lex->next->element))->lex_type == NL) {
                             list_lex = list_lex->next; // on saute le NL qui suit
                             break;
@@ -145,7 +122,6 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                             section = PDATA;
                             pcurrent_list = &list_data;
                             pdecalage = &dec_data;
-                            //if ( ( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL) {
                             if ( ( ( (LEXEM)(list_lex->next->element))->lex_type == NL) || ( ( (LEXEM)(list_lex->next->element))->lex_type == COMMENT) ) {
                                  list_lex = list_lex-> next; // on va passer le NL ou le COMMENT (on sera dans le case(NL) )
                                  S = START;
@@ -160,7 +136,6 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                             section = BSS;
                             pcurrent_list = &list_bss;
                             pdecalage = &dec_bss;
-                            //if ( ( ((LEXEM)((LIST)(list_lex->next))->element)->lex_type) == NL) {
                             if ( ( ( (LEXEM)(list_lex->next->element))->lex_type == NL) || ( ( (LEXEM)(list_lex->next->element))->lex_type == COMMENT) ) {
                                  list_lex = list_lex-> next; // on va passer le NL ou le COMMENT (on sera dans le case(NL) )L
                                  S = START;
@@ -260,7 +235,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                     default :
                         printf("ERREUR LIGNE : %d\n", line);
                         //ERROR_MSG("Element non acceptable en debut de ligne !\n");
-                        ERROR_MSG("Element non acceptable en debut de ligne !\n");
+                        ERROR_MSG("Element non acceptable en debut de ligne ! (debut après étiquette)\n");
                         // TODO afficher le lexeme qui cree l'erreur
                 }
                 break;

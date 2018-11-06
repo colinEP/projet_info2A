@@ -6,5 +6,4 @@
 void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_table, LIST list_lex );
 
 
-
 #endif
