@@ -101,6 +101,8 @@ int main ( int argc, char *argv[] ) {
     // a mettre dans les tests  avec -t
 
 
+    test_register();
+
 
     /* ---------------- do the lexical analysis -------------------*/
     INFO_MSG("Début de l'analyse lexical");

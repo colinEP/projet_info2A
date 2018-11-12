@@ -4,5 +4,6 @@
 
 
 void type_lex_test();
+void test_register();
 
 #endif

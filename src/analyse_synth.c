@@ -312,7 +312,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                 if (type_lexem == SYMBOLE) { // recherche étiquette dans symb_table
                     // alignement en mémoire du mot
                     *pdecalage = *pdecalage + 3 - ((*pdecalage-1+4)%4);  // +4 car pour gérer le cas dec=0  (en c : -1%4 = -1)
-                    if (*pdecalage%4) {
+                    if (*pdecalage%4) {  // normalement jamais le cas si ligne prec OK
                         printf("ERREUR LIGNE : %d\n", line);
                         ERROR_MSG("Erreur, problème d'alignement d'addressage en mémoire du mot !\n");
                     }
@@ -348,7 +348,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                         ERROR_MSG("Erreur, problème d'alignement d'addressage en mémoire du mot !\n");
                     }
                     // conversion de la string en nombre
-                    val_convert = (int) strtol(val_lexem, NULL, 0);
+                    val_convert = (int) strtol(val_lexem, NULL, 0); // sauf cas du REG et AIBD
                     if (previous_type_lexem == MOINS) val_convert = -val_convert;
                     // TODO TODO TODO TODO
                     // TODO TODO TODO TODO
