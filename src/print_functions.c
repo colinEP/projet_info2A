@@ -46,12 +46,12 @@ void read_queue_word(QUEUE Q)
     QUEUE first_memory = Q;
     WORD mot = Q->element;
     printf("lecture de la liste Queue : \n");
-    printf("instruction : %s arguments: %d  \n", mot->instruction, mot->arg);
+    printf("Instruction : %s nb arguments: %d  type arg1 : %s  type arg2 : %s  type arg3: %s \n", mot->instruction, mot->arg, mot->arg_type_1, mot->arg_type_2, mot->arg_type_3);
     Q = Q->next;
     while (Q != first_memory)
     {
         WORD mot = Q->element;
-        printf("instruction : %s arguments: %d  \n", mot->instruction, mot->arg);
+        printf("Instruction : %s nb arguments: %d  type arg1 : %s  type arg2 : %s  type arg3: %s \n", mot->instruction, mot->arg, mot->arg_type_1, mot->arg_type_2, mot->arg_type_3);
         Q = Q->next;
 
     }

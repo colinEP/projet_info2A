@@ -16,7 +16,7 @@ LIST open_dict(char *file);
 
 int look_for_inst(char* lex_init, LIST l_dico, int* nb_arg);
 
-QUEUE add_definition ( QUEUE Q, int nb_arg, char* instruction);
+QUEUE add_definition ( QUEUE Q, int nb_arg, char* instruction, char* a_type_1, char* a_type_2, char* a_type_3);
 
 char* put_in_uppercase (char* chaine);
 
