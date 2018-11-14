@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <ctype.h>
+
 
 #include <global.h>
 #include <notify.h>
@@ -9,6 +11,7 @@
 #include <queue_list.h>
 #include <test.h>
 #include <dictionnaire.h>
+#include <print_functions.h>
 
 #include <error.h>
 #include <assert.h>
@@ -18,6 +21,7 @@
 
 QUEUE open_dict(char *file) //fonctionne ! Cette fonction ouvre le dictionnaire et stocke les instructions et leur nb arg dans une liste renvoyée
 {
+    int nline = 1;
     FILE *fp = NULL;
     char inst[10];
     char arg1[10];
@@ -45,7 +49,7 @@ QUEUE open_dict(char *file) //fonctionne ! Cette fonction ouvre le dictionnaire 
 
 
 
-int look_for_inst(char* lex, LIST l_dico, int* pnb_arg) //renvoit 1 si instruction lex trouvée dans le dictionnaire, 0 sinon
+int look_for_inst(char* lex_init, LIST l_dico, int* pnb_arg) //renvoit 1 si instruction lex trouvée dans le dictionnaire, 0 sinon
 {
     if (l_dico == NULL)
     {
@@ -54,6 +58,11 @@ int look_for_inst(char* lex, LIST l_dico, int* pnb_arg) //renvoit 1 si instructi
 
     int a;
     int i = 0;
+    // --- conversion en majuscules ---
+    char* lex;
+    lex = strdup(lex_init); // pour ne pas modifier la chaine initiale
+    lex = put_in_uppercase(lex);
+
     while (l_dico != NULL)
     {
         a = strcmp(((WORD) l_dico->element)->instruction, lex); // conversion en WORD de (dico->element)
@@ -61,8 +70,8 @@ int look_for_inst(char* lex, LIST l_dico, int* pnb_arg) //renvoit 1 si instructi
         if (a == 0)
 
         {
+            //printf("valeur arguments : %d et compteur de boucle %d\n", *pnb_arg, i);
             *pnb_arg = ((WORD) l_dico->element)->arg;
-            printf("valeur arguments : %d et compteur de boucle %d\n", *pnb_arg, i);
             return 1; //alors l'instruction a été trouvée !
         }
         l_dico = l_dico->next;
@@ -72,6 +81,18 @@ int look_for_inst(char* lex, LIST l_dico, int* pnb_arg) //renvoit 1 si instructi
 }
 
 
+char* put_in_uppercase (char* chaine)
+{
+    int lgr = strlen(chaine);
+    int i;
+    for (i=0 ; i <lgr ; i++) {
+        char c = chaine[i];
+        if ((c>= 'a') && (c<='z')) {
+            chaine[i] = c - 32; // on met en majuscule
+        }
+    }
+    return chaine;
+}
 
 
 

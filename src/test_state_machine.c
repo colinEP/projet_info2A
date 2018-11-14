@@ -14,6 +14,7 @@
 
 void type_lex_test()
 {
+    printf("\n------ test analyse lexeme --------\n");
     if (lex_analyse("01234567",0 , 0, NULL) != OCTAL)
     {
         printf("Erreur analyse pour les %d\n", OCTAL);
