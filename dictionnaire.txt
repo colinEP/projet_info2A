@@ -1,29 +1,29 @@
-ADD 3
-ADDI 3
-SUB 3
-MULT 2
-DIV 2
-AND 3
-OR 3
-XOR 3
-ROTR 3
-SLL 3
-SRL 3
-SLT 3
-LW 2
-SW 2
-LUI 2
-MFHI 1
-MFLO 1
-BEQ 3
-BNE 3
-BGTZ 2
-BLEZ 2
-J 1
-JAL 1
-JR 2
+ADD 3 Reg Reg Reg
+ADDI 3 Reg Reg Imm
+SUB 3 Reg Reg Reg
+MULT 2 Reg Reg
+DIV 2 Reg Reg
+AND 3 Reg Reg Reg
+OR 3 Reg Reg Reg
+XOR 3 Reg Reg Reg
+ROTR 3 Reg Reg Sa
+SLL 3 Reg Reg Sa
+SRL 3 Reg Reg Sa
+SLT 3 Reg Reg Reg
+LW 2 Reg Bas
+SW 2 Reg Bas
+LUI 2 Reg Imm
+MFHI 1 Reg
+MFLO 1 Reg
+BEQ 3 Reg Reg Rel
+BNE 3 Reg Reg Rel
+BGTZ 2 Reg Rel
+BLEZ 2 Reg Rel
+J 1 Abs
+JAL 1 Abs
+JR 2 Reg
 NOP 0
-MOVE 2
-NEG 2
-LI 2
-BLT 3
+MOVE 2 Reg Reg
+NEG 2 Reg Reg
+LI 2 Reg Imm
+BLT 3 Reg Reg Abs 

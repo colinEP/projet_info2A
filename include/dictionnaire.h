@@ -6,6 +6,9 @@ typedef struct
 {
     int arg;
     char* instruction;
+    char* arg_type_1;
+    char* arg_type_2;
+    char* arg_type_3;
 } *WORD; // structure qui prend les mots du dictionnaire stockés
 
 
