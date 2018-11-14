@@ -22,7 +22,7 @@
 void test_register()
 {
     int reg;
-    printf("------test des registres --------\n");
+    printf("\n------ test des registres --------\n");
 
     reg = check_and_convert_register("$t0");
     printf("Pour le symbole t0 le prog renvoit : %d \n", reg);
@@ -56,6 +56,8 @@ void test_register()
     printf("Pour le symbole gp le prog renvoit : %d \n", reg);
     reg = check_and_convert_register("$fp");
     printf("Pour le symbole fp le prog renvoit : %d \n", reg);
+    reg = check_and_convert_register("$zero");
+    printf("Pour le symbole zero le prog renvoit : %d \n", reg);
 
 
     return;

@@ -26,4 +26,4 @@ lunchtime:
 menu:
     .space 0x4
     .space 24
-    .space 0x4
+    .space 0x5

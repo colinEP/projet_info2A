@@ -53,6 +53,7 @@ int main ( int argc, char *argv[] ) {
 
         /* ---------------- TEST ----------------*/
         type_lex_test();
+        test_register();
 
         exit( EXIT_SUCCESS );
     }
@@ -99,9 +100,6 @@ int main ( int argc, char *argv[] ) {
     // NOTE colin
     // printf("%d  %d", Retour, nb_arg) // look_for_inst_ => find_instr
     // a mettre dans les tests  avec -t
-
-
-    test_register();
 
 
     /* ---------------- do the lexical analysis -------------------*/

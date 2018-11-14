@@ -118,7 +118,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                         ERROR_MSG("Erreur, après le commentaire !\n");
 
 
-                    case NL: // impossible je crois
+                    case NL:
                         //ON Y PASSE AVEC .set => on peut généraliser utilisation => NON !!!
                         //printf("AAAAAAA  %s\n\n\n\n\n\n\n\n",  ( (LEXEM)(list_lex->next->element))->value);
                         break;
@@ -175,9 +175,11 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                             //      printf("AAAAAAA\n\n\n\n\n\n\n\n");
                             // }
                             S = START;
-                            list_lex = list_lex->next; // on saute l'argument qui suit
-                                                       // OU le NL si oublie de l'argument par le coder => case NL
+                            list_lex = list_lex->next; // on saute l'argument qui suit => case NL
+                                                       // OU le NL si oublie de l'argument par le codeur
                             // TODO si y'en a pas ? erreur ?
+                            // TODO erreur si pas d'argument
+                            // TODO erreur si pas section NONE
                             break;
                         }
 
@@ -206,20 +208,10 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                         }
 
                         if (section == TEXT ){
-                            // WARNING NOTE WARNING TODO TODO TODO
-                            // WARNING NOTE WARNING TODO TODO TODO
-                            // ces directives sont interdites dans .text non ???
-                            // WARNING NOTE WARNING TODO TODO TODO
-                            // WARNING NOTE WARNING TODO TODO TODO
-                            if      (strcmp(val_lexem, ".word")   == 0) S = PWORD;
-                            else if (strcmp(val_lexem, ".byte")   == 0) S = PBYTE;
-                            else if (strcmp(val_lexem, ".asciiz") == 0) S = PASCIIZ;
-                            else if (strcmp(val_lexem, ".space")  == 0) S = PSPACE;
-                            else {
-                                printf("ERREUR LIGNE : %d\n", line);
-                                ERROR_MSG("Directive inconnue ou dans mauvaise section !\n");
-                            }
-                            break;
+                            // Les directives (autres que celles de section) sont interdites dans la section TEXT
+                            printf("ERREUR LIGNE : %d\n", line);
+                            ERROR_MSG("Directive interdites dans la section TEXT !\n");
+                            break; //
                         }
 
                     default :
@@ -304,11 +296,6 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
             case PWORD:
 
-                if ((type_lexem == VIRGULE) || (type_lexem == DEUX_PTS) || (type_lexem == DIRECTIVE) || (type_lexem == STRING)){
-                    printf("ERREUR LIGNE : %d\n", line);
-                    ERROR_MSG("Element non acceptable apres un .word !\n");
-                }
-
                 if (type_lexem == SYMBOLE) { // recherche étiquette dans symb_table
                     // alignement en mémoire du mot
                     *pdecalage = *pdecalage + 3 - ((*pdecalage-1+4)%4);  // +4 car pour gérer le cas dec=0  (en c : -1%4 = -1)
@@ -377,7 +364,13 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                         ERROR_MSG("Virgule manquante apres un argument !\n");
                     }
                 }
-                break;
+                if (type_lexem == NL) {
+                    printf("ERREUR LIGNE : %d\n", line);
+                    ERROR_MSG("Element manquant apres un .word !\n");
+                }
+                printf("ERREUR LIGNE : %d\n", line);
+                ERROR_MSG("Element non acceptable apres un .word !\n");
+
 
             case PASCIIZ:
 
