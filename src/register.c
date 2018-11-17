@@ -122,18 +122,28 @@ int check_type_arg_inst(int type_lexem, char* val_lexem, int type_arg_expected)
     }
 
     if (type_arg_expected == Imm){
+        // TODO
+        return 1;
     }
 
     if (type_arg_expected == Rel){
+        // TODO
+        return 1;
     }
 
     if (type_arg_expected == Abs){
+        // TODO
+        return 1;
     }
 
     if (type_arg_expected == Sa){
+        // TODO
+        return 1;
     }
 
     if (type_arg_expected == Bas){
+        // TODO
+        return 1;
     }
 
     if (type_arg_expected == None){

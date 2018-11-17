@@ -161,7 +161,7 @@ LIST add_to_current_list(operand_type type_op, void* pvalue, int dec, int line, 
      if ( nb_arg_ligne == 1 ) {
          A = ((ARG_INST)(((INSTR)(list_instr->element))->arg1));
          A->type = type;
-         value = strdup(A->val.char_chain);
+         A->val.char_chain = strdup(value);
          A->etiq_def = etiq_definition;
          return list_instr;
       }
@@ -169,7 +169,7 @@ LIST add_to_current_list(operand_type type_op, void* pvalue, int dec, int line, 
           if (  nb_arg_ligne == 2 ){
                A = ((ARG_INST)(((INSTR)(list_instr->element))->arg2));
                A->type = type;
-               value = strdup(A->val.char_chain);
+               A->val.char_chain = strdup(value);
                A->etiq_def = etiq_definition;
                return list_instr;
           }
@@ -177,7 +177,7 @@ LIST add_to_current_list(operand_type type_op, void* pvalue, int dec, int line, 
               if (  nb_arg_ligne == 3 ){
                   A = ((ARG_INST)(((INSTR)(list_instr->element))->arg3));
                   A->type = type;
-                  value = strdup(A->val.char_chain);
+                  A->val.char_chain = strdup(value);
                   A->etiq_def = etiq_definition;
                   return list_instr;
               }
@@ -232,23 +232,61 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
 
      if (etiq_definition != -1){
          // cas où l'on a une étiquette, pas besoin de checker expected_type ! Mais il faudra le faire à la relocation !?
-         list_instr = add_label_or_sa(nb_arg_ligne, LABEL, lexem->value, etiq_definition, list_instr);
+         list_instr = add_label_or_sa(nb_arg_ligne, Label, lexem->value, etiq_definition, list_instr);
          return list_instr;
      }
      else { // ce n'est pas une étiquette
         // là il faut checker le type_arg_expected lequel est stocké dans la list_instr
-
         // TODO :
+        char* val_lexem = lexem->value;
+        int convert_value;
         if (nb_arg_ligne == 1){
-            check_type_arg_inst(lexem->lex_type, lexem->value, ((INSTR)(list_instr->element))->Exp_Type_1);
-            //convertir;
-            //add_int(nb_arg_ligne, inst_op_type type, int valeur, int etiq_definition,LIST list_instr);
+            check_type_arg_inst(lexem->lex_type, val_lexem, ((INSTR)(list_instr->element))->Exp_Type_1);
+
+            if (((INSTR)(list_instr->element))->Exp_Type_1 == Sa){
+                list_instr = add_label_or_sa(nb_arg_ligne, Sa, val_lexem, etiq_definition, list_instr);
+                return list_instr;
+            }
+
+            if (lexem->lex_type == REGISTRE){
+                convert_value = check_and_convert_register(val_lexem);
+                list_instr=add_int(nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_1, convert_value, etiq_definition, list_instr);
+                return list_instr;
+            }
+
+            convert_value = (int) strtol(val_lexem, NULL, 0);
+            list_instr=add_int(nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_1, convert_value, etiq_definition, list_instr);
+            return list_instr;
         }
         if (nb_arg_ligne == 2){
-            check_type_arg_inst(lexem->lex_type, lexem->value, ((INSTR)(list_instr->element))->Exp_Type_2);
+            check_type_arg_inst(lexem->lex_type, val_lexem, ((INSTR)(list_instr->element))->Exp_Type_2);
+                if (((INSTR)(list_instr->element))->Exp_Type_2 == Sa){
+                    list_instr = add_label_or_sa(nb_arg_ligne, Sa, val_lexem, etiq_definition, list_instr);
+                    return list_instr;
+                }
+                if (lexem->lex_type == REGISTRE){
+                    convert_value = check_and_convert_register(val_lexem);
+                    list_instr=add_int(nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_2, convert_value, etiq_definition, list_instr);
+                    return list_instr;
+                }
+                convert_value = (int) strtol(val_lexem, NULL, 0);
+                list_instr = add_int(nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_2, convert_value, etiq_definition, list_instr);
+                return list_instr;
         }
         if (nb_arg_ligne == 3){
-            check_type_arg_inst(lexem->lex_type, lexem->value, ((INSTR)(list_instr->element))->Exp_Type_3);
+            check_type_arg_inst(lexem->lex_type, val_lexem, ((INSTR)(list_instr->element))->Exp_Type_3);
+                if (((INSTR)(list_instr->element))->Exp_Type_1 == Sa){
+                    list_instr = add_label_or_sa(nb_arg_ligne, Sa, val_lexem, etiq_definition, list_instr);
+                    return list_instr;
+                }
+                if (lexem->lex_type == REGISTRE){
+                    convert_value = check_and_convert_register(val_lexem);
+                    list_instr=add_int(nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_3, convert_value, etiq_definition, list_instr);
+                    return list_instr;
+                }
+                convert_value = (int) strtol(val_lexem, NULL, 0);
+                list_instr=add_int(nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_1, convert_value, etiq_definition, list_instr);
+                return list_instr;
         }
      }
 
