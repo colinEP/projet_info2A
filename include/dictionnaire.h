@@ -11,10 +11,9 @@ typedef struct
     char* arg_type_3;
 } *WORD; // structure qui prend les mots du dictionnaire stockés
 
-
 LIST open_dict(char *file);
 
-int look_for_inst(char* lex_init, LIST l_dico, int* nb_arg);
+int look_for_inst(char* lex_init, LIST l_dico, int* pnb_arg, int* exp_typ_1, int* exp_typ_2, int* exp_typ_3);
 
 QUEUE add_definition ( QUEUE Q, int nb_arg, char* instruction, char* a_type_1, char* a_type_2, char* a_type_3);
 

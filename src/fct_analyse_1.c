@@ -12,6 +12,7 @@
 #include <fct_analyse_1.h>
 #include <analyse_synth.h>
 #include <print_functions.h>
+#include <dictionnaire.h>
 
 #include <etiq.h>
 
@@ -19,30 +20,64 @@
 
 
 
+// INSTR new_instr(){ //initialisation de la cellule instruction
+//     INSTR I = calloc(1, sizeof(*I));
+//
+//     I-> arg1 = calloc(1, sizeof(*(I-> arg1)));
+//     ((ARG_INST)(I-> arg1))->lex = NULL;
+//     ((ARG_INST)(I-> arg1))->etiq_def = -1; // initialisation de la variable qui indique si etiquette definie dans symb_tab. A -1 pour faciliter deuxième passage de la boucle
+//
+//     I-> arg2 = calloc(1, sizeof(*(I-> arg2)));
+//     ((ARG_INST)(I-> arg2))->lex = NULL;
+//     ((ARG_INST)(I-> arg2))->etiq_def = -1;
+//
+//     I-> arg3 = calloc(1, sizeof(*(I-> arg3)));
+//     ((ARG_INST)(I-> arg3))->lex = NULL;
+//     ((ARG_INST)(I-> arg3))->etiq_def = -1;
+//
+//     return I;
+// }
+
 INSTR new_instr(){ //initialisation de la cellule instruction
     INSTR I = calloc(1, sizeof(*I));
 
     I-> arg1 = calloc(1, sizeof(*(I-> arg1)));
-    ((ARG_INST)(I-> arg1))->lex = NULL;
     ((ARG_INST)(I-> arg1))->etiq_def = -1; // initialisation de la variable qui indique si etiquette definie dans symb_tab. A -1 pour faciliter deuxième passage de la boucle
+    ((ARG_INST)(I-> arg1))->type = None;
 
     I-> arg2 = calloc(1, sizeof(*(I-> arg2)));
-    ((ARG_INST)(I-> arg2))->lex = NULL;
     ((ARG_INST)(I-> arg2))->etiq_def = -1;
+    ((ARG_INST)(I-> arg1))->type = None;
 
     I-> arg3 = calloc(1, sizeof(*(I-> arg3)));
-    ((ARG_INST)(I-> arg3))->lex = NULL;
     ((ARG_INST)(I-> arg3))->etiq_def = -1;
+    ((ARG_INST)(I-> arg1))->type = None;
 
     return I;
 }
 
-LIST add_to_list_instr(LEXEM l, int dec, int nbarg, LIST list_instr)
+// LIST add_to_list_instr(LEXEM l, int dec, int nbarg, LIST list_instr)
+// {
+//     INSTR I = new_instr();
+//     I-> decalage = dec;
+//     I-> nb_arg = nbarg;
+//     I-> lex = l;
+//     list_instr = add_to_list(list_instr, I);
+//     return list_instr;
+// }
+
+
+
+LIST add_to_list_instr(LEXEM l, int dec, int nbarg, LIST list_instr, int exp_typ_1, int exp_typ_2, int exp_typ_3)
 {
+
     INSTR I = new_instr();
     I-> decalage = dec;
     I-> nb_arg = nbarg;
     I-> lex = l;
+    I->Exp_Type_1 = exp_typ_1;
+    I->Exp_Type_2 = exp_typ_2;
+    I->Exp_Type_3 = exp_typ_3;
     list_instr = add_to_list(list_instr, I);
     return list_instr;
 }
@@ -53,6 +88,7 @@ DATA new_data(){ //initialisation de la cellule DATA
     data->etiq_def = 0; // initialisation de la variable qui indique si etiquette definie dans symb_tab
     return data;
 }
+
 
 data_op fill_val_op(void* pvalue, operand_type type_op)
 {
@@ -90,37 +126,135 @@ LIST add_to_current_list(operand_type type_op, void* pvalue, int dec, int line, 
 }
 
 
+// LIST fill_arguments(LEXEM lexem, LIST list_instr, int previous_type_lexem, int etiq_definition) // faire la verification des type d'arg ICI
+// {
+//     if (previous_type_lexem == MOINS)
+//     {
+//         lexem->value = strdup(mystrcat("-", lexem->value));
+//     }
+//     if ( ((ARG_INST)(((INSTR)(list_instr->element))->arg1))->lex == NULL){  // à mettre sous forme d'une fonction
+//          ((ARG_INST)(((INSTR)(list_instr->element))->arg1))->lex = lexem;
+//          ((ARG_INST)(((INSTR)(list_instr->element))->arg1))->etiq_def = etiq_definition;
+//      }
+//      else {
+//          if ( ((ARG_INST)(((INSTR)(list_instr->element))->arg2))->lex == NULL){
+//               ((ARG_INST)(((INSTR)(list_instr->element))->arg2))->lex = lexem;
+//              ((ARG_INST)(((INSTR)(list_instr->element))->arg2))->etiq_def = etiq_definition;
+//          }
+//          else {
+//              if ( ((ARG_INST)(((INSTR)(list_instr->element))->arg3))->lex == NULL){
+//                   ((ARG_INST)(((INSTR)(list_instr->element))->arg3))->lex = lexem;
+//                  ((ARG_INST)(((INSTR)(list_instr->element))->arg3))->etiq_def = etiq_definition;
+//              }
+//              else {
+//                  printf("ERREUR LIGNE : %d\n", lexem->nline);
+//                  ERROR_MSG("Trop d'arguments !\n");
+//              }
+//          }
+//      }
+//      return list_instr;
+//  }
 
+ LIST add_label_or_sa(int nb_arg_ligne, inst_op_type type, char* value, int etiq_definition, LIST list_instr) // cas 0 ??
+ {
+     ARG_INST A;
+     if ( nb_arg_ligne == 1 ) {
+         A = ((ARG_INST)(((INSTR)(list_instr->element))->arg1));
+         A->type = type;
+         value = strdup(A->val.char_chain);
+         A->etiq_def = etiq_definition;
+         return list_instr;
+      }
+      else {
+          if (  nb_arg_ligne == 2 ){
+               A = ((ARG_INST)(((INSTR)(list_instr->element))->arg2));
+               A->type = type;
+               value = strdup(A->val.char_chain);
+               A->etiq_def = etiq_definition;
+               return list_instr;
+          }
+          else {
+              if (  nb_arg_ligne == 3 ){
+                  A = ((ARG_INST)(((INSTR)(list_instr->element))->arg3));
+                  A->type = type;
+                  value = strdup(A->val.char_chain);
+                  A->etiq_def = etiq_definition;
+                  return list_instr;
+              }
+              else {
+                  printf("ERREUR LIGNE : %d\n", ((LEXEM)((INSTR)(list_instr->element))->lex)->nline);
+                  ERROR_MSG("Trop d'arguments !\n");
+              }
+          }
+      }
+      return list_instr;
 
-
-LIST fill_arguments(LEXEM lexem, LIST list_instr, int previous_type_lexem, int etiq_definition)
-{
-    if (previous_type_lexem == MOINS)
-    {
-        lexem->value = strdup(mystrcat("-", lexem->value));
-    }
-    if ( ((ARG_INST)(((INSTR)(list_instr->element))->arg1))->lex == NULL){  // à mettre sous forme d'une fonction
-         ((ARG_INST)(((INSTR)(list_instr->element))->arg1))->lex = lexem;
-         ((ARG_INST)(((INSTR)(list_instr->element))->arg1))->etiq_def = etiq_definition;
+ }
+LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definition,LIST list_instr){
+    ARG_INST A;
+    if ( nb_arg_ligne == 1 ) {
+        A = ((ARG_INST)(((INSTR)(list_instr->element))->arg1));
+        A->type = type;
+        A->val.entier = valeur;
+        A->etiq_def = etiq_definition;
+        return list_instr;
      }
      else {
-         if ( ((ARG_INST)(((INSTR)(list_instr->element))->arg2))->lex == NULL){
-              ((ARG_INST)(((INSTR)(list_instr->element))->arg2))->lex = lexem;
-             ((ARG_INST)(((INSTR)(list_instr->element))->arg2))->etiq_def = etiq_definition;
+         if (  nb_arg_ligne == 2 ){
+              A = ((ARG_INST)(((INSTR)(list_instr->element))->arg2));
+              A->type = type;
+              A->val.entier = valeur;
+              A->etiq_def = etiq_definition;
+              return list_instr;
          }
          else {
-             if ( ((ARG_INST)(((INSTR)(list_instr->element))->arg3))->lex == NULL){
-                  ((ARG_INST)(((INSTR)(list_instr->element))->arg3))->lex = lexem;
-                 ((ARG_INST)(((INSTR)(list_instr->element))->arg3))->etiq_def = etiq_definition;
+             if (  nb_arg_ligne == 3 ){
+                 A = ((ARG_INST)(((INSTR)(list_instr->element))->arg3));
+                 A->type = type;
+                 A->val.entier = valeur;
+                 A->etiq_def = etiq_definition;
+                 return list_instr;
              }
              else {
-                 printf("ERREUR LIGNE : %d\n", lexem->nline);
+                 printf("ERREUR LIGNE : %d\n",  ((LEXEM)((INSTR)(list_instr->element))->lex)->nline);
                  ERROR_MSG("Trop d'arguments !\n");
              }
          }
      }
      return list_instr;
  }
+
+ LIST fill_arguments(LEXEM lexem, LIST list_instr, int previous_type_lexem, int etiq_definition, int nb_arg_ligne) // faire la verification des type d'arg ICI
+ {
+     if (previous_type_lexem == MOINS){
+         lexem->value = strdup(mystrcat("-", lexem->value));
+     }
+
+     if (etiq_definition != -1){
+         // cas où l'on a une étiquette, pas besoin de checker expected_type ! Mais il faudra le faire à la relocation !?
+         list_instr = add_label_or_sa(nb_arg_ligne, LABEL, lexem->value, etiq_definition, list_instr);
+         return list_instr;
+     }
+     else { // ce n'est pas une étiquette
+        // là il faut checker le type_arg_expected lequel est stocké dans la list_instr
+
+        // TODO :
+        if (nb_arg_ligne == 1){
+            check_type_arg_inst(lexem->lex_type, lexem->value, ((INSTR)(list_instr->element))->Exp_Type_1);
+            //convertir;
+            //add_int(nb_arg_ligne, inst_op_type type, int valeur, int etiq_definition,LIST list_instr);
+        }
+        if (nb_arg_ligne == 2){
+            check_type_arg_inst(lexem->lex_type, lexem->value, ((INSTR)(list_instr->element))->Exp_Type_2);
+        }
+        if (nb_arg_ligne == 3){
+            check_type_arg_inst(lexem->lex_type, lexem->value, ((INSTR)(list_instr->element))->Exp_Type_3);
+        }
+     }
+
+
+      return list_instr;
+  }
 
 
 void look_for_undefined_etiq_in_instr(LIST l, LIST symb_table){
@@ -135,23 +269,23 @@ void look_for_undefined_etiq_in_instr(LIST l, LIST symb_table){
 
         if ( ((ARG_INST)(I->arg1))->etiq_def == 0 ) {
                 //a = look_for_etiq(symb_table, ((LEXEM)(((ARG_INST)(I->arg1))->lex))->value);
-                a = look_for_etiq(symb_table, I->arg1->lex->value );
+                a = look_for_etiq(symb_table,(((ARG_INST)(I->arg1))->val.char_chain));
                 if (a == 0){                        // etiq non trouvée donc non déf
-                    printf("ERREUR LIGNE : %d\n", ((LEXEM)(((ARG_INST)(I->arg1))->lex))->nline);
+                    printf("ERREUR LIGNE : %d\n", ((LEXEM)(I->lex))->nline);
                     ERROR_MSG("Usage d'une etiquette non definie !\n");
                 }
         }
         if ( ((ARG_INST)(I->arg2))->etiq_def == 0 ) {
-                a = look_for_etiq(symb_table, ((LEXEM)(((ARG_INST)(I->arg2))->lex))->value);
+                a = look_for_etiq(symb_table, (((ARG_INST)(I->arg2))->val.char_chain));
                 if (a == 0){                        // etiq non trouvée donc non déf
-                    printf("ERREUR LIGNE : %d\n", ((LEXEM)(((ARG_INST)(I->arg2))->lex))->nline);
+                    printf("ERREUR LIGNE : %d\n", ((LEXEM)(I->lex))->nline);
                     ERROR_MSG("Usage d'une etiquette non definie !\n");
                 }
         }
         if ( ((ARG_INST)(I->arg3))->etiq_def == 0 ) {
-                a = look_for_etiq(symb_table, ((LEXEM)(((ARG_INST)(I->arg3))->lex))->value);
+                a = look_for_etiq(symb_table, (((ARG_INST)(I->arg3))->val.char_chain));
                 if (a == 0){                        // etiq non trouvée donc non déf
-                    printf("ERREUR LIGNE : %d\n", ((LEXEM)(((ARG_INST)(I->arg3))->lex))->nline);
+                    printf("ERREUR LIGNE : %d\n", ((LEXEM)(I->lex))->nline);
                     ERROR_MSG("Usage d'une etiquette non definie !\n");
                 }
         }
@@ -177,18 +311,9 @@ void look_for_undefined_etiq_in_data(LIST l, LIST symb_table){
             }
         }
         l = l->next;
-
     }
     return;
 }
-
-
-
-// conversion()
-// {
-//
-// }
-
 
 
 
@@ -200,4 +325,17 @@ char *mystrcat( char *start, char *addend )
 	memcpy( str, start, slen );
 	memcpy( str+slen, addend, alen ); // ajout du \0 automatique !
     return str;
+}
+
+
+inst_op_type convert_inst_op_type(char* type)
+{
+    if (strcmp(type, "Reg")==0) return Reg;
+    if (strcmp(type, "Imm")==0) return Imm;
+    if (strcmp(type, "Sa")==0) return Sa;
+    if (strcmp(type, "Bas")==0) return Bas;
+    if (strcmp(type, "Rel")==0) return Rel;
+    if (strcmp(type, "Abs")==0) return Abs;
+    if (strcmp(type, "None")==0) return None;
+    ERROR_MSG("Type invalide dans dictionnaire !\n");
 }

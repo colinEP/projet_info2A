@@ -12,6 +12,7 @@
 #include <test.h>
 #include <dictionnaire.h>
 #include <print_functions.h>
+#include <fct_analyse_1.h>
 
 #include <error.h>
 #include <assert.h>
@@ -50,7 +51,7 @@ QUEUE open_dict(char *file) //fonctionne ! Cette fonction ouvre le dictionnaire 
 
 
 
-int look_for_inst(char* lex_init, LIST l_dico, int* pnb_arg) //renvoit 1 si instruction lex trouvée dans le dictionnaire, 0 sinon
+int look_for_inst(char* lex_init, LIST l_dico, int* pnb_arg, int* exp_typ_1, int* exp_typ_2, int* exp_typ_3) //renvoit 1 si instruction lex trouvée dans le dictionnaire, 0 sinon
 {
     if (l_dico == NULL)
     {
@@ -73,6 +74,9 @@ int look_for_inst(char* lex_init, LIST l_dico, int* pnb_arg) //renvoit 1 si inst
         {
             //printf("valeur arguments : %d et compteur de boucle %d\n", *pnb_arg, i);
             *pnb_arg = ((WORD) l_dico->element)->arg;
+            *exp_typ_1 = convert_inst_op_type(((WORD) l_dico->element)->arg_type_1);
+            *exp_typ_2 = convert_inst_op_type(((WORD) l_dico->element)->arg_type_2);
+            *exp_typ_3 = convert_inst_op_type(((WORD) l_dico->element)->arg_type_3);
             return 1; //alors l'instruction a été trouvée !
         }
         l_dico = l_dico->next;

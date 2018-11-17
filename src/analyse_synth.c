@@ -45,6 +45,10 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
     int val_convert = 0;
 
+    int type_arg_expected_1;
+    int type_arg_expected_2;
+    int type_arg_expected_3;
+
     // --- premier parcours de la liste ----
 
     /* pourquoi suppr ça ? */
@@ -85,7 +89,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                         }
 
                         // cas 2 : une instruction ?
-                        if ( look_for_inst(val_lexem, dictionnaire, &nb_arg_needed) )   // le else sert a rien normalement
+                        if ( look_for_inst(val_lexem, dictionnaire, &nb_arg_needed, &type_arg_expected_1, &type_arg_expected_2, &type_arg_expected_3) )   // le else ne sert a rien normalement
                         {
                             if (section != TEXT) // pas d'instruction possible hors de la section .Text
                                 {
@@ -97,7 +101,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                                 printf("ERREUR LIGNE : %d\n", line);
                                 ERROR_MSG("Erreur, problème d'alignement d'addressage en mémoire de l'instruction !\n");
                             }
-                            else list_instr =  add_to_list_instr(lexem, *pdecalage, nb_arg_needed, list_instr);
+                            else list_instr =  add_to_list_instr(lexem, *pdecalage, nb_arg_needed, list_instr, type_arg_expected_1, type_arg_expected_2, type_arg_expected_3);
                             *pdecalage += 4;
                             S = INSTRUCTION;
                             break;
@@ -258,15 +262,15 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
                         if (type_lexem == SYMBOLE){ // cas etiquette
                             if (look_for_etiq(symb_table, val_lexem) == 1){         // si cette etiq est deja définie
-                                list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 1);
+                                list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 1, nb_arg_ligne);
                             }
-                            else  list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 0);  // si cette etiq n'est PAS deja définie
+                            else  list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 0, nb_arg_ligne);  // si cette etiq n'est PAS deja définie
 
                             break;
                         }
 
                         if ( ( (LEXEM)(list_lex->next->element))->lex_type == VIRGULE) {
-                            list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, -1);
+                            list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, -1, nb_arg_ligne); //renvoit -1 car pas une étiquette
                             S = INSTRUCTION;
                             list_lex = list_lex->next; // saute VIRGULE
                             break;
@@ -277,7 +281,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                                 printf("ERREUR LIGNE : %d\n", line);
                                 ERROR_MSG("Erreur, mauvais nombre d'arguments pour instruction !\n");
                             }
-                            list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, -1);
+                            list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, -1, nb_arg_ligne);
                             S = START;
                             nb_arg_ligne = 0;
                             nb_arg_needed= 0;
@@ -495,9 +499,6 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
 
     // --- deuxième parcours : on cherche les étiquettes ----
-
-
-    // WARNING WARNING LES 3 FCT NE MARCHE PAS ???
     // list_instr
     look_for_undefined_etiq_in_instr(list_instr, symb_table);
     // list_data
@@ -505,7 +506,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
     // list_bss
     look_for_undefined_etiq_in_data(list_bss, symb_table);
 
-    print_list_instr(list_instr);
+    //print_list_instr(list_instr);
     print_symb_table(symb_table);
     print_list_data(list_data);
     // TODO

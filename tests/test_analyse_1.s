@@ -17,7 +17,7 @@ byebye: test :
 
 .data
 lunchtime:
-    .word -12
+    .word 12
     .word boucle
     .byte 4,5
     .asciiz "ils disent : \"au ru!\""
