@@ -9,16 +9,12 @@ boucle: #comm2
     BEQ $t0 , $t1 , byebye
     NOP
     addi $t1 , $t1 , 1
-    J boucle
-    NOP
-byebye: test :
-    JAL boucle
-
-.data
-lunchtime:
-    .word -12
-    .word boucle
-    .byte 4,5
+boucle:
+    BEQ $t0 , $t1 , 6
+ .data
+ lunchtime:
+    .word 12
+    .word boucle    # mais pas là!
     .asciiz "ils disent : \"au ru!\""
     .asciiz "abc"
     .asciiz "12345"
@@ -33,6 +29,4 @@ lunchtime:
     #.byte -129
 .bss
 menu:
-    .space 0x4
     .space 24
-    .space 0x5

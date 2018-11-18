@@ -1,7 +1,7 @@
 #ifndef __PRINT_FUNCTIONS_H
 #define __PRINT_FUNCTIONS_H
 
-void print_list_instr( LIST l );
+//void print_list_instr( LIST l );
 
 void print_symb_table( LIST l );
 

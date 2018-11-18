@@ -96,7 +96,7 @@ int main ( int argc, char *argv[] ) {
     /* ----------------- test du dictionnaire --------------------*/ //FONCTIONNE
     int nb_arg = 0;
     int Retour;
-    Retour = look_for_inst("GAA", dictionnaire, &nb_arg);
+    //Retour = look_for_inst("GAA", dictionnaire, &nb_arg);
     // NOTE colin
     // printf("%d  %d", Retour, nb_arg) // look_for_inst_ => find_instr
     // a mettre dans les tests  avec -t

@@ -104,3 +104,51 @@ int check_and_convert_register(char* reg)
     ERROR_MSG("Erreur, registre inexistant !\n");
 
 }
+
+
+// TODO
+
+int check_type_arg_inst(int type_lexem, char* val_lexem, int type_arg_expected)
+{
+    if (type_arg_expected == Reg){
+        if (type_lexem == REGISTRE) {
+            // int new_val_reg;
+            // new_val_reg = check_and_convert_register(val_lexem); // a mettre ici ??
+            // return new_val_reg;
+            return 1;
+        }
+        // le cas d'étiquette n'est pas à prendre en compte ici car considéré dans la machine à états
+        ERROR_MSG("Erreur, type_registre attendu pour argument !\n");
+    }
+
+    if (type_arg_expected == Imm){
+        // TODO
+        return 1;
+    }
+
+    if (type_arg_expected == Rel){
+        // TODO
+        return 1;
+    }
+
+    if (type_arg_expected == Abs){
+        // TODO
+        return 1;
+    }
+
+    if (type_arg_expected == Sa){
+        // TODO
+        return 1;
+    }
+
+    if (type_arg_expected == Bas){
+        // TODO
+        return 1;
+    }
+
+    if (type_arg_expected == None){
+        ERROR_MSG("Erreur, argument en trop !\n");
+    }
+
+    else ERROR_MSG("Erreur dans fonction check_type_arg_inst !\n");
+}
