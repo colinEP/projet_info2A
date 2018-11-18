@@ -162,7 +162,7 @@ int check_type_arg_inst(int type_lexem, char* val_lexem, int type_arg_expected) 
         }
         convert_value = strtol(val_lexem, NULL, 0);
         if ((convert_value < 0)||(convert_value > 31)){
-            ERROR_MSG("Erreur, argument Sa over 5 bits long !\n");
+            ERROR_MSG("Erreur, argument Sa not between 0 and 31 !\n");
         }
         return convert_value;
     }
