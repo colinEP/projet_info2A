@@ -40,6 +40,9 @@
 
 INSTR new_instr(){ //initialisation de la cellule instruction
     INSTR I = calloc(1, sizeof(*I));
+    I->Exp_Type_1 = None;
+    I->Exp_Type_2 = None;
+    I->Exp_Type_3 = None;
 
     I-> arg1 = calloc(1, sizeof(*(I-> arg1)));
     ((ARG_INST)(I-> arg1))->etiq_def = -1; // initialisation de la variable qui indique si etiquette definie dans symb_tab. A -1 pour faciliter deuxième passage de la boucle
@@ -65,7 +68,6 @@ INSTR new_instr(){ //initialisation de la cellule instruction
 //     list_instr = add_to_list(list_instr, I);
 //     return list_instr;
 // }
-
 
 
 LIST add_to_list_instr(LEXEM l, int dec, int nbarg, LIST list_instr, int exp_typ_1, int exp_typ_2, int exp_typ_3)
@@ -155,7 +157,7 @@ LIST add_to_current_list(operand_type type_op, void* pvalue, int dec, int line, 
 //      return list_instr;
 //  }
 
- LIST add_label_or_sa(int nb_arg_ligne, inst_op_type type, char* value, int etiq_definition, LIST list_instr) // cas 0 ??
+ LIST add_label_or_bas(int nb_arg_ligne, inst_op_type type, char* value, int etiq_definition, LIST list_instr) // cas 0 ??
  {
      ARG_INST A;
      if ( nb_arg_ligne == 1 ) {
@@ -232,7 +234,7 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
 
      if (etiq_definition != -1){
          // cas où l'on a une étiquette, pas besoin de checker expected_type ! Mais il faudra le faire à la relocation !?
-         list_instr = add_label_or_sa(nb_arg_ligne, Label, lexem->value, etiq_definition, list_instr);
+         list_instr = add_label_or_bas(nb_arg_ligne, Label, lexem->value, etiq_definition, list_instr);
          return list_instr;
      }
      else { // ce n'est pas une étiquette
@@ -241,52 +243,39 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
         char* val_lexem = lexem->value;
         int convert_value;
         if (nb_arg_ligne == 1){
-            check_type_arg_inst(lexem->lex_type, val_lexem, ((INSTR)(list_instr->element))->Exp_Type_1);
+            convert_value = check_type_arg_inst(lexem->lex_type, val_lexem, ((INSTR)(list_instr->element))->Exp_Type_1);
+            // renvoit une erreur si jamais les bons types ne sont pas reliés et renvoit un entier correspondant à convert value sauf si c'est un AIBD = Bas
 
-            if (((INSTR)(list_instr->element))->Exp_Type_1 == Sa){
-                list_instr = add_label_or_sa(nb_arg_ligne, Sa, val_lexem, etiq_definition, list_instr);
+            if (((INSTR)(list_instr->element))->Exp_Type_1 == Bas){
+                // ici convert_value == -1
+                list_instr = add_label_or_bas(nb_arg_ligne, Bas, val_lexem, etiq_definition, list_instr);
                 return list_instr;
             }
-
-            if (lexem->lex_type == REGISTRE){
-                convert_value = check_and_convert_register(val_lexem);
-                list_instr=add_int(nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_1, convert_value, etiq_definition, list_instr);
-                return list_instr;
-            }
-
-            convert_value = (int) strtol(val_lexem, NULL, 0);
-            list_instr=add_int(nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_1, convert_value, etiq_definition, list_instr);
+            list_instr = add_int(nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_1, convert_value, etiq_definition, list_instr);
             return list_instr;
         }
+
         if (nb_arg_ligne == 2){
-            check_type_arg_inst(lexem->lex_type, val_lexem, ((INSTR)(list_instr->element))->Exp_Type_2);
-                if (((INSTR)(list_instr->element))->Exp_Type_2 == Sa){
-                    list_instr = add_label_or_sa(nb_arg_ligne, Sa, val_lexem, etiq_definition, list_instr);
-                    return list_instr;
-                }
-                if (lexem->lex_type == REGISTRE){
-                    convert_value = check_and_convert_register(val_lexem);
-                    list_instr=add_int(nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_2, convert_value, etiq_definition, list_instr);
-                    return list_instr;
-                }
-                convert_value = (int) strtol(val_lexem, NULL, 0);
-                list_instr = add_int(nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_2, convert_value, etiq_definition, list_instr);
+            convert_value = check_type_arg_inst(lexem->lex_type, val_lexem, ((INSTR)(list_instr->element))->Exp_Type_2);
+            // renvoit une erreur si jamais les bons types ne sont pas reliés et renvoit un entier correspondant à convert value sauf si c'est un AIBD = Bas
+
+            if (((INSTR)(list_instr->element))->Exp_Type_2 == Bas){
+                list_instr = add_label_or_bas(nb_arg_ligne, Bas, val_lexem, etiq_definition, list_instr);
                 return list_instr;
+            }
+            list_instr = add_int(nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_2, convert_value, etiq_definition, list_instr);
+            return list_instr;
         }
         if (nb_arg_ligne == 3){
-            check_type_arg_inst(lexem->lex_type, val_lexem, ((INSTR)(list_instr->element))->Exp_Type_3);
-                if (((INSTR)(list_instr->element))->Exp_Type_1 == Sa){
-                    list_instr = add_label_or_sa(nb_arg_ligne, Sa, val_lexem, etiq_definition, list_instr);
-                    return list_instr;
-                }
-                if (lexem->lex_type == REGISTRE){
-                    convert_value = check_and_convert_register(val_lexem);
-                    list_instr=add_int(nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_3, convert_value, etiq_definition, list_instr);
-                    return list_instr;
-                }
-                convert_value = (int) strtol(val_lexem, NULL, 0);
-                list_instr=add_int(nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_1, convert_value, etiq_definition, list_instr);
+            convert_value = check_type_arg_inst(lexem->lex_type, val_lexem, ((INSTR)(list_instr->element))->Exp_Type_3);
+            // renvoit une erreur si jamais les bons types ne sont pas reliés et renvoit un entier correspondant à convert value sauf si c'est un AIBD = Bas
+
+            if (((INSTR)(list_instr->element))->Exp_Type_3 == Bas){
+                list_instr = add_label_or_bas(nb_arg_ligne, Bas, val_lexem, etiq_definition, list_instr);
                 return list_instr;
+            }
+            list_instr = add_int(nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_3, convert_value, etiq_definition, list_instr);
+            return list_instr;
         }
      }
 

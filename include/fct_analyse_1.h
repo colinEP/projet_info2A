@@ -47,12 +47,12 @@ typedef struct {
     union {
         // int Reg;
         // int Imm;
-        // int Bas;
+        // int Sa;
         // int Rel;
         // int Abs;
-        // char* Sa;
+        // char* Bas;
         // char* Label;
-        int entier;
+        long int entier; // WARNING long ?!
         char* char_chain;
     } val;
     int etiq_def;
@@ -79,6 +79,8 @@ INSTR new_instr();
 LIST add_to_list_instr(LEXEM l, int dec, int nbarg, LIST list_instr, int exp_typ_1, int exp_typ_2, int exp_typ_3);
 //LIST fill_arguments(LEXEM lexem, LIST list_instr, int previous_type_lexem, int etiq_definition);
 LIST fill_arguments(LEXEM lexem, LIST list_instr, int previous_type_lexem, int etiq_definition, int nb_arg_ligne);
+LIST add_label_or_bas(int nb_arg_ligne, inst_op_type type, char* value, int etiq_definition, LIST list_instr);
+LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definition,LIST list_instr);
 LIST add_to_current_list(operand_type type_op, void* pvalue, int dec, int line, LIST current_list);
 DATA new_data();
 data_op fill_val_op(void* pvalue, operand_type type_op);

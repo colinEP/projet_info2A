@@ -108,42 +108,72 @@ int check_and_convert_register(char* reg)
 
 // TODO
 
-int check_type_arg_inst(int type_lexem, char* val_lexem, int type_arg_expected)
+// cette fonction renvoit le int si c'est un chiffre ou un registre, ou -1 si c'est un Bas
+int check_type_arg_inst(int type_lexem, char* val_lexem, int type_arg_expected) // quand on arrive à cette fonction, on peut avoir un chiffre, un reg ou un AIBD
 {
+    int convert_value;
     if (type_arg_expected == Reg){
         if (type_lexem == REGISTRE) {
-            // int new_val_reg;
-            // new_val_reg = check_and_convert_register(val_lexem); // a mettre ici ??
-            // return new_val_reg;
-            return 1;
+            convert_value = check_and_convert_register(val_lexem); // a mettre ici ??
+            return convert_value;
         }
         // le cas d'étiquette n'est pas à prendre en compte ici car considéré dans la machine à états
-        ERROR_MSG("Erreur, type_registre attendu pour argument !\n");
+        ERROR_MSG("Erreur, type_registre attendu comme argument !\n");
     }
 
     if (type_arg_expected == Imm){
-        // TODO
-        return 1;
+        if ((type_lexem == REGISTRE)||(type_lexem == AIBD)) {
+            ERROR_MSG("Erreur, type inadapte pour cet argument !\n");
+        }
+        convert_value = strtol(val_lexem, NULL, 0);
+        if ((convert_value <-32768)||(convert_value >32767)){
+            ERROR_MSG("Erreur, argument immediat over 16 bits long !\n");
+        }
+        return convert_value;
     }
 
     if (type_arg_expected == Rel){
-        // TODO
-        return 1;
+        // TODO prendre en compte les décalages ?
+        if ((type_lexem == REGISTRE)||(type_lexem == AIBD)) { // Ah bon ?
+            ERROR_MSG("Erreur, type inadapte pour cet argument !\n");
+        }
+        convert_value = strtol(val_lexem, NULL, 0);
+        if ((convert_value <-32768)||(convert_value >32767)){
+            ERROR_MSG("Erreur, argument immediat over 16 bits long !\n");
+        }
+        return convert_value;
     }
 
     if (type_arg_expected == Abs){
-        // TODO
-        return 1;
+        // TODO prendre en compte les décalages ?
+        if ((type_lexem == REGISTRE)||(type_lexem == AIBD)) { // Ah bon ?
+            ERROR_MSG("Erreur, type inadapte pour cet argument !\n");
+        }
+        convert_value = strtol(val_lexem, NULL, 0);
+        if ((convert_value <-33554432)||(convert_value >33554431)){
+            ERROR_MSG("Erreur, argument immediat over 26 bits long !\n");
+        }
+        return convert_value;
     }
 
     if (type_arg_expected == Sa){
-        // TODO
-        return 1;
+        if ((type_lexem == REGISTRE)||(type_lexem == AIBD)) {
+            ERROR_MSG("Erreur, type inadapte pour cet argument !\n");
+        }
+        convert_value = strtol(val_lexem, NULL, 0);
+        if ((convert_value < 0)||(convert_value > 31)){
+            ERROR_MSG("Erreur, argument Sa over 5 bits long !\n");
+        }
+        return convert_value;
     }
 
     if (type_arg_expected == Bas){
-        // TODO
-        return 1;
+        if (type_lexem == AIBD ) {
+            return -1;
+        }
+        // laisser sous forme de char* ?!
+        // check existence ???
+        ERROR_MSG("Erreur, type argument inadapte pour cette instruction !\n");
     }
 
     if (type_arg_expected == None){

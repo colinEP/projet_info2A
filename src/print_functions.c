@@ -76,36 +76,58 @@ void print_list_lex( LIST l ) {
 }
 
 
-// void print_list_instr( LIST l ) {
-//     INSTR I;
-//     printf("\n====== Liste des instructions ====== \n \n");
-//     while (l!= NULL)
-//     {
-//         I = l->element;
-//         char* a1;
-//         char* a2;
-//         char* a3;
-//         if (( (I->arg1)->type) == None) a1 = strdup("NONE");
-//         else {
-//             if ( (((I->arg1)->type) == Label)||(((I->arg1)->type) == Sa)){
-//                 a1 = strdup(((char*)(((LEXEM)(((ARG_INST)(I->arg1))->val)))) ;
-//             }
-//             else //PB il faut convertir les int en char* ??
-//         }
-//
-//         if (((I->arg2)->lex)== NULL) a2 = strdup("NONE");
-//         else a2 = strdup(((char*)(((LEXEM)(((ARG_INST)(I->arg2))->lex))->value)))  ;
-//
-//
-//         if (((I->arg3)->lex) == NULL)   a3 = strdup("NONE");
-//         else a3 = strdup(((char*)(((LEXEM)(((ARG_INST)(I->arg3))->lex))->value)))  ;
-//
-//
-//         printf(" Instruction : %s \n Arg1 : %s  %d  \n Arg2: %s  %d \n Arg3: %s  %d \n\n", ((LEXEM)(I->lex))->value, a1, ((ARG_INST)(I->arg1))->etiq_def, a2,((ARG_INST)(I->arg2))->etiq_def, a3,((ARG_INST)(I->arg3))->etiq_def);
-//         l = l->next;
-//     }
-//     return;
-// }
+void print_list_instr( LIST l ) {
+    INSTR I;
+    printf("\n====== Liste des instructions ====== \n \n");
+    while (l!= NULL)
+    {
+        I = l->element;
+        char* a1;
+        char* a2;
+        char* a3;
+        ARG_INST A1 = I->arg1;
+        ARG_INST A2 = I->arg2;
+        ARG_INST A3 = I->arg3;
+        printf(" Instruction : %s \n", ((LEXEM)(I->lex))->value);
+        if (( A1->type) == None) {
+            a1 = strdup("NONE");
+            printf(" Arg1 : %s \n", a1);
+        }
+        else {
+            if ( ((A1->type) == Label)||((A1->type) == Bas)){
+                a1 = strdup(((char*)(A1->val.char_chain) )) ;
+                printf(" Arg1 : %s \n", a1);
+            }
+            else printf(" Arg1 : %ld \n", ((long int)(A1->val.entier)));
+        }
+
+        if ((A2->type)== None){
+             a2 = strdup("NONE");
+             printf(" Arg1 : %s \n", a2);
+         }
+        else {
+            if ( ((A2->type) == Label)||((A2->type) == Bas)){
+                a2 = strdup(((char*)(A2->val.char_chain) )) ;
+                printf(" Arg2 : %s \n", a2);
+            }
+            else printf(" Arg2 : %ld \n", ((long int)(A2->val.entier)));
+        }
+
+        if ((A3->type) == None) {
+            a3 = strdup("NONE");
+            printf(" Arg1 : %s \n", a3);
+        }
+        else {
+            if ( ((A3->type) == Label)||((A3->type) == Bas)){
+                a3 = strdup(((char*)(A3->val.char_chain))) ;
+                printf(" Arg3 : %s \n", a3);
+            }
+            else printf(" Arg3 : %ld \n", ((long int)(A3->val.entier)));
+        }
+        l = l->next;
+    }
+    return;
+}
 
 void print_symb_table( LIST l ) {
     printf("\n====== Table des symboles ======\n");

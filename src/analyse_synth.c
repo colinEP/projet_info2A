@@ -235,8 +235,8 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
                 if (type_lexem == MOINS) break;
                 else {
-                    if (((type_lexem == NL)||(type_lexem == COMMENT)) && (previous_type_lexem != MOINS)) { // plus d'argument apres l'instruction ou apres la virgule
-                        if ((nb_arg_ligne == nb_arg_needed) && (previous_type_lexem != VIRGULE)) // cas où 0 arg
+                    if (((type_lexem == NL)||(type_lexem == COMMENT)) ) { // plus d'argument apres l'instruction ou apres la virgule
+                        if ((nb_arg_ligne == nb_arg_needed) && (previous_type_lexem != VIRGULE) && (previous_type_lexem != MOINS)) // cas où 0 arg
                         {
                             if (type_lexem == COMMENT){
                                 list_lex = list_lex->next; // on saute le NL qui suit
@@ -253,6 +253,10 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                         if (previous_type_lexem == VIRGULE) {
                             printf("ERREUR LIGNE : %d\n", line);
                             ERROR_MSG("Argument manquant (ou de trop) apres instruction!\n");
+                        }
+                        if (previous_type_lexem == MOINS) {
+                            printf("ERREUR LIGNE : %d\n", line);
+                            ERROR_MSG("Manque chiffre apres signe moins !\n");
                         }
 
                     }
@@ -506,7 +510,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
     // list_bss
     look_for_undefined_etiq_in_data(list_bss, symb_table);
 
-    //print_list_instr(list_instr);
+    print_list_instr(list_instr);
     print_symb_table(symb_table);
     print_list_data(list_data);
     // TODO
