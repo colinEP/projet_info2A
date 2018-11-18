@@ -1,4 +1,4 @@
-ADD 3
+ADD 3   
 ADDI 3
 SUB 3
 MULT 2

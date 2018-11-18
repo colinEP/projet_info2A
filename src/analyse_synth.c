@@ -17,8 +17,8 @@
 #include <error.h>
 #include <assert.h>
 
-enum{TEXT, PDATA, BSS, NONE};
 
+enum{TEXT, PDATA, BSS, NONE};
 
 void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_table, LIST list_lex )
 {
@@ -43,7 +43,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
     int nb_arg_needed = 0;
     int S = START;
 
-    int val_convert = 0;
+    long int val_convert = 0;
 
     // --- premier parcours de la liste ----
 
@@ -179,7 +179,10 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                                                        // OU le NL si oublie de l'argument par le codeur
                             // TODO si y'en a pas ? erreur ?
                             // TODO erreur si pas d'argument
-                            // TODO erreur si pas section NONE
+                            if (section != NONE) {
+                                printf("ERREUR LIGNE : %d\n", line);
+                                ERROR_MSG(".set doit etre au debut du programme (avant la 1e section) \n");
+                            }
                             break;
                         }
 
@@ -295,6 +298,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
 
             case PWORD:
+                if (type_lexem == MOINS) break;
 
                 if (type_lexem == SYMBOLE) { // recherche étiquette dans symb_table
                     // alignement en mémoire du mot
@@ -327,7 +331,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                     }
                 }
 
-                if ((type_lexem == HEXA) || (type_lexem == OCTAL) || (type_lexem == DECIMAL) || (type_lexem == AIBD)|| (type_lexem == REGISTRE)){
+                if ((type_lexem == HEXA) || (type_lexem == OCTAL) || (type_lexem == DECIMAL) ){
                     // alignement en mémoire du mot
                     *pdecalage = *pdecalage + 3 - ((*pdecalage-1+4)%4);  // +4 car pour gérer le cas dec=0  (en c : -1%4 = -1)
                     if (*pdecalage%4) {
@@ -335,16 +339,15 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                         ERROR_MSG("Erreur, problème d'alignement d'addressage en mémoire du mot !\n");
                     }
                     // conversion de la string en nombre
-                    val_convert = (int) strtol(val_lexem, NULL, 0); // sauf cas du REG et AIBD
+                    val_convert = strtol(val_lexem, NULL, 0);
                     if (previous_type_lexem == MOINS) val_convert = -val_convert;
                     // TODO TODO TODO TODO
                     // TODO TODO TODO TODO
-                    // TODO verif si la valeur rentre dans 32bits
-                    // WARNING registre possible ????????? faire cas a part !!!
-                    // => pas traité en attendant de savoir
-                    // TODO cas AIBD pas traité
-                    // TODO TODO TODO TODO
-                    // TODO TODO TODO TODO
+                    printf("\nAAAAAAAAAAAAAAAAAA %ld\n",val_convert) ;
+                    if ( (val_convert<-2147483648) || (2147483647<val_convert) ) {
+                        printf("ERREUR LIGNE : %d\n", line);
+                        ERROR_MSG("Nombre trop grand pour etre stocké dans un word (32 bits : -2147483648 < x < 2147483647)\n");
+                    }
                     *pcurrent_list = add_to_current_list(PWORD, &val_convert, *pdecalage, line, *pcurrent_list);
                     *pdecalage += 4;
 
@@ -373,13 +376,13 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
 
             case PASCIIZ:
-
                 if (type_lexem == STRING) {
-                    // CONVERSION TO DO ! car pour l'instant on stocke : ""chaine de char""
-                    // TODO TODO TODO TODO TODO TODO
-                    // TODO TODO TODO TODO TODO TODO
-                    *pcurrent_list = add_to_current_list(PASCIIZ, val_lexem, *pdecalage, line, *pcurrent_list);
-                    *pdecalage += strlen(val_lexem)+1;   //+1 pour le \0
+                    // /!\ le lexeme vaut ""chaine de char""   => donc il faut enlever des guillements aux extrémités
+                    char* str = strdup(val_lexem);
+                    str[strlen(str)-1] = '\0';   // on envèle le dernier guillement
+                    *pcurrent_list = add_to_current_list(PASCIIZ, str+1, *pdecalage, line, *pcurrent_list);   // str+1 pour enlever le 1er guillement
+                    *pdecalage += strlen(str+1)+1;   //+1 pour le \0
+                    free(str);
 
                     if ( (( (LEXEM)(list_lex->next)->element) ->lex_type) == VIRGULE ) {
                         list_lex = list_lex->next; // on saute la virgule qui suit
@@ -404,40 +407,15 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                 break;
 
             case PSPACE :
-
                 // Seuls les entiers non signés sont acceptés
-                if (previous_type_lexem == MOINS)
+                if (type_lexem == MOINS)
                 {
                     printf("ERREUR LIGNE : %d\n", line);
                     ERROR_MSG("Seuls entiers non signés acceptés après .space !\n");
                 }
-
-                /*  EST CE QUI PEUT Y AVOIR UNE ETIQUETTE / REGISTRE / AIBD APRES .space   ???  POUR L'INSTANT ON DIT QUE NON
-
-                if (type_lexem == SYMBOLE) { // recherche étiquette dans symb_table --> il faudra vérifier que son type CONVIENT
-                    *pcurrent_list = add_to_current_list(LABEL, val_lexem, *pdecalage, line, *pcurrent_list);// stocke. Par defaut etiq_def est à 0;
-                    if (look_for_etiq(symb_table, val_lexem) == 1){ // si etiq deja définie
-                         ((DATA)((*pcurrent_list)->element))->etiq_def = 1;
-                    }
-                    break;
-                }
-
-                */
-
-
-                // utile ???????????
-                if ((type_lexem == VIRGULE) || (type_lexem == DEUX_PTS) || (type_lexem == DIRECTIVE) || (type_lexem == STRING)){
-                    printf("ERREUR LIGNE : %d\n", line);
-                    ERROR_MSG("Element non acceptable apres un .space !\n");
-                }
                 if ((type_lexem == HEXA) || (type_lexem == OCTAL) || (type_lexem == DECIMAL)) {
                     // conversion de la string en nombre
                     val_convert = (int) strtol(val_lexem, NULL, 0);
-                    // TODO TODO TODO TODO
-                    // TODO TODO TODO TODO
-                    // TODO verif si la valeur rentre dans 8 bits ? ou 16 bits je sais plus ? pAS DE LIMITE HORMIS LA RAM ??
-                    // TODO TODO TODO TODO
-                    // TODO TODO TODO TODO
                     *pcurrent_list = add_to_current_list(PSPACE, &val_convert, *pdecalage, line, *pcurrent_list);
                     *pdecalage += val_convert;
 
@@ -454,19 +432,20 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                 break;
 
             case PBYTE:
+                if (type_lexem == MOINS) break;
 
                 if ((type_lexem == HEXA) || (type_lexem == OCTAL) || (type_lexem == DECIMAL)) {
                     // conversion de la string en nombre
-                    val_convert = (int) strtol(val_lexem, NULL, 0);
+                    val_convert = strtol(val_lexem, NULL, 0);
                     if (previous_type_lexem == MOINS) val_convert = -val_convert;
-                    // TODO TODO TODO TODO
-                    // TODO TODO TODO TODO
-                    // TODO verif si la valeur rentre dans 8 bits
-                    // TODO TODO TODO TODO
-                    // TODO TODO TODO TODO
+                    if ( (val_convert<-128) || (127<val_convert) ) {
+                        printf("ERREUR LIGNE : %d\n", line);
+                        ERROR_MSG("Nombre trop grand pour etre stocké dans un byte (32 bits : -128 < x < 127)\n");
+                    }
                     *pcurrent_list = add_to_current_list(PSPACE, &val_convert, *pdecalage, line, *pcurrent_list);
                     (*pdecalage)++;
                 }
+
                 else {
                     printf("ERREUR LIGNE : %d\n", line);
                     ERROR_MSG("Element non acceptable apres un .byte !\n");
@@ -483,19 +462,14 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                     break;
                 }
                 break;
-                // ETIQ et REGISTRE et AIBD pas autorisé (car trop grande : 32bits alors que .byte permet 8bits)
-
         } // fin switch
-
         previous_type_lexem = type_lexem; // on garde en mémoire pour le cas du MOINS
         list_lex = list_lex->next;
 
     } // fin while
 
 
-
     // --- deuxième parcours : on cherche les étiquettes ----
-
 
     // WARNING WARNING LES 3 FCT NE MARCHE PAS ???
     // list_instr

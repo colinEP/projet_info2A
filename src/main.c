@@ -126,6 +126,8 @@ int main ( int argc, char *argv[] ) {
     // char* tmp;
     // printf("%ld\n", strlen(str));
     // printf("%d\n", sprintf(tmp, str));
+
+    //TODO TODO gestion \ dans asciiz
     /* ---------------- Free memory and terminate -------------------*/
     INFO_MSG("Libération de la mémoire");
     free_list_lex(list_lex);

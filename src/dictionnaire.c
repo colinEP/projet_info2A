@@ -42,8 +42,7 @@ QUEUE open_dict(char *file) //fonctionne ! Cette fonction ouvre le dictionnaire 
             if ( strlen(inst) == 15) {  // test si taille inst trop longue
                 ERROR_MSG("Instruction dans le dico (line %d) trop longue (length max = 14 characters)", nline);
             }
-
-            //printf (" Instruction %s et arguments: %d \n", inst, nb_arg); // pour DEBUG
+            //printf (" Instruction %s et nb_arguments: %d \n", inst, nb_arg); // pour DEBUG
             list_dico = add_definition(list_dico, nb_arg, put_in_uppercase(inst) );
             nline++;
         }
