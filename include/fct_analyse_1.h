@@ -89,5 +89,8 @@ void look_for_undefined_etiq_in_instr(LIST l, LIST symb_table);
 char *mystrcat( char *start, char *addend );
 inst_op_type convert_inst_op_type(char* type);
 
+// dans pseudo_instr.c
+LIST change_pseudo_instr(LIST list_instr);
+
 
 #endif

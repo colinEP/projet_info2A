@@ -237,12 +237,21 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                 }
 
                 if (type_lexem == MOINS) break;
+
                 else {
                     if (((type_lexem == NL)||(type_lexem == COMMENT)) ) { // plus d'argument apres l'instruction ou apres la virgule
                         if ((nb_arg_ligne == nb_arg_needed) && (previous_type_lexem != VIRGULE) && (previous_type_lexem != MOINS)) // cas où 0 arg
                         {
                             if (type_lexem == COMMENT){
                                 list_lex = list_lex->next; // on saute le NL qui suit
+                            }
+
+                            // ici si l'on a bien un NOP alors il faut la remplacer (pseudo_instruction): peut-on avoir autre chose qu'un NOP ??
+
+                            char* val_instr = strdup( ((LEXEM)(((INSTR)(list_instr->element))->lex)) -> value); 
+
+                            if ( strcmp( val_instr, "NOP") ==  0){ //ICI ERREUR DE SEG
+                                list_instr = change_pseudo_instr(list_instr);
                             }
                             S = START;
                             nb_arg_ligne = 0;
@@ -289,6 +298,11 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                                 ERROR_MSG("Erreur, mauvais nombre d'arguments pour instruction !\n");
                             }
                             list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, -1, nb_arg_ligne);
+
+                            // ici on doit vérifier que l'on a pas une pseudo_instruction !
+                            list_instr = change_pseudo_instr(list_instr);
+
+
                             S = START;
                             nb_arg_ligne = 0;
                             nb_arg_needed= 0;
