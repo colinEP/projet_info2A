@@ -26,4 +26,4 @@ NOP 0 None None None
 MOVE 2 Reg Reg None
 NEG 2 Reg Reg None
 LI 2 Reg Imm None
-BLT 3 Reg Reg Abs
+BLT 3 Reg Reg Rel

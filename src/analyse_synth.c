@@ -233,7 +233,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
             case INSTRUCTION:
                 if ((type_lexem == VIRGULE) || (type_lexem == DEUX_PTS) || (type_lexem == DIRECTIVE) || (type_lexem == STRING)){
                     printf("ERREUR LIGNE : %d\n", line);
-                    ERROR_MSG("Element non acceptable apres une instruction !\n");
+                    ERROR_MSG("Element non acceptable apres cette instruction !\n");
                 }
 
                 if (type_lexem == MOINS) break;
@@ -248,7 +248,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
                             // ici si l'on a bien un NOP alors il faut la remplacer (pseudo_instruction): peut-on avoir autre chose qu'un NOP ??
 
-                            char* val_instr = strdup( ((LEXEM)(((INSTR)(list_instr->element))->lex)) -> value); 
+                            char* val_instr = strdup( ((LEXEM)(((INSTR)(list_instr->element))->lex)) -> value);
 
                             if ( strcmp( val_instr, "NOP") ==  0){ //ICI ERREUR DE SEG
                                 list_instr = change_pseudo_instr(list_instr);
@@ -276,28 +276,38 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
                         nb_arg_ligne = nb_arg_ligne + 1;
 
-                        if (type_lexem == SYMBOLE){ // cas etiquette
-                            if (look_for_etiq(symb_table, val_lexem) == 1){         // si cette etiq est deja définie
-                                list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 1, nb_arg_ligne);
-                            }
-                            else  list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 0, nb_arg_ligne);  // si cette etiq n'est PAS deja définie
-
-                            break;
-                        }
 
                         if ( ( (LEXEM)(list_lex->next->element))->lex_type == VIRGULE) {
-                            list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, -1, nb_arg_ligne); //renvoit -1 car pas une étiquette
+                            if (type_lexem == SYMBOLE){ // cas etiquette
+                                if (look_for_etiq(symb_table, val_lexem) == 1){         // si cette etiq est deja définie
+                                    list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 1, nb_arg_ligne);
+                                }
+                                else  list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 0, nb_arg_ligne);  // si cette etiq n'est PAS deja définie
+                            }
+
+                            else list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, -1, nb_arg_ligne); //renvoit -1 car pas une étiquette
                             S = INSTRUCTION;
-                            list_lex = list_lex->next; // saute VIRGULE
+
+                            if ( ( ( (LEXEM)(list_lex->next->next->element))->lex_type != NL) && ( ( (LEXEM)(list_lex->next->next->element))->lex_type != COMMENT) ) { // pour éviter le cas intr arg1, arg2, NL
+                                list_lex = list_lex->next; // saute VIRGULE
+                            }
                             break;
                         }
+                        
                         if ( ( ( (LEXEM)(list_lex->next->element))->lex_type == NL) || ( ( (LEXEM)(list_lex->next->element))->lex_type == COMMENT) ) {
                             if (nb_arg_ligne != nb_arg_needed)
                             {
                                 printf("ERREUR LIGNE : %d\n", line);
                                 ERROR_MSG("Erreur, mauvais nombre d'arguments pour instruction !\n");
                             }
-                            list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, -1, nb_arg_ligne);
+                            if (type_lexem == SYMBOLE){ // cas etiquette
+                                if (look_for_etiq(symb_table, val_lexem) == 1){         // si cette etiq est deja définie
+                                    list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 1, nb_arg_ligne);
+                                }
+                                else  list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 0, nb_arg_ligne);  // si cette etiq n'est PAS deja définie
+                            }
+
+                            else list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, -1, nb_arg_ligne);
 
                             // ici on doit vérifier que l'on a pas une pseudo_instruction !
                             list_instr = change_pseudo_instr(list_instr);
