@@ -19,17 +19,20 @@
 
 
 
+
+// TODO TODO TODO
+// mettre à jour le décalage suite à ces pseudo_instruction !!
+// + le cas LW / SW 
+
 LIST change_pseudo_instr(LIST list_instr)
 // normalement cette fonction est appelée alors que les arguments des pseudo_instruction ont déjà été vérifiés donc c'est bon !
 
-// WARNING WARNING ET LES CAS AVEC ETIQUETTES ! ?
  {
      INSTR I = list_instr->element;
      printf("Instruction actuelle : %s\n", ((LEXEM)(I->lex))->value);
      char* instruction =  strdup( ((LEXEM)(I->lex))->value );
      char* char1;
      int int1;
-
      int is_label = 0;
      int is_def = 0;
 
@@ -168,6 +171,6 @@ LIST change_pseudo_instr(LIST list_instr)
          }
          return list_instr;
      }
-     return list_instr;
 
+     return list_instr;
  }
