@@ -24,7 +24,7 @@ QUEUE open_dict(char *file) //fonctionne ! Cette fonction ouvre le dictionnaire 
 {
     int nline = 1;
     FILE *fp = NULL;
-    char inst[10];
+    char inst[16];  // taille max des instructions = 14   (voir boucle while ci-dessous)
     char arg1[10];
     char arg2[10];
     char arg3[10];
@@ -40,9 +40,16 @@ QUEUE open_dict(char *file) //fonctionne ! Cette fonction ouvre le dictionnaire 
     }
 
     while (fscanf (fp, "%s %d %s %s %s", inst, &nb_arg, arg1, arg2, arg3) != EOF){
-            //printf (" Ici Instruction %s et arguments: %d : %s %s %s \n", inst, nb_arg, arg1, arg2, arg3); // pour tester
+    // on recupère au plus les 15 premiers caracteres de l'inst => pas de risque de buffer-overflow
+            fscanf (fp,"%*[^\n]");      // si buffer excedent, on le vide
+            if ( strlen(inst) == 15) {  // test si taille inst trop longue
+                ERROR_MSG("Instruction dans le dico (line %d) trop longue (length max = 14 characters)", nline);
+            }
+            //printf (" Instruction %s et nb_arguments: %d \n", inst, nb_arg); // pour DEBUG
             list_dico = add_definition(list_dico, nb_arg, inst, arg1, arg2, arg3);
-    }
+            nline++;
+        }
+
     //read_queue_word(list_dico); // test
     list_dico = queue_to_list(list_dico); // peu optimisé ?
     fclose(fp);
