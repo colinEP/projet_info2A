@@ -3,7 +3,7 @@
 
 typedef enum{START, INSTRUCTION, PWORD, PBYTE, PASCIIZ, PSPACE, LABEL} operand_type; //est-ce que cela a du sens de rajouter LABEL là dedans?
 
-typedef enum{None, Reg, Imm, Sa, Bas, Rel, Abs, Label} inst_op_type;
+typedef enum{None, Reg, Imm, Sa, Bas, Rel, Abs, Label, Target, Bas_Target} inst_op_type;
 
 
 typedef struct{
@@ -88,9 +88,14 @@ void look_for_undefined_etiq_in_data(LIST l, LIST symb_table);
 void look_for_undefined_etiq_in_instr(LIST l, LIST symb_table);
 char *mystrcat( char *start, char *addend );
 inst_op_type convert_inst_op_type(char* type);
+int upper_16(int val_32b);
+int lower_16(int val_32b);
 
 // dans pseudo_instr.c
 LIST change_pseudo_instr(LIST list_instr);
+LIST change_pseudo_SW_LW(LIST list_instr);
+int upper_16(int val_32b);
+int lower_16(int val_32b);
 
 
 #endif

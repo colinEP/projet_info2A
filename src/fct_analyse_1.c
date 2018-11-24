@@ -293,7 +293,6 @@ void look_for_undefined_etiq_in_instr(LIST l, LIST symb_table){
 
         // NOTE peut etre mettre a 1 m^eme si inutile
 
-
         if ( ((ARG_INST)(I->arg1))->etiq_def == 0 ) {
                 //a = look_for_etiq(symb_table, ((LEXEM)(((ARG_INST)(I->arg1))->lex))->value);
                 a = look_for_etiq(symb_table,(((ARG_INST)(I->arg1))->val.char_chain));

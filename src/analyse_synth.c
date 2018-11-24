@@ -250,9 +250,11 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
                             char* val_instr = strdup( ((LEXEM)(((INSTR)(list_instr->element))->lex)) -> value);
 
-                            if ( strcmp( val_instr, "NOP") ==  0){ //ICI ERREUR DE SEG
+                            if ( strcmp( val_instr, "NOP") ==  0){
                                 list_instr = change_pseudo_instr(list_instr);
                             }
+
+                            list_instr = change_pseudo_SW_LW(list_instr);
                             S = START;
                             nb_arg_ligne = 0;
                             nb_arg_needed= 0;
@@ -293,7 +295,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                             }
                             break;
                         }
-                        
+
                         if ( ( ( (LEXEM)(list_lex->next->element))->lex_type == NL) || ( ( (LEXEM)(list_lex->next->element))->lex_type == COMMENT) ) {
                             if (nb_arg_ligne != nb_arg_needed)
                             {
@@ -311,7 +313,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
                             // ici on doit vérifier que l'on a pas une pseudo_instruction !
                             list_instr = change_pseudo_instr(list_instr);
-
+                            list_instr = change_pseudo_SW_LW(list_instr);
 
                             S = START;
                             nb_arg_ligne = 0;
@@ -500,7 +502,6 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
     } // fin while
 
-
     // --- deuxième parcours : on cherche les étiquettes ----
     // list_instr
     look_for_undefined_etiq_in_instr(list_instr, symb_table);
@@ -515,6 +516,11 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
     // TODO
     printf("\n\nci dessous c'est la liste des .bss meme si c'est marqué .data (à corriger)\n");
     print_list_data(list_bss);  // faire une fct différente ou envoyer en paramètre la section
+
+    // RELOCATION
+
+
+    // fonction à insérer qui met la bonne valeur dans LW et SW à l'aide des fonctions upper_16 et lower_16
 
 
     return;
