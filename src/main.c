@@ -52,6 +52,10 @@ int main ( int argc, char *argv[] ) {
     if ( !strcmp(argv[argc-1], "-t") ) {
 
         /* ---------------- TEST ----------------*/
+        // int nb_arg = -1;
+        // int Retour = look_for_inst("GAA", dictionnaire, &nb_arg);
+        // printf("%d  %d", Retour, nb_arg);
+
         type_lex_test();
         test_register();
 
@@ -92,33 +96,25 @@ int main ( int argc, char *argv[] ) {
     /* ----------- Chargement du dico d'instructions -------------*/
     INFO_MSG("Chargement du dictionnaire d'instructions");
     LIST dictionnaire = open_dict("dictionnaire.txt");
-
-    /* ----------------- test du dictionnaire --------------------*/ //FONCTIONNE
-    int nb_arg = 0;
-    int Retour;
-    //Retour = look_for_inst("GAA", dictionnaire, &nb_arg);
-    // NOTE colin
-    // printf("%d  %d", Retour, nb_arg) // look_for_inst_ => find_instr
-    // a mettre dans les tests  avec -t
+    INFO_MSG("Affichage du dictionnaire d'instructions");
+    print_list_dico( dictionnaire );
 
 
     /* ---------------- do the lexical analysis -------------------*/
     INFO_MSG("Début de l'analyse lexical");
     LIST list_lex = new_list();
     list_lex = lex_load_file( file, &nlines , list_lex );
-
     DEBUG_MSG("source code got %d lines",nlines);
-
     INFO_MSG("Affichage du résultat de l'analyse lexical");
     print_list_lex(list_lex);
 
     /* ---------------- do the grammatical analysis -------------------*/
     INFO_MSG("Début de l'analyse grammatical");
-    LIST list_instr = new_list();
+    LIST list_inst  = new_list();
     LIST list_data  = new_list();
     LIST list_bss   = new_list();
     LIST symb_table = new_list();
-    analyse_synth(list_instr, list_data, list_bss, symb_table, list_lex );
+    analyse_synth(list_inst, list_data, list_bss, symb_table, list_lex );
 
     // char* str = ((LEXEM)list_lex->element)->value;
     // str = "ils : \n\"au ru!\"";
@@ -128,9 +124,16 @@ int main ( int argc, char *argv[] ) {
     // printf("%d\n", sprintf(tmp, str));
 
     //TODO TODO gestion \ dans asciiz
+
     /* ---------------- Free memory and terminate -------------------*/
     INFO_MSG("Libération de la mémoire");
+    free_list_dico(dictionnaire);
     free_list_lex(list_lex);
+    // free_list_inst  //TODO
+    // free_list_data  //TODO
+    // free_list_bss   //TODO
+    // free_symb_table //TODO
+
 
     INFO_MSG("Fin du programme %s", argv[0]);
     exit( EXIT_SUCCESS );

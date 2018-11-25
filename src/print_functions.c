@@ -21,7 +21,7 @@
 
 void read_queue_lex(QUEUE Q)
 {
-    if (Q == NULL) printf("VIDE! \n");
+    if (Q == NULL) printf("VIDE! \n");    // TODO ajouter return ??
     Q = Q->next;
     QUEUE first_memory = Q;
     LEXEM lex = Q->element;
@@ -39,23 +39,35 @@ void read_queue_lex(QUEUE Q)
 }
 
 
-void read_queue_word(QUEUE Q)
+void read_queue_dico(QUEUE Q)   // la version list exite !
 {
-    if (Q == NULL) printf("VIDE! \n");
+    if (Q == NULL) printf("VIDE! \n");    // TODO ajouter return ??
     Q = Q->next;
     QUEUE first_memory = Q;
-    WORD mot = Q->element;
+    DICO_LINE mot = Q->element;
     printf("lecture de la liste Queue : \n");
     printf("Instruction : %s nb arguments: %d  type arg1 : %s  type arg2 : %s  type arg3: %s \n", mot->instruction, mot->arg, mot->arg_type_1, mot->arg_type_2, mot->arg_type_3);
     Q = Q->next;
     while (Q != first_memory)
     {
-        WORD mot = Q->element;
+        DICO_LINE mot = Q->element;
         printf("Instruction : %s nb arguments: %d  type arg1 : %s  type arg2 : %s  type arg3: %s \n", mot->instruction, mot->arg, mot->arg_type_1, mot->arg_type_2, mot->arg_type_3);
         Q = Q->next;
 
     }
     return;
+}
+
+void print_list_dico( LIST l ) {
+    LIST p;
+    DICO_LINE dico;
+    printf("\n====== Dico d'instruction ======\n");
+    printf("Instruct | nb_arg | type_arg1 | type_arg2 | type_arg3\n");
+    //printf("         |        |           |           |\n");
+    for ( p=l ; p!=NULL ; p=p->next ) {
+        dico = p->element;
+        printf("  %s\t      %d\t       %s\t   %s\t      %s\t\n", dico->instruction, dico->arg, dico->arg_type_1, dico->arg_type_2, dico->arg_type_3);
+    }
 }
 
 

@@ -8,6 +8,7 @@
 #include <notify.h>
 #include <lex.h>
 #include <queue_list.h>
+#include <dictionnaire.h>
 
 
 
@@ -89,6 +90,21 @@ void free_list_lex(LIST l) {
 		free(l);
 	}
 }
+
+void free_list_dico(LIST l) {
+    if (l==NULL) return;
+    else {
+        free_list_dico( l->next );
+        free( ( (DICO_LINE) (l->element) ) ->instruction);
+        free( ( (DICO_LINE) (l->element) ) ->arg_type_1);
+        free( ( (DICO_LINE) (l->element) ) ->arg_type_2);
+        free( ( (DICO_LINE) (l->element) ) ->arg_type_3);
+
+        free(l->element);
+        free(l);
+    }
+}
+
 
 /* pour l'instant elle n'est pas utilisée */
 void free_lex(void* lex_ambigu) {

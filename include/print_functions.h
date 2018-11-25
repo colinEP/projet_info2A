@@ -7,7 +7,9 @@ void print_symb_table( LIST l );
 
 void print_list_lex( LIST l );
 
-void read_queue_word(QUEUE Q);
+void read_queue_dico(QUEUE Q);
+
+void print_list_dico( LIST l );
 
 void read_queue_lex(QUEUE Q);
 

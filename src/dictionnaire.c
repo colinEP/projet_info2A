@@ -25,10 +25,11 @@ QUEUE open_dict(char *file) //fonctionne ! Cette fonction ouvre le dictionnaire 
     int nline = 1;
     FILE *fp = NULL;
     char inst[16];  // taille max des instructions = 14   (voir boucle while ci-dessous)
+    int nb_arg;
     char arg1[10];
     char arg2[10];
     char arg3[10];
-    int nb_arg;
+
     QUEUE list_dico = new_queue();
 
     fp = fopen( file, "r" );
@@ -46,12 +47,12 @@ QUEUE open_dict(char *file) //fonctionne ! Cette fonction ouvre le dictionnaire 
                 ERROR_MSG("Instruction dans le dico (line %d) trop longue (length max = 14 characters)", nline);
             }
             //printf (" Instruction %s et nb_arguments: %d \n", inst, nb_arg); // pour DEBUG
-            list_dico = add_definition(list_dico, nb_arg, inst, arg1, arg2, arg3);
+            list_dico = add_definition(list_dico, inst, nb_arg, arg1, arg2, arg3);
             nline++;
         }
 
-    //read_queue_word(list_dico); // test
-    list_dico = queue_to_list(list_dico); // peu optimisé ?
+    //read_queue_dico(list_dico); // test
+    list_dico = queue_to_list(list_dico);
     fclose(fp);
     return list_dico;
 }
@@ -74,16 +75,16 @@ int look_for_inst(char* lex_init, LIST l_dico, int* pnb_arg, int* exp_typ_1, int
 
     while (l_dico != NULL)
     {
-        a = strcmp(((WORD) l_dico->element)->instruction, lex); // conversion en WORD de (dico->element)
+        a = strcmp(((DICO_LINE) l_dico->element)->instruction, lex); // conversion en DICO_LINE de (dico->element)
         i ++;
         if (a == 0)
 
         {
             //printf("valeur arguments : %d et compteur de boucle %d\n", *pnb_arg, i);
-            *pnb_arg = ((WORD) l_dico->element)->arg;
-            *exp_typ_1 = convert_inst_op_type(((WORD) l_dico->element)->arg_type_1);
-            *exp_typ_2 = convert_inst_op_type(((WORD) l_dico->element)->arg_type_2);
-            *exp_typ_3 = convert_inst_op_type(((WORD) l_dico->element)->arg_type_3);
+            *pnb_arg = ((DICO_LINE) l_dico->element)->arg;
+            *exp_typ_1 = convert_inst_op_type(((DICO_LINE) l_dico->element)->arg_type_1);
+            *exp_typ_2 = convert_inst_op_type(((DICO_LINE) l_dico->element)->arg_type_2);
+            *exp_typ_3 = convert_inst_op_type(((DICO_LINE) l_dico->element)->arg_type_3);
             return 1; //alors l'instruction a été trouvée !
         }
         l_dico = l_dico->next;
@@ -109,16 +110,16 @@ char* put_in_uppercase (char* chaine)
 
 
 
-QUEUE add_definition ( QUEUE Q, int nb_arg, char* inst, char* a_type_1, char* a_type_2, char* a_type_3) // EVENTUELLEMENT A METTRE DANS LE CODE AVEC SEUL APPEL A ajouter_fin
+QUEUE add_definition ( QUEUE Q, char* inst, int nb_arg, char* a_type_1, char* a_type_2, char* a_type_3) // EVENTUELLEMENT A METTRE DANS LE CODE AVEC SEUL APPEL A ajouter_fin
 {
-    WORD def = calloc (1, sizeof(*def));
+    DICO_LINE def = calloc (1, sizeof(*def));
 
-    def->arg = nb_arg;
     def->instruction = strdup(inst);
-    def->arg_type_1 = strdup(a_type_1);
-    def->arg_type_2 = strdup(a_type_2);
-    def->arg_type_3 = strdup(a_type_3);
-    Q = ajouter_fin(Q, def);
+    def->arg         = nb_arg;
+    def->arg_type_1  = strdup(a_type_1);
+    def->arg_type_2  = strdup(a_type_2);
+    def->arg_type_3  = strdup(a_type_3);
 
+    Q = ajouter_fin(Q, def);
     return Q;
 }
