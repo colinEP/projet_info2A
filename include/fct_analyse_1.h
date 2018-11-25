@@ -5,6 +5,7 @@ typedef enum{START, INSTRUCTION, PWORD, PBYTE, PASCIIZ, PSPACE, LABEL} operand_t
 
 typedef enum{None, Reg, Imm, Sa, Bas, Rel, Abs, Label, Target, Bas_Target} inst_op_type;
 
+enum{TEXT, PDATA, BSS, NONE};
 
 typedef struct{
     operand_type type;
@@ -84,8 +85,9 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
 LIST add_to_current_list(operand_type type_op, void* pvalue, int dec, int line, LIST current_list);
 DATA new_data();
 data_op fill_val_op(void* pvalue, operand_type type_op);
-void look_for_undefined_etiq_in_data(LIST l, LIST symb_table);
-void look_for_undefined_etiq_in_instr(LIST l, LIST symb_table);
+LIST look_for_undefined_etiq_in_data(LIST l, LIST symb_table);
+LIST look_for_undefined_etiq_in_instr(LIST l, LIST symb_table);
+LIST look_for_undefined_etiq_in_bss(LIST l, LIST symb_table);
 char *mystrcat( char *start, char *addend );
 inst_op_type convert_inst_op_type(char* type);
 int upper_16(int val_32b);

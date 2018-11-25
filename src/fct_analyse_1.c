@@ -158,7 +158,7 @@ LIST add_to_current_list(operand_type type_op, void* pvalue, int dec, int line, 
 //  }
 
  LIST add_label_or_bas(int nb_arg_ligne, inst_op_type type, char* value, int etiq_definition, LIST list_instr) // cas 0 ??
- {
+{
      ARG_INST A;
      if ( nb_arg_ligne == 1 ) {
          A = ((ARG_INST)(((INSTR)(list_instr->element))->arg1));
@@ -284,7 +284,7 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
   }
 
 
-void look_for_undefined_etiq_in_instr(LIST l, LIST symb_table){
+LIST look_for_undefined_etiq_in_instr(LIST l, LIST symb_table){ // met à 1 etiq def si définie dans le code, sinon ajoute l'etiq à symb_table mais laisse etiq_def à 0
 
     INSTR I;
     while (l!= NULL){
@@ -294,34 +294,51 @@ void look_for_undefined_etiq_in_instr(LIST l, LIST symb_table){
         // NOTE peut etre mettre a 1 m^eme si inutile
 
         if ( ((ARG_INST)(I->arg1))->etiq_def == 0 ) {
-                //a = look_for_etiq(symb_table, ((LEXEM)(((ARG_INST)(I->arg1))->lex))->value);
                 a = look_for_etiq(symb_table,(((ARG_INST)(I->arg1))->val.char_chain));
-                if (a == 0){                        // etiq non trouvée donc non déf
-                    printf("ERREUR LIGNE : %d\n", ((LEXEM)(I->lex))->nline);
-                    ERROR_MSG("Usage d'une etiquette non definie !\n");
+                (I->arg1)->etiq_def = 1;
+                if (a == 0){                        // etiq non trouvée donc non déf --> il faut alors l'ajouter à la table des symboles
+                    char* name_etiq = strdup((I->arg1)->val.char_chain);
+                    int dec = I->decalage; // WARNING WARNING WARNING Est-ce correct ??
+                    int line = (I->lex)->nline ;
+                    int sect = TEXT; // car list instr
+                    symb_table = add_to_symb_table(name_etiq, dec, line, sect, symb_table);
+                    (I->arg1)->etiq_def = 0;
                 }
+
         }
         if ( ((ARG_INST)(I->arg2))->etiq_def == 0 ) {
                 a = look_for_etiq(symb_table, (((ARG_INST)(I->arg2))->val.char_chain));
+                (I->arg2)->etiq_def = 1;
                 if (a == 0){                        // etiq non trouvée donc non déf
-                    printf("ERREUR LIGNE : %d\n", ((LEXEM)(I->lex))->nline);
-                    ERROR_MSG("Usage d'une etiquette non definie !\n");
+                    char* name_etiq = strdup((I->arg2)->val.char_chain);
+                    int dec = I->decalage; // WARNING WARNING WARNING Est-ce correct ??
+                    int line = (I->lex)->nline ;
+                    int sect = TEXT; // car list instr
+                    symb_table = add_to_symb_table(name_etiq, dec, line, sect, symb_table);
+                    (I->arg2)->etiq_def = 0;
                 }
+
         }
         if ( ((ARG_INST)(I->arg3))->etiq_def == 0 ) {
                 a = look_for_etiq(symb_table, (((ARG_INST)(I->arg3))->val.char_chain));
+                (I->arg3)->etiq_def = 1;
                 if (a == 0){                        // etiq non trouvée donc non déf
-                    printf("ERREUR LIGNE : %d\n", ((LEXEM)(I->lex))->nline);
-                    ERROR_MSG("Usage d'une etiquette non definie !\n");
+                    char* name_etiq = strdup((I->arg3)->val.char_chain);
+                    int dec = I->decalage; // WARNING WARNING WARNING Est-ce correct ??
+                    int line = (I->lex)->nline ;
+                    int sect = TEXT; // car list instr
+                    symb_table = add_to_symb_table(name_etiq, dec, line, sect, symb_table);
+                    (I->arg3)->etiq_def = 0;
                 }
+
         }
         l = l->next;
     }
-    return;
+    return symb_table;
 }
 
 
-void look_for_undefined_etiq_in_data(LIST l, LIST symb_table){
+LIST look_for_undefined_etiq_in_data(LIST l, LIST symb_table){ // met à 1 etiq def si définie dans le code, sinon ajoute l'etiq à symb_table mais laisse etiq_def à 0
     while (l!= NULL){
 
         int a = 0;
@@ -329,16 +346,47 @@ void look_for_undefined_etiq_in_data(LIST l, LIST symb_table){
             if ( ((DATA)(l->element))-> etiq_def == 0 ){
 
                 a = look_for_etiq(symb_table, ((data_op)(((DATA)(l->element))->D))->val.LABEL);
+                ((DATA)(l->element))-> etiq_def = 1;
 
                 if (a == 0){                                        // etiq non trouvée donc non déf
-                    printf("ERREUR LIGNE : %d\n", ((DATA)(l->element))->line);
-                    ERROR_MSG("Usage d'une etiquette non definie !\n");
+                    char* name_etiq = strdup(((data_op)(((DATA)(l->element))->D))->val.LABEL);
+                    int dec = ((DATA)(l->element))->decalage;
+                    int line = ((DATA)(l->element))->line;
+                    int sect = PDATA; // car list .data
+                    symb_table = add_to_symb_table(name_etiq, dec, line, sect, symb_table);
+                    ((DATA)(l->element))-> etiq_def = 0;
+                }
+
+            }
+        }
+        l = l->next;
+    }
+    return symb_table;
+}
+
+LIST look_for_undefined_etiq_in_bss(LIST l, LIST symb_table){ // met à 1 etiq def si définie dans le code, sinon ajoute l'etiq à symb_table mais laisse etiq_def à 0
+    while (l!= NULL){
+
+        int a = 0;
+        if ( ((data_op)(((DATA)(l->element))->D))->type == LABEL) { // on ne considère que les etiq, d'où LABEL
+            if ( ((DATA)(l->element))-> etiq_def == 0 ){
+
+                a = look_for_etiq(symb_table, ((data_op)(((DATA)(l->element))->D))->val.LABEL);
+                ((DATA)(l->element))-> etiq_def = 1;
+
+                if (a == 0){                                        // etiq non trouvée donc non déf
+                    char* name_etiq = strdup(((data_op)(((DATA)(l->element))->D))->val.LABEL);
+                    int dec = ((DATA)(l->element))->decalage;
+                    int line = ((DATA)(l->element))->line;
+                    int sect = BSS; // car list .data
+                    symb_table = add_to_symb_table(name_etiq, dec, line, sect, symb_table);
+                    ((DATA)(l->element))-> etiq_def = 0;
                 }
             }
         }
         l = l->next;
     }
-    return;
+    return symb_table;
 }
 
 
