@@ -49,7 +49,7 @@ QUEUE add_to_queue_lex(QUEUE Q, char* token, int type, int numline)
 }
 
 
-LIST add_to_list(LIST L, void* element) //à vérfier
+LIST add_to_list(LIST L, void* element) 
 {
   if (L == NULL)
     {

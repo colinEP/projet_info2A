@@ -138,8 +138,8 @@ int check_type_arg_inst(int type_lexem, char* val_lexem, int type_arg_expected) 
             ERROR_MSG("Erreur, type inadapte pour cet argument !\n");
         }
         convert_value = strtol(val_lexem, NULL, 0);
-        if ((convert_value <-32768)||(convert_value >32767)){
-            ERROR_MSG("Erreur, argument immediat over 16 bits long !\n");
+        if (((convert_value <-131072)||(convert_value >131071)) && (convert_value%4)){
+            ERROR_MSG("Erreur, argument immediat over 18 bits long !\n");
         }
         return convert_value;
     }
@@ -150,8 +150,8 @@ int check_type_arg_inst(int type_lexem, char* val_lexem, int type_arg_expected) 
             ERROR_MSG("Erreur, type inadapte pour cet argument !\n");
         }
         convert_value = strtol(val_lexem, NULL, 0);
-        if ((convert_value <-33554432)||(convert_value >33554431)){
-            ERROR_MSG("Erreur, argument immediat over 26 bits long !\n");
+        if ((convert_value <-134217728)||(convert_value >134217727) || (convert_value%4)){
+            ERROR_MSG("Erreur, argument immediat over 28 bits long !\n");
         }
         return convert_value;
     }

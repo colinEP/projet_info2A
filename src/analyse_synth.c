@@ -18,9 +18,13 @@
 #include <assert.h>
 
 
+<<<<<<< HEAD
 enum{TEXT, PDATA, BSS, NONE};
 
 void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_table, LIST list_lex, LIST dictionnaire)
+=======
+void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_table, LIST list_lex )
+>>>>>>> 4efb6549baa1cf587fe0d356ea656bee6c06b661
 {
     // --- initialisation des variables ----
     int dec_data = 0; //décalage
@@ -442,11 +446,11 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
     // --- deuxième parcours : on cherche les étiquettes ----
     // list_instr
-    look_for_undefined_etiq_in_instr(list_instr, symb_table);
+    symb_table=look_for_undefined_etiq_in_instr(list_instr, symb_table);
     // list_data
-    look_for_undefined_etiq_in_data(list_data, symb_table);
+    symb_table=look_for_undefined_etiq_in_data(list_data, symb_table);
     // list_bss
-    look_for_undefined_etiq_in_data(list_bss, symb_table);
+    symb_table=look_for_undefined_etiq_in_bss(list_bss, symb_table);
 
     print_list_instr(list_instr);
     print_symb_table(symb_table);
@@ -456,9 +460,12 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
     print_list_data(list_bss);  // faire une fct différente ou envoyer en paramètre la section
 
     // RELOCATION
+    // 1. on parcourt les liste .data et .text (pas de reloc dans .bss )
+    // 2. dès qu'on trouve une étiquette on créé une nouvelle cellule dans la table de reloc de la section dans laquelle on est
+    // 3. on remplit cette table avec l'aide de la table des symboles
 
 
-    // fonction à insérer qui met la bonne valeur dans LW et SW à l'aide des fonctions upper_16 et lower_16
+    // TODO fonction à insérer qui met la bonne valeur dans LW et SW à l'aide des fonctions upper_16 et lower_16
 
 
     return;
