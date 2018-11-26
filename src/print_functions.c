@@ -39,7 +39,7 @@ void read_queue_lex(QUEUE Q)
 }
 
 
-void read_queue_dico(QUEUE Q)   // la version list exite !
+void read_queue_dico(QUEUE Q)   // la version list existe !
 {
     if (Q == NULL) printf("VIDE! \n");    // TODO ajouter return ??
     Q = Q->next;

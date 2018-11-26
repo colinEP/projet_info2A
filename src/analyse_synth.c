@@ -18,13 +18,7 @@
 #include <assert.h>
 
 
-<<<<<<< HEAD
-enum{TEXT, PDATA, BSS, NONE};
-
 void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_table, LIST list_lex, LIST dictionnaire)
-=======
-void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_table, LIST list_lex )
->>>>>>> 4efb6549baa1cf587fe0d356ea656bee6c06b661
 {
     // --- initialisation des variables ----
     int dec_data = 0; //décalage
@@ -107,7 +101,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                     case COMMENT: //on ne considère pas les commentaires, on ne les stocke pas
                         if ( ( (LEXEM)(list_lex->next->element))->lex_type == NL) {
                             list_lex = list_lex->next; // on saute le NL qui suit
-                            break;
+                            break;  // il y a tjrs un NL en fin de ligne
                         }
                         // else  // est-ce possible ??? je crois pas, mais bon ...
                         ERROR_MSG("ERR LINE %d : après le commentaire !\n", line);
