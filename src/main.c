@@ -114,7 +114,9 @@ int main ( int argc, char *argv[] ) {
     LIST list_data  = new_list();
     LIST list_bss   = new_list();
     LIST symb_table = new_list();
-    analyse_synth(list_inst, list_data, list_bss, symb_table, list_lex );
+    analyse_synth(list_inst, list_data, list_bss, symb_table, list_lex, dictionnaire);
+
+
 
     // char* str = ((LEXEM)list_lex->element)->value;
     // str = "ils : \n\"au ru!\"";

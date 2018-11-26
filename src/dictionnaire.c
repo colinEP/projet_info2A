@@ -75,7 +75,7 @@ int look_for_inst(char* lex_init, LIST l_dico, int* pnb_arg, int* exp_typ_1, int
 
     while (l_dico != NULL)
     {
-        a = strcmp(((DICO_LINE) l_dico->element)->instruction, lex); // conversion en DICO_LINE de (dico->element)
+        a = strcmp(((DICO_LINE) l_dico->element)->instruction, lex); // conversion en DICO_LINE de (l_dico->element)
         i ++;
         if (a == 0)
 
@@ -89,7 +89,7 @@ int look_for_inst(char* lex_init, LIST l_dico, int* pnb_arg, int* exp_typ_1, int
         }
         l_dico = l_dico->next;
     }
-
+    free(lex);
     return 0; //oups ! instruction non trouvée
 }
 
