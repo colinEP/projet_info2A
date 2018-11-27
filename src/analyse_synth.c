@@ -53,7 +53,6 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
     // }
 
 
-
     while (list_lex != NULL)
     {
         lexem      = list_lex->element;
@@ -61,30 +60,26 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
         val_lexem  = lexem->value;
         line       = lexem -> nline;
 
+
         switch (S)
         {
-            case START: // cas lexeme de début de ligne
+            case START: // cas lexeme de début de ligne ou après étiquette ou après dernier arg d'instruction
             /* ------------ CASE S = START ----------------- */
                 switch(type_lexem) {
                     case SYMBOLE:
                         // test si section=NONE sinon risque de pointeur vers NULL ( pdecalage / pcurrent_list )
                         if (section==NONE) ERROR_MSG("ERR LINE %d : aucune section définie !\n", line);
-
-                        // cas 1 : une déclaration d'étiquette ? (on commence par ce cas car certaines etiquettes ont le même nom que des instructions)
-                        if ( ( (LEXEM)(list_lex->next->element))->lex_type == DEUX_PTS) {
+                        // CAS 1 : une déclaration d'étiquette ? (on commence par ce cas car certaines etiquettes ont le même nom que des instructions)
+                        else if ( ( (LEXEM)(list_lex->next->element))->lex_type == DEUX_PTS) {
                             if (look_for_etiq(symb_table, val_lexem)) {
                                 ERROR_MSG("ERR LINE %d : Redefinition d'etiquette !\n", line);
-                                // TODO msg d'erreur donnant les lignes de définition et rédéfinition
                             }
                             symb_table = add_to_symb_table(val_lexem, *pdecalage, line, section, symb_table);
                             list_lex = list_lex->next; // on va passer les DEUX_PTS
-                            break;
                         }
-
-                        // cas 2 : une instruction ?
-                        if ( look_for_inst(val_lexem, dictionnaire, &nb_arg_needed, &type_arg_expected_1, &type_arg_expected_2, &type_arg_expected_3) )   // le else ne sert a rien normalement
-                        {
-                            // pas d'instruction possible hors de la section .Text
+                        // CAS 2 : une instruction ?
+                        else if ( look_for_inst(val_lexem, dictionnaire, &nb_arg_needed, &type_arg_expected_1, &type_arg_expected_2, &type_arg_expected_3) ) {
+                            // pas d'instruction possible hors de la section .text
                             if (section != TEXT) ERROR_MSG("ERR LINE %d : instruction dans la mauvaise section !\n", line);
 
                             // Les instructions sont toujours codées sur des adresses alignées sur un mot
@@ -93,107 +88,76 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                             else list_instr =  add_to_list_instr(lexem, *pdecalage, nb_arg_needed, list_instr, type_arg_expected_1, type_arg_expected_2, type_arg_expected_3);
                             *pdecalage += 4;
                             S = INSTRUCTION;
-                            break;
                         }
                         // cas 3 : autres. C'est une erreur car une ligne ne peut pas commencer par un appel d'etiquette !
                         else ERROR_MSG("ERR LINE %d : symbole non valide en debut de ligne ! (debut après étiquette)\n", line);
 
-                    case COMMENT: //on ne considère pas les commentaires, on ne les stocke pas
-                        if ( ( (LEXEM)(list_lex->next->element))->lex_type == NL) {
-                            list_lex = list_lex->next; // on saute le NL qui suit
-                            break;  // il y a tjrs un NL en fin de ligne
-                        }
-                        // else  // est-ce possible ??? je crois pas, mais bon ...
-                        ERROR_MSG("ERR LINE %d : après le commentaire !\n", line);
+                        break;
 
+                    case COMMENT: //on ne considère pas les commentaires, on ne les stocke pas
+                        break;  // il y a tjrs un NL en fin de ligne   => case NL
 
                     case NL:
-                        //ON Y PASSE AVEC .set => on peut généraliser utilisation => NON !!!
-                        //printf("AAAAAAA  %s\n\n\n\n\n\n\n\n",  ( (LEXEM)(list_lex->next->element))->value);
                         break;
 
                     case DIRECTIVE:
                         /* ---- modification de la section et de la liste courante ---- */
-                        if (strcmp(val_lexem, ".data") == 0){
+                        if      (strcmp(val_lexem, ".data") == 0) {
                             section = PDATA;
                             pcurrent_list = &list_data;
                             pdecalage = &dec_data;
-                            if ( ( ( (LEXEM)(list_lex->next->element))->lex_type == NL) || ( ( (LEXEM)(list_lex->next->element))->lex_type == COMMENT) ) {
-                                 list_lex = list_lex-> next; // on va passer le NL ou le COMMENT (on sera dans le case(NL) )
-                                 S = START;
-                                 break;
+                            if ( ( ( (LEXEM)(list_lex->next->element))->lex_type != NL) && ( ( (LEXEM)(list_lex->next->element))->lex_type != COMMENT) ) {
+                                ERROR_MSG("ERR LINE %d : invalide element apres un .data !\n", line);
                             }
-                            // else
-                            ERROR_MSG("ERR LINE %d : invalide element apres un .data !\n", line);
                         }
-
-                        else if (strcmp(val_lexem, ".bss") == 0){
+                        else if (strcmp(val_lexem, ".bss") == 0) {
                             section = BSS;
                             pcurrent_list = &list_bss;
                             pdecalage = &dec_bss;
-                            if ( ( ( (LEXEM)(list_lex->next->element))->lex_type == NL) || ( ( (LEXEM)(list_lex->next->element))->lex_type == COMMENT) ) {
-                                 list_lex = list_lex-> next; // on va passer le NL ou le COMMENT (on sera dans le case(NL) )L
-                                 S = START;
-                                 break;
+                            if ( ( ( (LEXEM)(list_lex->next->element))->lex_type != NL) && ( ( (LEXEM)(list_lex->next->element))->lex_type != COMMENT) ) {
+                                ERROR_MSG("ERR LINE %d : invalide element apres un .bss !\n", line);
                             }
-                            // else
-                            ERROR_MSG("ERR LINE %d : invalide element apres un .bss !\n", line);
                         }
-
-                        else if (strcmp(val_lexem, ".text") == 0){
+                        else if (strcmp(val_lexem, ".text") == 0) {
                             section = TEXT;
                             pcurrent_list = &list_instr;
                             pdecalage = &dec_txt;
-                            if ( ( ( (LEXEM)(list_lex->next->element))->lex_type == NL) || ( ( (LEXEM)(list_lex->next->element))->lex_type == COMMENT) ) {
-                                 list_lex = list_lex-> next; // on va passer le NL ou le COMMENT (on sera dans le case(NL) )
-                                 S = START;
-                                 break;
+                            if ( ( ( (LEXEM)(list_lex->next->element))->lex_type != NL) && ( ( (LEXEM)(list_lex->next->element))->lex_type != COMMENT) ) {
+                                ERROR_MSG("ERR LINE %d : invalide element apres un .text !\n", line);
                             }
-                            // else
-                            ERROR_MSG("ERR LINE %d : invalide element apres un .text !\n", line);
                         }
-                        /* --- fin gestion directives de section --- */
+                        /* ---- fin gestion directives de section ---- */
 
                         // ---- cas du .set ----
                         else if (strcmp(val_lexem, ".set") == 0){
-                            // if ( ( (LEXEM)(list_lex->next->element))->lex_type == NL) {
-                            //      list_lex = list_lex-> next; // on va passer l'argument
-                            //      printf("AAAAAAA\n\n\n\n\n\n\n\n");
-                            // }
-                            S = START;
-                            list_lex = list_lex->next; // on saute l'argument qui suit => case NL
-                                                       // OU le NL si oublie de l'argument par le codeur
-                            // TODO si y'en a pas ? erreur ?
-                            // TODO erreur si pas d'argument
-
-                            if (section != NONE) ERROR_MSG("ERR LINE %d : .set doit etre au debut du programme (avant la 1e section) \n", line);
-
-                            break;
+                            list_lex = list_lex->next;   //pas de risque de faire ça, meme s'il y a pas l'arg apres le .set il y a au moins un NL
+                                                         //et une erreur sera levé donc pas de risque à la fin du switch quand on refait list_lex = list_lex->next
+                            if (section != NONE) {
+                                ERROR_MSG("ERR LINE %d : .set doit etre au debut du programme (avant la 1e section) \n", line);
+                            }
+                            if ( strcmp( ((LEXEM)list_lex->element)->value , "noreorder") ) {
+                                ERROR_MSG("ERR LINE %d : \"noreorder\" attendu après un .set\n", line);
+                            }
                         }
 
-
-
                         /* ---- autres directives ---- */
-                        if (section == PDATA ) {
+                        else if (section == PDATA ) {
                             if      (strcmp(val_lexem, ".word")   == 0) S = PWORD;
                             else if (strcmp(val_lexem, ".byte")   == 0) S = PBYTE;
                             else if (strcmp(val_lexem, ".asciiz") == 0) S = PASCIIZ;
                             else if (strcmp(val_lexem, ".space")  == 0) S = PSPACE;   // il peut aussi y avoir des .space dans DATA
-                            else    ERROR_MSG("ERR LINE %d : Directive inconnue ou dans mauvaise section !\n", line); // est-ce possible ???  oui par exemple .space dans section DATA
-                            break;
-                        }
-
-                        if (section == BSS ){
-                            if      (strcmp(val_lexem, ".space") == 0) S = PSPACE;
                             else    ERROR_MSG("ERR LINE %d : Directive inconnue ou dans mauvaise section !\n", line);
-                            break;
                         }
-
-                        if (section == TEXT ){
+                        else if (section == BSS ){
+                            if      (strcmp(val_lexem, ".space")  == 0) S = PSPACE;
+                            else    ERROR_MSG("ERR LINE %d : Directive inconnue ou dans mauvaise section !\n", line);
+                        }
+                        else if (section == TEXT ){
                             // Les directives (autres que celles de section) sont interdites dans la section TEXT
                             ERROR_MSG("ERR LINE %d : Directive interdites dans la section TEXT !\n", line);
-                            break;
                         }
+
+                        break;
 
                     default :
                         ERROR_MSG("ERR LINE %d : Element non acceptable en debut de ligne ou après étiquette !\n", line);
@@ -202,95 +166,149 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
             /* ------------ FIN CASE S = START ----------------- */
 
             case INSTRUCTION:
-                if ((type_lexem == VIRGULE) || (type_lexem == DEUX_PTS) || (type_lexem == DIRECTIVE) || (type_lexem == STRING)) {
-                    ERROR_MSG("ERR LINE %d : Element non acceptable apres cette instruction !\n", line);
+
+                if ( (type_lexem == NL) || (type_lexem == COMMENT) ) {
+                    if (previous_type_lexem == MOINS) {
+                        ERROR_MSG("ERR LINE %d : Manque chiffre apres signe moins !\n", line);
+                    }
+                    if (nb_arg_ligne != nb_arg_needed) {
+                        if (previous_type_lexem == VIRGULE) ERROR_MSG("ERR LINE %d : Argument attendu après une virgule\n", line);
+                        else                                ERROR_MSG("ERR LINE %d : mauvais nombre d'arguments pour cette instruction !\n", line);
+                    }
+                    if (previous_type_lexem == VIRGULE) {
+                        ERROR_MSG("ERR LINE %d : Virgule de trop à la fin!\n", line);
+                    }
+
+                    // cas pseudo instruction NOP (0 opérande)
+                    char* val_instr = strdup( ((LEXEM)(((INSTR)(list_instr->element))->lex)) -> value);
+                    if ( strcmp( val_instr, "NOP") ==  0){
+                        list_instr = change_pseudo_instr(list_instr);
+                    }
+
+                    S = START;
+                    nb_arg_ligne = 0;
+                    nb_arg_needed= 0;
+                    break;
                 }
 
                 if (type_lexem == MOINS) break;
 
-                else {
-                    if (((type_lexem == NL)||(type_lexem == COMMENT)) ) { // plus d'argument apres l'instruction ou apres la virgule
-                        if ((nb_arg_ligne == nb_arg_needed) && (previous_type_lexem != VIRGULE) && (previous_type_lexem != MOINS)) // cas où 0 arg
-                        {
-                            if (type_lexem == COMMENT){
-                                list_lex = list_lex->next; // on saute le NL qui suit
-                            }
+                if ( (type_lexem == REGISTRE) || (type_lexem == SYMBOLE) || (type_lexem == HEXA) || (type_lexem == OCTAL) || (type_lexem == DECIMAL) || (type_lexem == AIBD) ) {
+                    nb_arg_ligne = nb_arg_ligne + 1;
 
-                            // ici si l'on a bien un NOP alors il faut la remplacer (pseudo_instruction): peut-on avoir autre chose qu'un NOP ??
-
-                            char* val_instr = strdup( ((LEXEM)(((INSTR)(list_instr->element))->lex)) -> value);
-
-                            if ( strcmp( val_instr, "NOP") ==  0){
-                                list_instr = change_pseudo_instr(list_instr);
-                            }
-
-                            list_instr = change_pseudo_SW_LW(list_instr);
-                            S = START;
-                            nb_arg_ligne = 0;
-                            nb_arg_needed= 0;
-                            break;
+                    if (type_lexem == SYMBOLE) { // cas etiquette
+                        if (look_for_etiq(symb_table, val_lexem) == 1) {         // si cette etiq est deja définie
+                            list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 1, nb_arg_ligne);
                         }
-                        if ((nb_arg_ligne == nb_arg_needed) && (previous_type_lexem == VIRGULE)) {
-                            ERROR_MSG("ERR LINE %d : Virgule de trop !\n", line);
-                        }
-                        if (previous_type_lexem == VIRGULE) {
-                            ERROR_MSG("ERR LINE %d : Argument manquant (ou de trop) apres instruction!\n", line);
-                        }
-                        if (previous_type_lexem == MOINS) {
-                            ERROR_MSG("ERR LINE %d : Manque chiffre apres signe moins !\n", line);
-                        }
-
+                        else  list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 0, nb_arg_ligne);  // si cette etiq n'est PAS deja définie
                     }
-                    if ( ( ( (LEXEM)(list_lex->next->element))->lex_type == NL) || ( ( (LEXEM)(list_lex->next->element))->lex_type == COMMENT) || ( ( (LEXEM)(list_lex->next->element))->lex_type == VIRGULE) ) {
+                    else list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, -1, nb_arg_ligne);
 
-                        nb_arg_ligne = nb_arg_ligne + 1;
+                    // ici on doit vérifier que l'on a pas une pseudo_instruction !
+                    list_instr = change_pseudo_instr(list_instr);
+                    list_instr = change_pseudo_SW_LW(list_instr);
 
-
-                        if ( ( (LEXEM)(list_lex->next->element))->lex_type == VIRGULE) {
-                            if (type_lexem == SYMBOLE){ // cas etiquette
-                                if (look_for_etiq(symb_table, val_lexem) == 1){         // si cette etiq est deja définie
-                                    list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 1, nb_arg_ligne);
-                                }
-                                else  list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 0, nb_arg_ligne);  // si cette etiq n'est PAS deja définie
-                            }
-
-                            else list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, -1, nb_arg_ligne); //renvoit -1 car pas une étiquette
-                            S = INSTRUCTION;
-
-                            if ( ( ( (LEXEM)(list_lex->next->next->element))->lex_type != NL) && ( ( (LEXEM)(list_lex->next->next->element))->lex_type != COMMENT) ) { // pour éviter le cas intr arg1, arg2, NL
-                                list_lex = list_lex->next; // saute VIRGULE
-                            }
-                            break;
-                        }
-
-                        if ( ( ( (LEXEM)(list_lex->next->element))->lex_type == NL) || ( ( (LEXEM)(list_lex->next->element))->lex_type == COMMENT) ) {
-                            if (nb_arg_ligne != nb_arg_needed) {
-                                ERROR_MSG("ERR LINE %d : mauvais nombre d'arguments pour instruction !\n", line);
-                            }
-                            if (type_lexem == SYMBOLE) { // cas etiquette
-                                if (look_for_etiq(symb_table, val_lexem) == 1){         // si cette etiq est deja définie
-                                    list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 1, nb_arg_ligne);
-                                }
-                                else  list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 0, nb_arg_ligne);  // si cette etiq n'est PAS deja définie
-                            }
-
-                            else list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, -1, nb_arg_ligne);
-
-                            // ici on doit vérifier que l'on a pas une pseudo_instruction !
-                            list_instr = change_pseudo_instr(list_instr);
-                            list_instr = change_pseudo_SW_LW(list_instr);
-
-                            S = START;
-                            nb_arg_ligne = 0;
-                            nb_arg_needed= 0;
-                            list_lex = list_lex->next; // saute NL
-                            break;
-                        }
-
+                    if      ( ( (LEXEM)(list_lex->next->element))->lex_type == VIRGULE) {
+                        list_lex = list_lex->next;   // on saute la virgule
+                        lexem = list_lex->element;   // pour que previous_type_lexem enregistre la virgule
+                        type_lexem = lexem->lex_type;
                     }
-                    else ERROR_MSG("ERR LINE %d : Virgule manquante apres un argument !\n", line);
+                    else if ( ( ( (LEXEM)(list_lex->next->element))->lex_type == NL) || ( ( (LEXEM)(list_lex->next->element))->lex_type == COMMENT) );  // ne rien faire
+                    else    ERROR_MSG("ERR LINE %d : Element non acceptable apres une opérande !\n", line);
                 }
+                else ERROR_MSG("ERR LINE %d : Opérande non valide !\n", line);
+                break;
 
+                ///////////////
+
+
+
+                // if ((type_lexem == VIRGULE) || (type_lexem == DEUX_PTS) || (type_lexem == DIRECTIVE) || (type_lexem == STRING)) {
+                //     ERROR_MSG("ERR LINE %d : Element non acceptable apres cette instruction !\n", line);
+                // }
+                //
+                // if (type_lexem == MOINS) break;
+                //
+                //
+                // if (((type_lexem == NL)||(type_lexem == COMMENT)) ) { // plus d'argument apres l'instruction ou apres la virgule
+                //     if ((nb_arg_ligne == nb_arg_needed) && (previous_type_lexem != VIRGULE) && (previous_type_lexem != MOINS)) // cas où 0 arg
+                //     {
+                //         // ici si l'on a bien un NOP alors il faut la remplacer (pseudo_instruction): peut-on avoir autre chose qu'un NOP ??
+                //
+                //         char* val_instr = strdup( ((LEXEM)(((INSTR)(list_instr->element))->lex)) -> value);
+                //
+                //         if ( strcmp( val_instr, "NOP") ==  0){
+                //             list_instr = change_pseudo_instr(list_instr);
+                //         }
+                //
+                //         list_instr = change_pseudo_SW_LW(list_instr);   // inutile ? que instruction
+                //         S = START;
+                //         nb_arg_ligne = 0;
+                //         nb_arg_needed= 0;
+                //         break;
+                //     }
+                //     if ((nb_arg_ligne == nb_arg_needed) && (previous_type_lexem == VIRGULE)) {
+                //         ERROR_MSG("ERR LINE %d : Virgule de trop à la fin!\n", line);
+                //     }
+                //     if (previous_type_lexem == VIRGULE) {
+                //         ERROR_MSG("ERR LINE %d : Argument attendu après une virgule\n", line);
+                //     }
+                //     if (previous_type_lexem == MOINS) {
+                //         ERROR_MSG("ERR LINE %d : Manque chiffre apres signe moins !\n", line);
+                //     }
+                //
+                // }
+                // if ( ( ( (LEXEM)(list_lex->next->element))->lex_type == NL) || ( ( (LEXEM)(list_lex->next->element))->lex_type == COMMENT) || ( ( (LEXEM)(list_lex->next->element))->lex_type == VIRGULE) ) {
+                //
+                //     nb_arg_ligne = nb_arg_ligne + 1;
+                //
+                //
+                //     if ( ( (LEXEM)(list_lex->next->element))->lex_type == VIRGULE) {
+                //         if (type_lexem == SYMBOLE){ // cas etiquette
+                //             if (look_for_etiq(symb_table, val_lexem) == 1){         // si cette etiq est deja définie
+                //                 list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 1, nb_arg_ligne);
+                //             }
+                //             else  list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 0, nb_arg_ligne);  // si cette etiq n'est PAS deja définie
+                //         }
+                //
+                //         else list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, -1, nb_arg_ligne); //renvoit -1 car pas une étiquette
+                //         S = INSTRUCTION;
+                //
+                //         if ( ( ( (LEXEM)(list_lex->next->next->element))->lex_type != NL) && ( ( (LEXEM)(list_lex->next->next->element))->lex_type != COMMENT) ) { // pour éviter le cas intr arg1, arg2, NL
+                //             list_lex = list_lex->next; // saute VIRGULE
+                //         }
+                //         break;
+                //     }
+                //
+                //     if ( ( ( (LEXEM)(list_lex->next->element))->lex_type == NL) || ( ( (LEXEM)(list_lex->next->element))->lex_type == COMMENT) ) {
+                //         if (nb_arg_ligne != nb_arg_needed) {
+                //             ERROR_MSG("ERR LINE %d : mauvais nombre d'arguments pour instruction !\n", line);
+                //         }
+                //         if (type_lexem == SYMBOLE) { // cas etiquette
+                //             if (look_for_etiq(symb_table, val_lexem) == 1){         // si cette etiq est deja définie
+                //                 list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 1, nb_arg_ligne);
+                //             }
+                //             else  list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 0, nb_arg_ligne);  // si cette etiq n'est PAS deja définie
+                //         }
+                //
+                //         else list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, -1, nb_arg_ligne);
+                //
+                //         // ici on doit vérifier que l'on a pas une pseudo_instruction !
+                //         list_instr = change_pseudo_instr(list_instr);
+                //         list_instr = change_pseudo_SW_LW(list_instr);
+                //
+                //         S = START;
+                //         nb_arg_ligne = 0;
+                //         nb_arg_needed= 0;
+                //         list_lex = list_lex->next; // saute NL
+                //         break;
+                //     }
+                //
+                // }
+                // else ERROR_MSG("ERR LINE %d : Virgule manquante apres un argument !\n", line);
+                //
+
+                //ERROR_MSG("ERR LINE %d : Element non acceptable apres cette instruction !\n", line);
 
             case PWORD:
                 if (type_lexem == MOINS) break;
@@ -437,6 +455,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
         list_lex = list_lex->next;
 
     } // fin while
+
 
     // --- deuxième parcours : on cherche les étiquettes ----
     // list_instr

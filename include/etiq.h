@@ -9,9 +9,6 @@ typedef struct {
 }* ETIQ;
 
 
-
-
-
 int look_for_etiq( LIST symb_table, char* val_lexem);
 LIST add_to_symb_table(char* etiq, int decalage, int line, int section, LIST symb_table);
 

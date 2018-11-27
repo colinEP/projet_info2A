@@ -49,7 +49,7 @@ QUEUE add_to_queue_lex(QUEUE Q, char* token, int type, int numline)
 }
 
 
-LIST add_to_list(LIST L, void* element) 
+LIST add_to_head_list(LIST L, void* element)
 {
   if (L == NULL)
     {
@@ -64,6 +64,21 @@ LIST add_to_list(LIST L, void* element)
   return new_list;
 }
 
+LIST add_to_end_list(LIST l, void* element) {
+    if (l==NULL) {
+        LIST l = calloc(1, sizeof(*l) );
+        l->element = element;
+        l->next = NULL;
+        return l;
+    }
+    LIST p;
+    for (p=l ; p->next!=NULL ; p=p->next);
+    LIST new = calloc(1, sizeof(*new) );
+    p->next = new;
+    new->element = element;
+    new->next = NULL;
+    return l;
+}
 
 LIST new_list() {
   return NULL;

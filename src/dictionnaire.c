@@ -42,10 +42,10 @@ QUEUE open_dict(char *file) //fonctionne ! Cette fonction ouvre le dictionnaire 
 
     while (fscanf (fp, "%s %d %s %s %s", inst, &nb_arg, arg1, arg2, arg3) != EOF){
     // on recupère au plus les 15 premiers caracteres de l'inst => pas de risque de buffer-overflow
-            fscanf (fp,"%*[^\n]");      // si buffer excedent, on le vide
-            if ( strlen(inst) == 15) {  // test si taille inst trop longue
-                ERROR_MSG("Instruction dans le dico (line %d) trop longue (length max = 14 characters)", nline);
-            }
+            // fscanf (fp,"%*[^\n]");      // si buffer excedent, on le vide
+            // if ( strlen(inst) == 15) {  // test si taille inst trop longue
+            //     ERROR_MSG("Instruction dans le dico (line %d) trop longue (length max = 14 characters)", nline);
+            // }
             //printf (" Instruction %s et nb_arguments: %d \n", inst, nb_arg); // pour DEBUG
             list_dico = add_definition(list_dico, inst, nb_arg, arg1, arg2, arg3);
             nline++;

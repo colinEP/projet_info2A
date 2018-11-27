@@ -1,8 +1,8 @@
 # TEST_RETURN_CODE = PASS
 # allons au ru
-.set noreorder
+.set noreorder #test
 .text
-    Lw $t0 , lunchtime
+    Lw $t0, lunchtime
     LW $6, -200($7)
     ADDI $t1,$zero,8
 boucle:

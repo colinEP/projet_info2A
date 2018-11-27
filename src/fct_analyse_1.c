@@ -80,7 +80,7 @@ LIST add_to_list_instr(LEXEM l, int dec, int nbarg, LIST list_instr, int exp_typ
     I->Exp_Type_1 = exp_typ_1;
     I->Exp_Type_2 = exp_typ_2;
     I->Exp_Type_3 = exp_typ_3;
-    list_instr = add_to_list(list_instr, I);
+    list_instr = add_to_head_list(list_instr, I);  //TODO head => end
     return list_instr;
 }
 
@@ -123,7 +123,7 @@ LIST add_to_current_list(operand_type type_op, void* pvalue, int dec, int line, 
     data-> decalage = dec;
     data-> line = line;
     data -> D = fill_val_op(pvalue, type_op);
-    current_list = add_to_list(current_list, data);
+    current_list = add_to_head_list(current_list, data);  //TODO head => end
     return current_list;
 }
 
@@ -229,7 +229,8 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
  LIST fill_arguments(LEXEM lexem, LIST list_instr, int previous_type_lexem, int etiq_definition, int nb_arg_ligne) // faire la verification des type d'arg ICI
  {
      if (previous_type_lexem == MOINS){
-         lexem->value = strdup(mystrcat("-", lexem->value));
+         //lexem->value = strdup(mystrcat("-", lexem->value)); //pas du dup car calloc déjà dans mystrcat
+         lexem->value = (mystrcat("-", lexem->value));
      }
 
      if (etiq_definition != -1){
