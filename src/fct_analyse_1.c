@@ -102,8 +102,9 @@ LIST add_to_current_list(operand_type type_op, void* pvalue, int dec, int line, 
 
 
 
- LIST add_label_or_bas(int nb_arg_ligne, inst_op_type type, char* value, int etiq_definition, LIST list_instr) // cas 0 ??
-{
+ LIST add_label(int nb_arg_ligne, inst_op_type type, char* value, int etiq_definition, LIST list_instr) // cas 0 ??
+{   // copie les etiquette en char* pour le moment
+    // traduit les AIBD en bas numérique : offset(reg) = reg + offset
      ARG_INST A;
      if ( nb_arg_ligne == 1 ) {
          A = ((ARG_INST)(((INSTR)(list_instr->element))->arg1));
@@ -139,6 +140,7 @@ LIST add_to_current_list(operand_type type_op, void* pvalue, int dec, int line, 
  }
 LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definition,LIST list_instr){
     ARG_INST A;
+
     if ( nb_arg_ligne == 1 ) {
         A = ((ARG_INST)(((INSTR)(list_instr->element))->arg1));
         A->type = type;
@@ -180,45 +182,32 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
 
      if (etiq_definition != -1){
          // cas où l'on a une étiquette, pas besoin de checker expected_type ! Mais il faudra le faire à la relocation !?
-         list_instr = add_label_or_bas(nb_arg_ligne, Label, lexem->value, etiq_definition, list_instr);
+         list_instr = add_label(nb_arg_ligne, Label, lexem->value, etiq_definition, list_instr);
          return list_instr;
      }
+
+
      else { // ce n'est pas une étiquette
         // là il faut checker le type_arg_expected lequel est stocké dans la list_instr
         char* val_lexem = lexem->value;
         int convert_value;
         if (nb_arg_ligne == 1){
-            convert_value = check_type_arg_inst(lexem->lex_type, val_lexem, ((INSTR)(list_instr->element))->Exp_Type_1);
-            // renvoit une erreur si jamais les bons types ne sont pas reliés et renvoit un entier correspondant à convert value sauf si c'est un AIBD = Bas
 
-            if (((INSTR)(list_instr->element))->Exp_Type_1 == Bas){
-                // ici convert_value == -1
-                list_instr = add_label_or_bas(nb_arg_ligne, Bas, val_lexem, etiq_definition, list_instr);
-                return list_instr;
-            }
+            convert_value = check_type_arg_inst(lexem->lex_type, val_lexem, ((INSTR)(list_instr->element))->Exp_Type_1);
+            // renvoit une erreur si jamais les bons types ne sont pas reliés et renvoit un entier correspondant à convert value
             list_instr = add_int(nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_1, convert_value, etiq_definition, list_instr);
             return list_instr;
         }
 
         if (nb_arg_ligne == 2){
             convert_value = check_type_arg_inst(lexem->lex_type, val_lexem, ((INSTR)(list_instr->element))->Exp_Type_2);
-            // renvoit une erreur si jamais les bons types ne sont pas reliés et renvoit un entier correspondant à convert value sauf si c'est un AIBD = Bas
-
-            if (((INSTR)(list_instr->element))->Exp_Type_2 == Bas){
-                list_instr = add_label_or_bas(nb_arg_ligne, Bas, val_lexem, etiq_definition, list_instr);
-                return list_instr;
-            }
+            // renvoit une erreur si jamais les bons types ne sont pas reliés et renvoit un entier correspondant à convert value
             list_instr = add_int(nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_2, convert_value, etiq_definition, list_instr);
             return list_instr;
         }
         if (nb_arg_ligne == 3){
             convert_value = check_type_arg_inst(lexem->lex_type, val_lexem, ((INSTR)(list_instr->element))->Exp_Type_3);
-            // renvoit une erreur si jamais les bons types ne sont pas reliés et renvoit un entier correspondant à convert value sauf si c'est un AIBD = Bas
-
-            if (((INSTR)(list_instr->element))->Exp_Type_3 == Bas){
-                list_instr = add_label_or_bas(nb_arg_ligne, Bas, val_lexem, etiq_definition, list_instr);
-                return list_instr;
-            }
+            // renvoit une erreur si jamais les bons types ne sont pas reliés et renvoit un entier correspondant à convert value
             list_instr = add_int(nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_3, convert_value, etiq_definition, list_instr);
             return list_instr;
         }

@@ -19,6 +19,7 @@
 #include <dictionnaire.h>
 #include <analyse_synth.h>
 #include <print_functions.h>
+#include <fct_analyse_1.h>
 
 #include <error.h>
 //#include <etiq.h>
@@ -100,6 +101,7 @@ int main ( int argc, char *argv[] ) {
     print_list_dico( dictionnaire );
 
 
+
     /* ---------------- do the lexical analysis -------------------*/
     INFO_MSG("Début de l'analyse lexical");
     LIST list_lex = new_list();
@@ -115,8 +117,6 @@ int main ( int argc, char *argv[] ) {
     LIST list_bss   = new_list();
     LIST symb_table = new_list();
     analyse_synth(list_inst, list_data, list_bss, symb_table, list_lex, dictionnaire);
-
-
 
     // char* str = ((LEXEM)list_lex->element)->value;
     // str = "ils : \n\"au ru!\"";

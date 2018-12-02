@@ -106,7 +106,7 @@ void print_list_instr( LIST l ) {
             printf(" Arg1 : %s \n", a1);
         }
         else {
-            if ( ((A1->type) == Bas_Target)||((A1->type) == Target)||((A1->type) == Bas)){
+            if ( ((A1->type) == Bas_Target)||((A1->type) == Target)){
                 a1 = strdup(((char*)(A1->val.char_chain) )) ;
                 printf(" Arg1 : %s \n", a1);
             }
@@ -118,7 +118,7 @@ void print_list_instr( LIST l ) {
              printf(" Arg1 : %s \n", a2);
          }
         else {
-            if ( ((A2->type) == Bas_Target)||((A2->type) == Target)||((A2->type) == Bas)){
+            if ( ((A2->type) == Bas_Target)||((A2->type) == Target)){
                 a2 = strdup(((char*)(A2->val.char_chain) )) ;
                 printf(" Arg2 : %s \n", a2);
             }
@@ -130,7 +130,7 @@ void print_list_instr( LIST l ) {
             printf(" Arg3 : %s \n", a3);
         }
         else {
-            if ( ((A3->type) == Bas_Target)||((A3->type) == Target)||((A3->type) == Bas)){
+            if ( ((A3->type) == Bas_Target)||((A3->type) == Target)){
                 a3 = strdup(((char*)(A3->val.char_chain))) ;
                 printf(" Arg3 : %s \n", a3);
             }
