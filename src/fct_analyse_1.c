@@ -104,7 +104,7 @@ LIST add_to_current_list(operand_type type_op, void* pvalue, int dec, int line, 
 
  LIST add_label(int nb_arg_ligne, inst_op_type type, char* value, int etiq_definition, LIST list_instr) // cas 0 ??
 {   // copie les etiquette en char* pour le moment
-    // traduit les AIBD en bas numérique : offset(reg) = reg + offset
+    // traduit les AIBD en BAS numérique : offset(reg) = reg + offset
      ARG_INST A;
      if ( nb_arg_ligne == 1 ) {
          A = ((ARG_INST)(((INSTR)(list_instr->element))->arg1));
@@ -181,7 +181,7 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
      }
 
      if (etiq_definition != -1){
-         // cas où l'on a une étiquette, pas besoin de checker expected_type ! Mais il faudra le faire à la relocation !?
+         // cas où l'on a une étiquette, pas besoin de checker expected_type ! ce sera fait après !
          list_instr = add_label(nb_arg_ligne, Label, lexem->value, etiq_definition, list_instr);
          return list_instr;
      }

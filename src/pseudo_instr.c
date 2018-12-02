@@ -229,7 +229,7 @@ LIST change_pseudo_SW_LW(LIST list_instr){
      if (strcmp(instruction,"SW")==0){
           if (((I->arg2)->type) == Label){ // cas où arg2 est une target
              if (((I->arg1)->type) =! Reg){ // bizarre de mettre cette erreur ici, certes.... WARNING WARNING
-             ERROR_MSG("Arg1 de SW doit etre un registre !\n");
+                 ERROR_MSG("Arg1 de SW doit etre un registre !\n");
              }
              reg = (int)((I->arg1)->val.entier);
              (I->lex)->value = strdup("LUI");
@@ -245,7 +245,6 @@ LIST change_pseudo_SW_LW(LIST list_instr){
               //etiq_def2 reste le même
               is_def = (I->arg2)->etiq_def;
               name_etiq = strdup((I->arg2)->val.char_chain);
-              // PB:  pour avoir l'adresse du poiteur, il faut qu'il y ait eu relocation !
 
               (I-> arg3)->type = None;
 

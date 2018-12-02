@@ -61,6 +61,7 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
 
             if ( ((ARG_INST)(I->arg1))->type == Label ) {
 
+                (I->arg1)->type = Abs;
                 Re->section = strdup(".text"); // NOTE on doit avoir une char* d'après le sujet  ??
                 Re->adress = I->decalage; // valeur du décalage de l'APPEL de l'étiq (!= de sa définition)
 
@@ -98,15 +99,26 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                 }
 
             }
-            if ( ((ARG_INST)(I->arg2))->type == Label ) {
+
+
+            if ( (((ARG_INST)(I->arg2))->type == Label )||  ( ((ARG_INST)(I->arg2))->type == Target) || ( ((ARG_INST)(I->arg2))->type == Bas_Target) ) {
+
+                (I->arg2)->type = Abs;
                 Re->section = strdup(".text"); // NOTE on doit avoir une char* d'après le sujet  ??
                 Re->adress = I->decalage; // valeur du décalage de l'APPEL de l'étiq (!= de sa définition)
 
+
                 if ( (I->arg2)->etiq_def == 0 ) {               //etiq globale
                     Re->addend = strdup((I->arg2)->val.char_chain);// stocke le NOM de l'etiquette car non def
-                    (I->arg2)->val.entier = 0; // pour remplacer le nom de l'étiq par int = 0 car non def donc décalage nul
+                    if ( ((I->arg2)->type == Label) || ((I->arg2)->type == Target))  (I->arg2)->val.entier = 0; // pour remplacer le nom de l'étiq par int = 0 car non def donc décalage nul
+                    if ((I->arg2)->type == Bas_Target){
+                        (I->arg2)->val.entier = (I->arg1)->val.entier; // car alors on somme $rt + 0(adresse d'une etiq non def)
+                    }
                     Re->type_r = find_R_type((I->lex)->value);// a définir selon l'instruction !
                 }
+
+
+                // TODO TODO TODO CAS LW / SW 
 
                 else {
                     if ( (I->arg2)->etiq_def == 1 ) {               //etiq bien definie
@@ -136,7 +148,10 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                 }
 
             }
+
+
             if ( ((ARG_INST)(I->arg3))->type == Label ) {
+                (I->arg3)->type = Abs;
                 Re->section = strdup(".text"); // NOTE on doit avoir une char* d'après le sujet  ??
                 Re->adress = I->decalage; // valeur du décalage de l'APPEL de l'étiq (!= de sa définition)
                 if ( (I->arg3)->etiq_def == 0 ) {               //etiq globale
