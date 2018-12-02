@@ -1,7 +1,7 @@
 #ifndef _FCT_ANALYSE_H_
 #define _FCT_ANALYSE_H_
 
-typedef enum{START, INSTRUCTION, PWORD, PBYTE, PASCIIZ, PSPACE, LABEL} operand_type; //est-ce que cela a du sens de rajouter LABEL là dedans?
+typedef enum{START, INSTRUCTION, PWORD, PBYTE, PASCIIZ, PSPACE, LABEL, DEC_LABEL} operand_type;
 
 typedef enum{None, Reg, Imm, Sa, Bas, Rel, Abs, Label, Target, Bas_Target} inst_op_type;
 
@@ -15,6 +15,7 @@ typedef struct{
         char* PASCIIZ;
         char* LABEL;
         unsigned int PSPACE;
+        int DEC_LABEL; // pour stocker le decalage de l'étiquette
     } val;
 }* data_op;
 
@@ -27,22 +28,6 @@ typedef struct {
 }* DATA;
 
 
-// typedef struct {
-//     LEXEM lex;
-//     int etiq_def;
-// }* ARG_INST;
-//
-//
-// typedef struct {
-//     LEXEM lex;   //NOTE utiliser name car confusion avec lex ci dessus
-//     int nb_arg;
-//     int decalage;
-//     ARG_INST arg1;
-//     ARG_INST arg2;
-//     ARG_INST arg3;
-// }* INSTR;
-
-
 typedef struct {
     inst_op_type type;
     union {
@@ -52,7 +37,7 @@ typedef struct {
         // int Rel;
         // int Abs;
         // char* Bas;
-        // char* Label;
+        // char* Label ou int Label selon av ou ap replace_etiq_by_dec
         long int entier; // WARNING long ?!
         char* char_chain;
     } val;

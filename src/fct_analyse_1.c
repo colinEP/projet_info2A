@@ -20,24 +20,6 @@
 
 
 
-// INSTR new_instr(){ //initialisation de la cellule instruction
-//     INSTR I = calloc(1, sizeof(*I));
-//
-//     I-> arg1 = calloc(1, sizeof(*(I-> arg1)));
-//     ((ARG_INST)(I-> arg1))->lex = NULL;
-//     ((ARG_INST)(I-> arg1))->etiq_def = -1; // initialisation de la variable qui indique si etiquette definie dans symb_tab. A -1 pour faciliter deuxième passage de la boucle
-//
-//     I-> arg2 = calloc(1, sizeof(*(I-> arg2)));
-//     ((ARG_INST)(I-> arg2))->lex = NULL;
-//     ((ARG_INST)(I-> arg2))->etiq_def = -1;
-//
-//     I-> arg3 = calloc(1, sizeof(*(I-> arg3)));
-//     ((ARG_INST)(I-> arg3))->lex = NULL;
-//     ((ARG_INST)(I-> arg3))->etiq_def = -1;
-//
-//     return I;
-// }
-
 INSTR new_instr(){ //initialisation de la cellule instruction
     INSTR I = calloc(1, sizeof(*I));
     I->Exp_Type_1 = None;
@@ -59,15 +41,6 @@ INSTR new_instr(){ //initialisation de la cellule instruction
     return I;
 }
 
-// LIST add_to_list_instr(LEXEM l, int dec, int nbarg, LIST list_instr)
-// {
-//     INSTR I = new_instr();
-//     I-> decalage = dec;
-//     I-> nb_arg = nbarg;
-//     I-> lex = l;
-//     list_instr = add_to_list(list_instr, I);
-//     return list_instr;
-// }
 
 
 LIST add_to_list_instr(LEXEM l, int dec, int nbarg, LIST list_instr, int exp_typ_1, int exp_typ_2, int exp_typ_3)
@@ -128,34 +101,6 @@ LIST add_to_current_list(operand_type type_op, void* pvalue, int dec, int line, 
 }
 
 
-// LIST fill_arguments(LEXEM lexem, LIST list_instr, int previous_type_lexem, int etiq_definition) // faire la verification des type d'arg ICI
-// {
-//     if (previous_type_lexem == MOINS)
-//     {
-//         lexem->value = strdup(mystrcat("-", lexem->value));
-//     }
-//     if ( ((ARG_INST)(((INSTR)(list_instr->element))->arg1))->lex == NULL){  // à mettre sous forme d'une fonction
-//          ((ARG_INST)(((INSTR)(list_instr->element))->arg1))->lex = lexem;
-//          ((ARG_INST)(((INSTR)(list_instr->element))->arg1))->etiq_def = etiq_definition;
-//      }
-//      else {
-//          if ( ((ARG_INST)(((INSTR)(list_instr->element))->arg2))->lex == NULL){
-//               ((ARG_INST)(((INSTR)(list_instr->element))->arg2))->lex = lexem;
-//              ((ARG_INST)(((INSTR)(list_instr->element))->arg2))->etiq_def = etiq_definition;
-//          }
-//          else {
-//              if ( ((ARG_INST)(((INSTR)(list_instr->element))->arg3))->lex == NULL){
-//                   ((ARG_INST)(((INSTR)(list_instr->element))->arg3))->lex = lexem;
-//                  ((ARG_INST)(((INSTR)(list_instr->element))->arg3))->etiq_def = etiq_definition;
-//              }
-//              else {
-//                  printf("ERREUR LIGNE : %d\n", lexem->nline);
-//                  ERROR_MSG("Trop d'arguments !\n");
-//              }
-//          }
-//      }
-//      return list_instr;
-//  }
 
  LIST add_label_or_bas(int nb_arg_ligne, inst_op_type type, char* value, int etiq_definition, LIST list_instr) // cas 0 ??
 {
@@ -240,7 +185,6 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
      }
      else { // ce n'est pas une étiquette
         // là il faut checker le type_arg_expected lequel est stocké dans la list_instr
-        // TODO :
         char* val_lexem = lexem->value;
         int convert_value;
         if (nb_arg_ligne == 1){
@@ -280,7 +224,6 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
         }
      }
 
-
       return list_instr;
   }
 
@@ -297,7 +240,7 @@ LIST look_for_undefined_etiq_in_instr(LIST l, LIST symb_table){ // met à 1 etiq
                 (I->arg1)->etiq_def = 1;
                 if (a == 0){                        // etiq non trouvée donc non déf --> il faut alors l'ajouter à la table des symboles
                     char* name_etiq = strdup((I->arg1)->val.char_chain);
-                    int dec = I->decalage; // WARNING WARNING WARNING Est-ce correct ??
+                    int dec = I->decalage;
                     int line = (I->lex)->nline ;
                     int sect = TEXT; // car list instr
                     symb_table = add_to_symb_table(name_etiq, dec, line, sect, symb_table);
@@ -310,7 +253,7 @@ LIST look_for_undefined_etiq_in_instr(LIST l, LIST symb_table){ // met à 1 etiq
                 (I->arg2)->etiq_def = 1;
                 if (a == 0){                        // etiq non trouvée donc non déf
                     char* name_etiq = strdup((I->arg2)->val.char_chain);
-                    int dec = I->decalage; // WARNING WARNING WARNING Est-ce correct ??
+                    int dec = I->decalage;
                     int line = (I->lex)->nline ;
                     int sect = TEXT; // car list instr
                     symb_table = add_to_symb_table(name_etiq, dec, line, sect, symb_table);
@@ -323,13 +266,12 @@ LIST look_for_undefined_etiq_in_instr(LIST l, LIST symb_table){ // met à 1 etiq
                 (I->arg3)->etiq_def = 1;
                 if (a == 0){                        // etiq non trouvée donc non déf
                     char* name_etiq = strdup((I->arg3)->val.char_chain);
-                    int dec = I->decalage; // WARNING WARNING WARNING Est-ce correct ??
+                    int dec = I->decalage;
                     int line = (I->lex)->nline ;
                     int sect = TEXT; // car list instr
                     symb_table = add_to_symb_table(name_etiq, dec, line, sect, symb_table);
                     (I->arg3)->etiq_def = 0;
                 }
-
         }
         l = l->next;
     }
@@ -377,7 +319,7 @@ LIST look_for_undefined_etiq_in_bss(LIST l, LIST symb_table){ // met à 1 etiq d
                     char* name_etiq = strdup(((data_op)(((DATA)(l->element))->D))->val.LABEL);
                     int dec = ((DATA)(l->element))->decalage;
                     int line = ((DATA)(l->element))->line;
-                    int sect = BSS; // car list .data
+                    int sect = BSS; // car list .bss
                     symb_table = add_to_symb_table(name_etiq, dec, line, sect, symb_table);
                     ((DATA)(l->element))-> etiq_def = 0;
                 }

@@ -8,11 +8,10 @@
 boucle:
     BEQ $t0 , $t1 , byebye
     NOP
-
-    J boucle
+    J etiqnondef
     NOP
 byebye:
-    addi $t1 , $t1 , etiqnondef
+    addi $t1 , $t1 , 8
 
 .data
 lunchtime:
