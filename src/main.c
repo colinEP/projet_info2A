@@ -112,11 +112,31 @@ int main ( int argc, char *argv[] ) {
 
     /* ---------------- do the grammatical analysis -------------------*/
     INFO_MSG("Début de l'analyse grammatical");
-    LIST list_inst  = new_list();
+    LIST list_instr = new_list();
     LIST list_data  = new_list();
     LIST list_bss   = new_list();
     LIST symb_table = new_list();
-    analyse_synth(list_inst, list_data, list_bss, symb_table, list_lex, dictionnaire);
+    // On doit passer les pointeurs des listes car leur addresse de début change dans analyse_synth!
+    analyse_synth(&list_instr, &list_data, &list_bss, &symb_table, list_lex, dictionnaire);
+
+    /* ----- Relocation ------- */    //NOTE prototype dans etiq.h ?????
+    //TODO
+    LIST reloc_table_text = reloc_and_replace_etiq_by_dec_in_instr (list_instr, symb_table);
+    LIST reloc_table_data = reloc_and_replace_etiq_by_dec_in_data (list_data, symb_table);
+    // TODO fonction à insérer qui met la bonne valeur dans LW et SW à l'aide des fonctions upper_16 et lower_16
+
+
+    print_symb_table(symb_table);
+    print_list_instr(list_instr);
+    print_list_data(list_data);
+    //print bss //TODO
+    printf("\n\nci dessous c'est la liste des .bss meme si c'est marqué .data (à corriger)\n");
+    print_list_data(list_bss);  // faire une fct différente ou envoyer en paramètre la section
+
+
+
+
+
 
     // char* str = ((LEXEM)list_lex->element)->value;
     // str = "ils : \n\"au ru!\"";

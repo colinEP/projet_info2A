@@ -80,6 +80,23 @@ LIST add_to_end_list(LIST l, void* element) {
     return l;
 }
 
+LIST revers_list(LIST l) {
+
+    if (l==NULL) return l;   // cas liste vide
+
+    LIST l_next = l->next;
+    l->next     = NULL;
+    LIST l_prev = l;
+    l           = l_next;
+
+    for ( ; l!=NULL ; l=l_next ) {
+        l_next  = l->next;
+        l->next = l_prev;
+        l_prev  = l;
+    }
+    return l_prev;
+}
+
 LIST new_list() {
   return NULL;
 }

@@ -18,7 +18,7 @@
 #include <assert.h>
 
 
-void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_table, LIST list_lex, LIST dictionnaire)
+void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST* p_symb_table, LIST list_lex, LIST dictionnaire)
 {
     // --- initialisation des variables ----
     int dec_data = 0; //décalage
@@ -71,10 +71,10 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                         if (section==NONE) ERROR_MSG("ERR LINE %d : aucune section définie !\n", line);
                         // CAS 1 : une déclaration d'étiquette ? (on commence par ce cas car certaines etiquettes ont le même nom que des instructions)
                         else if ( ( (LEXEM)(list_lex->next->element))->lex_type == DEUX_PTS) {
-                            if (look_for_etiq(symb_table, val_lexem)) {
+                            if (look_for_etiq(*p_symb_table, val_lexem)) {
                                 ERROR_MSG("ERR LINE %d : Redefinition d'etiquette !\n", line);
                             }
-                            symb_table = add_to_symb_table(val_lexem, *pdecalage, line, section, symb_table);
+                            *p_symb_table = add_to_symb_table(val_lexem, *pdecalage, line, section, *p_symb_table);
                             list_lex = list_lex->next; // on va passer les DEUX_PTS
                         }
                         // CAS 2 : une instruction ?
@@ -85,7 +85,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                             // Les instructions sont toujours codées sur des adresses alignées sur un mot
                             if (*pdecalage%4) ERROR_MSG("ERR LINE %d : problème d'alignement d'addressage en mémoire de l'instruction !\n", line);
 
-                            else list_instr =  add_to_list_instr(lexem, *pdecalage, nb_arg_needed, list_instr, type_arg_expected_1, type_arg_expected_2, type_arg_expected_3);
+                            else *p_list_instr =  add_to_list_instr(lexem, *pdecalage, nb_arg_needed, *p_list_instr, type_arg_expected_1, type_arg_expected_2, type_arg_expected_3);
                             *pdecalage += 4;
                             S = INSTRUCTION;
                         }
@@ -104,7 +104,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                         /* ---- modification de la section et de la liste courante ---- */
                         if      (strcmp(val_lexem, ".data") == 0) {
                             section = PDATA;
-                            pcurrent_list = &list_data;
+                            pcurrent_list = p_list_data;
                             pdecalage = &dec_data;
                             if ( ( ( (LEXEM)(list_lex->next->element))->lex_type != NL) && ( ( (LEXEM)(list_lex->next->element))->lex_type != COMMENT) ) {
                                 ERROR_MSG("ERR LINE %d : invalide element apres un .data !\n", line);
@@ -112,7 +112,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                         }
                         else if (strcmp(val_lexem, ".bss") == 0) {
                             section = BSS;
-                            pcurrent_list = &list_bss;
+                            pcurrent_list = p_list_bss;
                             pdecalage = &dec_bss;
                             if ( ( ( (LEXEM)(list_lex->next->element))->lex_type != NL) && ( ( (LEXEM)(list_lex->next->element))->lex_type != COMMENT) ) {
                                 ERROR_MSG("ERR LINE %d : invalide element apres un .bss !\n", line);
@@ -120,7 +120,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                         }
                         else if (strcmp(val_lexem, ".text") == 0) {
                             section = TEXT;
-                            pcurrent_list = &list_instr;
+                            pcurrent_list = p_list_instr;
                             pdecalage = &dec_txt;
                             if ( ( ( (LEXEM)(list_lex->next->element))->lex_type != NL) && ( ( (LEXEM)(list_lex->next->element))->lex_type != COMMENT) ) {
                                 ERROR_MSG("ERR LINE %d : invalide element apres un .text !\n", line);
@@ -180,9 +180,9 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                     }
 
                     // cas pseudo instruction NOP (0 opérande)
-                    char* val_instr = strdup( ((LEXEM)(((INSTR)(list_instr->element))->lex)) -> value);
+                    char* val_instr = strdup( ((LEXEM)(((INSTR)((*p_list_instr)->element))->lex)) -> value);
                     if ( strcmp( val_instr, "NOP") ==  0){
-                        list_instr = change_pseudo_instr(list_instr);
+                        *p_list_instr = change_pseudo_instr(*p_list_instr);
                     }
 
                     S = START;
@@ -197,16 +197,16 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                     nb_arg_ligne = nb_arg_ligne + 1;
 
                     if (type_lexem == SYMBOLE) { // cas etiquette
-                        if (look_for_etiq(symb_table, val_lexem) == 1) {         // si cette etiq est deja définie
-                            list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 1, nb_arg_ligne);
+                        if (look_for_etiq(*p_symb_table, val_lexem) == 1) {         // si cette etiq est deja définie
+                            *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, 1, nb_arg_ligne);
                         }
-                        else  list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 0, nb_arg_ligne);  // si cette etiq n'est PAS deja définie
+                        else  *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, 0, nb_arg_ligne);  // si cette etiq n'est PAS deja définie
                     }
-                    else list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, -1, nb_arg_ligne);
+                    else *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, -1, nb_arg_ligne);
 
                     // ici on doit vérifier que l'on a pas une pseudo_instruction !
-                    list_instr = change_pseudo_instr(list_instr);
-                    list_instr = change_pseudo_SW_LW(list_instr);
+                    *p_list_instr = change_pseudo_instr(*p_list_instr);
+                    *p_list_instr = change_pseudo_SW_LW(*p_list_instr);
 
                     if      ( ( (LEXEM)(list_lex->next->element))->lex_type == VIRGULE) {
                         list_lex = list_lex->next;   // on saute la virgule
@@ -235,13 +235,13 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                 //     {
                 //         // ici si l'on a bien un NOP alors il faut la remplacer (pseudo_instruction): peut-on avoir autre chose qu'un NOP ??
                 //
-                //         char* val_instr = strdup( ((LEXEM)(((INSTR)(list_instr->element))->lex)) -> value);
+                //         char* val_instr = strdup( ((LEXEM)(((INSTR)(*p_list_instr->element))->lex)) -> value);
                 //
                 //         if ( strcmp( val_instr, "NOP") ==  0){
-                //             list_instr = change_pseudo_instr(list_instr);
+                //             *p_list_instr = change_pseudo_instr(*p_list_instr);
                 //         }
                 //
-                //         list_instr = change_pseudo_SW_LW(list_instr);   // inutile ? que instruction
+                //         *p_list_instr = change_pseudo_SW_LW(*p_list_instr);   // inutile ? que instruction
                 //         S = START;
                 //         nb_arg_ligne = 0;
                 //         nb_arg_needed= 0;
@@ -265,13 +265,13 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                 //
                 //     if ( ( (LEXEM)(list_lex->next->element))->lex_type == VIRGULE) {
                 //         if (type_lexem == SYMBOLE){ // cas etiquette
-                //             if (look_for_etiq(symb_table, val_lexem) == 1){         // si cette etiq est deja définie
-                //                 list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 1, nb_arg_ligne);
+                //             if (look_for_etiq(*p_symb_table, val_lexem) == 1){         // si cette etiq est deja définie
+                //                 *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, 1, nb_arg_ligne);
                 //             }
-                //             else  list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 0, nb_arg_ligne);  // si cette etiq n'est PAS deja définie
+                //             else  *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, 0, nb_arg_ligne);  // si cette etiq n'est PAS deja définie
                 //         }
                 //
-                //         else list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, -1, nb_arg_ligne); //renvoit -1 car pas une étiquette
+                //         else *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, -1, nb_arg_ligne); //renvoit -1 car pas une étiquette
                 //         S = INSTRUCTION;
                 //
                 //         if ( ( ( (LEXEM)(list_lex->next->next->element))->lex_type != NL) && ( ( (LEXEM)(list_lex->next->next->element))->lex_type != COMMENT) ) { // pour éviter le cas intr arg1, arg2, NL
@@ -285,17 +285,17 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                 //             ERROR_MSG("ERR LINE %d : mauvais nombre d'arguments pour instruction !\n", line);
                 //         }
                 //         if (type_lexem == SYMBOLE) { // cas etiquette
-                //             if (look_for_etiq(symb_table, val_lexem) == 1){         // si cette etiq est deja définie
-                //                 list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 1, nb_arg_ligne);
+                //             if (look_for_etiq(*p_symb_table, val_lexem) == 1){         // si cette etiq est deja définie
+                //                 *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, 1, nb_arg_ligne);
                 //             }
-                //             else  list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, 0, nb_arg_ligne);  // si cette etiq n'est PAS deja définie
+                //             else  *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, 0, nb_arg_ligne);  // si cette etiq n'est PAS deja définie
                 //         }
                 //
-                //         else list_instr = fill_arguments(lexem, list_instr, previous_type_lexem, -1, nb_arg_ligne);
+                //         else *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, -1, nb_arg_ligne);
                 //
                 //         // ici on doit vérifier que l'on a pas une pseudo_instruction !
-                //         list_instr = change_pseudo_instr(list_instr);
-                //         list_instr = change_pseudo_SW_LW(list_instr);
+                //         *p_list_instr = change_pseudo_instr(*p_list_instr);
+                //         *p_list_instr = change_pseudo_SW_LW(*p_list_instr);
                 //
                 //         S = START;
                 //         nb_arg_ligne = 0;
@@ -323,7 +323,7 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
                     *pcurrent_list = add_to_current_list(LABEL, val_lexem, *pdecalage, line, *pcurrent_list);// stocke. Par defaut etiq_def est à 0;
                     *pdecalage += 4;
 
-                    if (look_for_etiq(symb_table, val_lexem) == 1){ // si etiq deja définie
+                    if (look_for_etiq(*p_symb_table, val_lexem) == 1){ // si etiq deja définie
                          ((DATA)((*pcurrent_list)->element))->etiq_def = 1;
                     }
                     if ( ( ( (LEXEM)(list_lex->next)->element)->lex_type) == VIRGULE ) {
@@ -459,27 +459,17 @@ void analyse_synth(LIST list_instr, LIST list_data, LIST list_bss, LIST symb_tab
 
     // --- deuxième parcours : on cherche les étiquettes ----
     // list_instr
-    symb_table=look_for_undefined_etiq_in_instr(list_instr, symb_table);
+    *p_symb_table=look_for_undefined_etiq_in_instr(*p_list_instr, *p_symb_table);
     // list_data
-    symb_table=look_for_undefined_etiq_in_data(list_data, symb_table);
+    *p_symb_table=look_for_undefined_etiq_in_data(*p_list_data, *p_symb_table);
     // list_bss
-    symb_table=look_for_undefined_etiq_in_bss(list_bss, symb_table);
-
-    // TODO
-    printf("\n\nci dessous c'est la liste des .bss meme si c'est marqué .data (à corriger)\n");
-    print_list_data(list_bss);  // faire une fct différente ou envoyer en paramètre la section
-
-    //TODO --
-    LIST reloc_table_text = reloc_and_replace_etiq_by_dec_in_instr (list_instr, symb_table);
-    LIST reloc_table_data = reloc_and_replace_etiq_by_dec_in_data (list_data, symb_table);
-
-    print_list_instr(list_instr);
-    print_symb_table(symb_table);
-    print_list_data(list_data);
+    *p_symb_table=look_for_undefined_etiq_in_bss(*p_list_bss, *p_symb_table);
 
 
-    // TODO fonction à insérer qui met la bonne valeur dans LW et SW à l'aide des fonctions upper_16 et lower_16
-
+    // il faut inverser l'ordre des éléments de ces liste car on a ajouter les élément en tete de liste
+    *p_list_instr = revers_list(*p_list_instr);
+    *p_list_data  = revers_list(*p_list_data);
+    *p_list_bss   = revers_list(*p_list_bss);
 
     return;
 }

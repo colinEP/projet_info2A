@@ -23,7 +23,7 @@ QUEUE ajouter_fin(QUEUE l, void* element);
 
 LIST add_to_head_list(LIST L, void* element);
 LIST add_to_end_list (LIST L, void* element);
-
+LIST revers_list(LIST l);
 
 LIST new_list();
 
