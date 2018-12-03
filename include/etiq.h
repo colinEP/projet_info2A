@@ -8,6 +8,7 @@ typedef struct {
     int nline;
     int section;
     int decalage;
+    int def_in_file;
 }* ETIQ;
 
 typedef struct {
@@ -19,7 +20,7 @@ typedef struct {
 
 
 int look_for_etiq( LIST symb_table, char* val_lexem);
-LIST add_to_symb_table(char* etiq, int decalage, int line, int section, LIST symb_table);
+LIST add_to_symb_table(char* etiq, int decalage, int line, int section, int def, LIST symb_table);
 LIST reloc_and_replace_etiq_by_dec_in_data (LIST l, LIST symb_table);
 LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table);
 ETIQ look_for_etiq_and_return( LIST symb_table, char* lexem);

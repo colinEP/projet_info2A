@@ -74,7 +74,7 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
                             if (look_for_etiq(*p_symb_table, val_lexem)) {
                                 ERROR_MSG("ERR LINE %d : Redefinition d'etiquette !\n", line);
                             }
-                            *p_symb_table = add_to_symb_table(val_lexem, *pdecalage, line, section, *p_symb_table);
+                            *p_symb_table = add_to_symb_table(val_lexem, *pdecalage, line, section, TRUE, *p_symb_table);
                             list_lex = list_lex->next; // on va passer les DEUX_PTS
                         }
                         // CAS 2 : une instruction ?
@@ -182,7 +182,7 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
                     // cas pseudo instruction NOP (0 opérande)
                     char* val_instr = strdup( ((LEXEM)(((INSTR)((*p_list_instr)->element))->lex)) -> value);
                     if ( strcmp( val_instr, "NOP") ==  0){
-                        *p_list_instr = change_pseudo_instr(*p_list_instr);
+                        *p_list_instr = change_pseudo_instr(*p_list_instr, pdecalage);
                     }
 
                     S = START;
@@ -205,8 +205,10 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
                     else *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, -1, nb_arg_ligne);
 
                     // ici on doit vérifier que l'on a pas une pseudo_instruction !
-                    *p_list_instr = change_pseudo_instr(*p_list_instr);
-                    *p_list_instr = change_pseudo_SW_LW(*p_list_instr);
+                    *p_list_instr = change_pseudo_instr(*p_list_instr, pdecalage);
+                    // A ce moment, le decalage été déjà incrémenté => il faudra l'incrementer qu'APRES insertion de la 2e instruction
+                    *p_list_instr = change_pseudo_SW_LW(*p_list_instr, pdecalage);
+
 
                     if      ( ( (LEXEM)(list_lex->next->element))->lex_type == VIRGULE) {
                         list_lex = list_lex->next;   // on saute la virgule
@@ -351,7 +353,7 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
                     if (previous_type_lexem == MOINS) val_convert = -val_convert;
                     // TODO TODO TODO TODO
                     // TODO TODO TODO TODO
-                    printf("\nAAAAAAAAAAAAAAAAAA %ld\n",val_convert) ;
+                    printf("\nAAAAAAAAAAAAAAAAAA %ld verif taille operande .word (analyse_synth.c line 354)\n",val_convert) ;
                     if ( (val_convert<-2147483648) || (2147483647<val_convert) ) {
                         ERROR_MSG("ERR LINE %d : Nombre trop grand pour etre stocké dans un word (32 bits : -2147483648 < x < 2147483647)\n", line);
                     }

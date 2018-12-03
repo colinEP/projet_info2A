@@ -24,7 +24,7 @@
 // mettre à jour le décalage suite à ces pseudo_instruction !!
 // + le cas LW / SW
 
-LIST change_pseudo_instr(LIST list_instr)
+LIST change_pseudo_instr(LIST list_instr, int* pdecalage)
 // normalement cette fonction est appelée alors que les arguments des pseudo_instruction ont déjà été vérifiés donc c'est bon !
 
  {
@@ -37,6 +37,8 @@ LIST change_pseudo_instr(LIST list_instr)
      int is_def = 0;
 
      if (strcmp(instruction,"NOP")==0){ // OK
+
+         free(((LEXEM)(I->lex))->value);
          ((LEXEM)(I->lex))->value = strdup("SLL");
          I-> nb_arg = 3;
          I->Exp_Type_1 = Reg;
@@ -56,6 +58,7 @@ LIST change_pseudo_instr(LIST list_instr)
 
      if (strcmp(instruction,"MOVE")==0){ //OK
          //  ici peu de cas car pour arg1 et arg2, ils restent les mêmes, qu'ils soient Reg ou Label
+         free(((LEXEM)(I->lex))->value);
          (I->lex)->value = strdup("ADD");
          I-> nb_arg = 3;
          I->Exp_Type_3 = Reg;
@@ -69,6 +72,7 @@ LIST change_pseudo_instr(LIST list_instr)
          // cas arg 1 :  il reste le même, qu'il soit Label ou Reg
          // idem pour Exp_Type_2
 
+         free(((LEXEM)(I->lex))->value);
          ((LEXEM)(I->lex))->value = strdup("SUB");
           I-> nb_arg = 3;
           I->Exp_Type_3 = Reg;
@@ -90,6 +94,8 @@ LIST change_pseudo_instr(LIST list_instr)
 
      if (strcmp(instruction,"LI")==0){ //OK
          // cas arg 1 :  il reste le même, qu'il soit Label ou Reg
+
+         free(((LEXEM)(I->lex))->value);
 
          ((LEXEM)(I->lex))->value = strdup("ADDI");
           I-> nb_arg = 3;
@@ -125,7 +131,7 @@ LIST change_pseudo_instr(LIST list_instr)
              is_def = -1;
              int1 = (I-> arg3)->val.entier;
          }
-
+         free(((LEXEM)(I->lex))->value);
          ((LEXEM)(I->lex))->value = strdup("SLT");
          I-> nb_arg = 3;
          I->Exp_Type_1 = Reg; // normalement inutile
@@ -153,7 +159,7 @@ LIST change_pseudo_instr(LIST list_instr)
          second_instr->lex_type = SYMBOLE;
          second_instr->value = strdup("BNE") ;
 
-         list_instr = add_to_list_instr(second_instr, I-> decalage, 3, list_instr, Reg, Reg, Rel); //etiq def est à -1 par defaut
+         list_instr = add_to_list_instr(second_instr, *pdecalage, 3, list_instr, Reg, Reg, Rel); //etiq def est à -1 par defaut
          I = list_instr->element;
          (I-> arg1)->type = Reg;
          (I-> arg1)->val.entier = 1;
@@ -168,13 +174,17 @@ LIST change_pseudo_instr(LIST list_instr)
              (I-> arg3)->type = Rel;
              (I-> arg3)->val.entier = int1;
          }
+
+         // maj du decalage car instruction insérée
+         *pdecalage += 4;
+
          return list_instr;
      }
 
      return list_instr;
  }
 
-LIST change_pseudo_SW_LW(LIST list_instr){
+LIST change_pseudo_SW_LW(LIST list_instr, int* pdecalage){
       INSTR I = list_instr->element;
       char* instruction =  strdup( ((LEXEM)(I->lex))->value );
       instruction = put_in_uppercase (instruction);
@@ -205,12 +215,13 @@ LIST change_pseudo_SW_LW(LIST list_instr){
               (I-> arg1)->type = Reg; // UTILE
               (I-> arg3)->type = None;
 
+
               LEXEM second_instr = calloc(1, sizeof(*second_instr));
               second_instr->nline = I->lex->nline;
               second_instr->lex_type = SYMBOLE;
               second_instr->value = strdup("LW") ;
 
-              list_instr = add_to_list_instr(second_instr, I-> decalage, 2, list_instr, Reg, Bas, None); //etiq def est à -1 par defaut
+              list_instr = add_to_list_instr(second_instr, *pdecalage, 2, list_instr, Reg, Bas, None); //etiq def est à -1 par defaut
               I = list_instr->element;
               (I-> arg1)->type = Reg;
               (I-> arg1)->val.entier = reg;
@@ -221,6 +232,9 @@ LIST change_pseudo_SW_LW(LIST list_instr){
               (I-> arg2)->val.char_chain = strdup(name_etiq);
 
               (I-> arg3)->type = None;
+
+              // maj du decalage car instruction insérée
+              *pdecalage += 4;
 
               return list_instr;
           }
@@ -249,11 +263,12 @@ LIST change_pseudo_SW_LW(LIST list_instr){
 
               (I-> arg3)->type = None;
 
+
               LEXEM second_instr = calloc(1, sizeof(*second_instr));
               second_instr->nline = I->lex->nline;
               second_instr->lex_type = SYMBOLE;
               second_instr->value = strdup("SW") ;
-              list_instr = add_to_list_instr(second_instr, I-> decalage, 2, list_instr, Reg, Bas, None); //etiq def est à -1 par defaut
+              list_instr = add_to_list_instr(second_instr, *pdecalage, 2, list_instr, Reg, Bas, None); //etiq def est à -1 par defaut
               I = list_instr->element;
               (I-> arg1)->type = Reg;
               (I-> arg1)->val.entier = reg;
@@ -263,6 +278,9 @@ LIST change_pseudo_SW_LW(LIST list_instr){
               (I-> arg2)->val.char_chain = strdup(name_etiq);
 
               (I-> arg3)->type = None;
+
+              // maj du decalage car instruction insérée
+              *pdecalage += 4;
 
               return list_instr;
           }

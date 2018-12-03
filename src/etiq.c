@@ -34,13 +34,14 @@ int look_for_etiq( LIST symb_table, char* lexem) // renvoit 1 si trouvée, 0 sin
      return 0; //étiquette non trouvée
  }
 
-LIST add_to_symb_table(char* name_etiq, int dec, int line, int sect, LIST symb_table)
+LIST add_to_symb_table(char* name_etiq, int dec, int line, int sect, int def, LIST symb_table)
 {
     ETIQ etiq = calloc(1, sizeof(*etiq));
     etiq-> decalage = dec;
     etiq-> nline = line;
     etiq-> section = sect;
-    etiq->name = strdup(name_etiq);
+    etiq-> name = strdup(name_etiq);
+    etiq-> def_in_file = def;
     symb_table = add_to_end_list(symb_table, etiq);
     return symb_table;
 }

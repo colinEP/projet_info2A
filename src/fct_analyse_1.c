@@ -232,7 +232,7 @@ LIST look_for_undefined_etiq_in_instr(LIST l, LIST symb_table){ // met à 1 etiq
                     int dec = I->decalage;
                     int line = (I->lex)->nline ;
                     int sect = TEXT; // car list instr
-                    symb_table = add_to_symb_table(name_etiq, dec, line, sect, symb_table);
+                    symb_table = add_to_symb_table(name_etiq, dec, line, sect, FALSE, symb_table);
                     (I->arg1)->etiq_def = 0;
                 }
 
@@ -245,7 +245,7 @@ LIST look_for_undefined_etiq_in_instr(LIST l, LIST symb_table){ // met à 1 etiq
                     int dec = I->decalage;
                     int line = (I->lex)->nline ;
                     int sect = TEXT; // car list instr
-                    symb_table = add_to_symb_table(name_etiq, dec, line, sect, symb_table);
+                    symb_table = add_to_symb_table(name_etiq, dec, line, sect, FALSE, symb_table);
                     (I->arg2)->etiq_def = 0;
                 }
 
@@ -258,7 +258,7 @@ LIST look_for_undefined_etiq_in_instr(LIST l, LIST symb_table){ // met à 1 etiq
                     int dec = I->decalage;
                     int line = (I->lex)->nline ;
                     int sect = TEXT; // car list instr
-                    symb_table = add_to_symb_table(name_etiq, dec, line, sect, symb_table);
+                    symb_table = add_to_symb_table(name_etiq, dec, line, sect, FALSE, symb_table);
                     (I->arg3)->etiq_def = 0;
                 }
         }
@@ -283,7 +283,7 @@ LIST look_for_undefined_etiq_in_data(LIST l, LIST symb_table){ // met à 1 etiq 
                     int dec = ((DATA)(l->element))->decalage;
                     int line = ((DATA)(l->element))->line;
                     int sect = PDATA; // car list .data
-                    symb_table = add_to_symb_table(name_etiq, dec, line, sect, symb_table);
+                    symb_table = add_to_symb_table(name_etiq, dec, line, sect, FALSE, symb_table);
                     ((DATA)(l->element))-> etiq_def = 0;
                 }
 
@@ -309,7 +309,7 @@ LIST look_for_undefined_etiq_in_bss(LIST l, LIST symb_table){ // met à 1 etiq d
                     int dec = ((DATA)(l->element))->decalage;
                     int line = ((DATA)(l->element))->line;
                     int sect = BSS; // car list .bss
-                    symb_table = add_to_symb_table(name_etiq, dec, line, sect, symb_table);
+                    symb_table = add_to_symb_table(name_etiq, dec, line, sect, FALSE, symb_table);
                     ((DATA)(l->element))-> etiq_def = 0;
                 }
             }

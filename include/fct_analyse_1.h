@@ -79,8 +79,8 @@ int upper_16(int val_32b);
 int lower_16(int val_32b);
 
 // dans pseudo_instr.c
-LIST change_pseudo_instr(LIST list_instr);
-LIST change_pseudo_SW_LW(LIST list_instr);
+LIST change_pseudo_instr(LIST list_instr, int* pdecalage);
+LIST change_pseudo_SW_LW(LIST list_instr, int* pdecalage);
 int upper_16(int val_32b);
 int lower_16(int val_32b);
 

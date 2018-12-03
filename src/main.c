@@ -129,9 +129,7 @@ int main ( int argc, char *argv[] ) {
     print_symb_table(symb_table);
     print_list_instr(list_instr);
     print_list_data(list_data);
-    //print bss //TODO
-    printf("\n\nci dessous c'est la liste des .bss meme si c'est marqué .data (à corriger)\n");
-    print_list_data(list_bss);  // faire une fct différente ou envoyer en paramètre la section
+    print_list_bss(list_bss);
 
 
 

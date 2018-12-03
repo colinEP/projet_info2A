@@ -15,5 +15,6 @@ void read_queue_lex(QUEUE Q);
 
 void print_list_data( LIST l );
 
+void print_list_bss( LIST l );
 
 #endif

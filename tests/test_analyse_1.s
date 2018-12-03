@@ -2,6 +2,8 @@
 # allons au ru
 .set noreorder #test
 .text
+	BLT $4,$5,boucle #test decalage
+	# ERROR pseudo-instr : arg2 = None alors que arg3 = 4
     Lw $t0, lunchtime
     LW $6, -200($7)
     ADDI $t1,$zero,8
@@ -16,8 +18,14 @@ byebye:
 .data
 lunchtime:
     .word 12
+etiq1:    #OK
+    .byte 4
+etiq2:    #err => if .word après aligné sur 4
     .word boucle
+etiq3:    #OK
     .asciiz "ils disent : \"au ru!\""
+etiq4:    # pas tester car faut corriger gestion str avant  
 .bss
 menu:
     .space 24
+etiq5:    #OK

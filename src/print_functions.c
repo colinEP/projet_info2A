@@ -62,7 +62,7 @@ void print_list_dico( LIST l ) {
     LIST p;
     DICO_LINE dico;
     printf("\n====== Dico d'instruction ======\n");
-    printf("Instruct | nb_arg | type_arg1 | type_arg2 | type_arg3\n");
+    printf("\nInstruct | nb_arg | type_arg1 | type_arg2 | type_arg3\n");
     //printf("         |        |           |           |\n");
     for ( p=l ; p!=NULL ; p=p->next ) {
         dico = p->element;
@@ -100,41 +100,45 @@ void print_list_instr( LIST l ) {
         ARG_INST A1 = I->arg1;
         ARG_INST A2 = I->arg2;
         ARG_INST A3 = I->arg3;
-        printf(" Instruction : %s \n", ((LEXEM)(I->lex))->value);
+
+        printf(" LINE : %d \n", ((LEXEM)(I->lex))->nline);
+        printf("   Instruction : %s \n", ((LEXEM)(I->lex))->value);
+        printf("   Décalage : %d \n", I->decalage);
+
         if (( A1->type) == None) {
             a1 = strdup("NONE");
-            printf(" Arg1 : %s \n", a1);
+            printf("   Arg1 : %s \n", a1);
         }
         else {
             if ( ((A1->type) == Bas_Target)||((A1->type) == Target)){
                 a1 = strdup(((char*)(A1->val.char_chain) )) ;
-                printf(" Arg1 : %s \n", a1);
+                printf("   Arg1 : %s \n", a1);
             }
-            else printf(" Arg1 : %ld \n", ((long int)(A1->val.entier)));
+            else printf("   Arg1 : %ld \n", ((long int)(A1->val.entier)));
         }
 
-        if ((A2->type)== None){
+        if ((A2->type)== None) {
              a2 = strdup("NONE");
-             printf(" Arg1 : %s \n", a2);
-         }
+             printf("   Arg2 : %s \n", a2);
+        }
         else {
             if ( ((A2->type) == Bas_Target)||((A2->type) == Target)){
                 a2 = strdup(((char*)(A2->val.char_chain) )) ;
-                printf(" Arg2 : %s \n", a2);
+                printf("   Arg2 : %s \n", a2);
             }
-            else printf(" Arg2 : %ld \n", ((long int)(A2->val.entier)));
+            else printf("   Arg2 : %ld \n", ((long int)(A2->val.entier)));
         }
 
         if ((A3->type) == None) {
             a3 = strdup("NONE");
-            printf(" Arg3 : %s \n", a3);
+            printf("   Arg3 : %s \n", a3);
         }
         else {
             if ( ((A3->type) == Bas_Target)||((A3->type) == Target)){
                 a3 = strdup(((char*)(A3->val.char_chain))) ;
-                printf(" Arg3 : %s \n", a3);
+                printf("   Arg3 : %s \n", a3);
             }
-            else printf(" Arg3 : %ld \n", ((long int)(A3->val.entier)));
+            else printf("   Arg3 : %ld \n", ((long int)(A3->val.entier)));
         }
         l = l->next;
     }
@@ -143,21 +147,42 @@ void print_list_instr( LIST l ) {
 
 void print_symb_table( LIST l ) {
     printf("\n====== Table des symboles ======\n");
-    printf("\n          |             |           \n");
-    printf(" name     |  section    |   line   \n");
-    printf("          |             |          \n");
+    printf("\ndef_line  |    name     | decalage | section | def_in_file \n");
 
+    int i;
+    int stop;
+    ETIQ etiq;
     while (l!= NULL)
     {
-        printf(" %s\t\t %d\t   %d\n", ((ETIQ)(l->element))-> name, ((ETIQ)(l->element))-> section,  ((ETIQ)(l->element))-> nline );
+        etiq = (ETIQ)(l->element);
+        printf("   %d\t    ", etiq->nline);
+        printf("%s", etiq->name);
+        stop = 12 - strlen( etiq->name );
+        for (i=0 ; i<stop ; i++) printf(" ");
+
+        printf("    %d\t        %d          %d\n", etiq->decalage,  etiq-> section, etiq-> def_in_file);
+
         l = l->next;
     }
+
+
     return;
 }
 
 
 void print_list_data( LIST l ) {
     printf("\n====== Liste des .data ======\n");
+
+    while (l!= NULL)
+    {
+        printf(" decalage : %d  etiq_def: %d  op_type: %d\n", ((DATA)(l->element))-> decalage, ((DATA)(l->element))-> etiq_def,  (((data_op)(((DATA)(l->element))-> D))->type ));
+        l = l->next;
+    }
+    return;
+}
+
+void print_list_bss( LIST l ) {
+    printf("\n====== Liste des .bss =======\n");
 
     while (l!= NULL)
     {
