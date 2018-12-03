@@ -110,11 +110,11 @@ void print_list_instr( LIST l ) {
             printf("   Arg1 : %s \n", a1);
         }
         else {
-            if ( ((A1->type) == Bas_Target)||((A1->type) == Target)){
-                a1 = strdup(((char*)(A1->val.char_chain) )) ;
-                printf("   Arg1 : %s \n", a1);
-            }
-            else printf("   Arg1 : %ld \n", ((long int)(A1->val.entier)));
+            // if ( ((A1->type) == Bas_Target)||((A1->type) == Target)){
+            //     a1 = strdup(((char*)(A1->val.char_chain) )) ;
+            //     printf("   Arg1 : %s \n", a1);
+            // }
+            printf("   Arg1 : %ld \n", ((long int)(A1->val.entier)));
         }
 
         if ((A2->type)== None) {
@@ -122,11 +122,11 @@ void print_list_instr( LIST l ) {
              printf("   Arg2 : %s \n", a2);
         }
         else {
-            if ( ((A2->type) == Bas_Target)||((A2->type) == Target)){
-                a2 = strdup(((char*)(A2->val.char_chain) )) ;
-                printf("   Arg2 : %s \n", a2);
-            }
-            else printf("   Arg2 : %ld \n", ((long int)(A2->val.entier)));
+            // if ( ((A2->type) == Bas_Target)||((A2->type) == Target)){
+            //     a2 = strdup(((char*)(A2->val.char_chain) )) ;
+            //     printf("   Arg2 : %s \n", a2);
+            // }
+            printf("   Arg2 : %ld \n", ((long int)(A2->val.entier)));
         }
 
         if ((A3->type) == None) {
@@ -134,11 +134,11 @@ void print_list_instr( LIST l ) {
             printf("   Arg3 : %s \n", a3);
         }
         else {
-            if ( ((A3->type) == Bas_Target)||((A3->type) == Target)){
-                a3 = strdup(((char*)(A3->val.char_chain))) ;
-                printf("   Arg3 : %s \n", a3);
-            }
-            else printf("   Arg3 : %ld \n", ((long int)(A3->val.entier)));
+            // if ( ((A3->type) == Bas_Target)||((A3->type) == Target)){
+            //     a3 = strdup(((char*)(A3->val.char_chain))) ;
+            //     printf("   Arg3 : %s \n", a3);
+            // }
+            printf("   Arg3 : %ld \n", ((long int)(A3->val.entier)));
         }
         l = l->next;
     }
@@ -164,8 +164,22 @@ void print_symb_table( LIST l ) {
 
         l = l->next;
     }
+    return;
+}
 
+void print_reloc_table( LIST l ) {
+    printf("\n====== Table de relocation ======\n");
+    printf("\n section  |   decalage appel   | type relocation | valeur offset|\n");
 
+    RELOC R;
+    while (l!= NULL)
+    {
+        R = l->element;
+        printf("   %s   \t", R->section);
+        printf("    %d\t\t", R->adress);
+        printf("     %d \t\t%s\n", R->type_r,  R->addend);
+        l = l->next;
+    }
     return;
 }
 

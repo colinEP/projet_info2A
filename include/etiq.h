@@ -1,7 +1,7 @@
 #ifndef _ETIQ_H_
 #define _ETIQ_H_
 
-typedef enum {R_MIPS_32=2, R_MIPS_26=4, R_MIPS_HI16=5, R_MIPS_LO16=6} reloc_type;
+typedef enum {R_MIPS_32=32, R_MIPS_26=26, R_MIPS_HI16=162, R_MIPS_LO16=161} reloc_type;
 
 typedef struct {
     char* name;

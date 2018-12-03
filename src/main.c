@@ -16,6 +16,7 @@
 #include <lex.h>
 #include <queue_list.h>
 #include <test.h>
+#include <etiq.h>
 #include <dictionnaire.h>
 #include <analyse_synth.h>
 #include <print_functions.h>
@@ -123,13 +124,14 @@ int main ( int argc, char *argv[] ) {
     //TODO
     LIST reloc_table_text = reloc_and_replace_etiq_by_dec_in_instr (list_instr, symb_table);
     LIST reloc_table_data = reloc_and_replace_etiq_by_dec_in_data (list_data, symb_table);
-    // TODO fonction à insérer qui met la bonne valeur dans LW et SW à l'aide des fonctions upper_16 et lower_16
-
+    
 
     print_symb_table(symb_table);
     print_list_instr(list_instr);
     print_list_data(list_data);
     print_list_bss(list_bss);
+    print_reloc_table( reloc_table_text);
+    print_reloc_table( reloc_table_data);
 
 
 

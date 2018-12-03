@@ -39,7 +39,7 @@ typedef struct {
         // char* Bas;
         // char* Label ou int Label selon av ou ap replace_etiq_by_dec
         long int entier; // WARNING long ?!
-        char* char_chain;
+        char* char_chain; //etat de transition
     } val;
     int etiq_def;
 }* ARG_INST;

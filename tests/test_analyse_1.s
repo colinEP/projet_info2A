@@ -4,8 +4,8 @@
 .text
 	BLT $4,$5,boucle #test decalage
 	# ERROR pseudo-instr : arg2 = None alors que arg3 = 4
-    Lw $t0, lunchtime
-    Lw $t0, etiqnondef
+    Lw $t0, etiq1
+    Lw $t1, etiqnondef
     LW $6, -200($7)
     ADDI $t1,$zero,8
 boucle:

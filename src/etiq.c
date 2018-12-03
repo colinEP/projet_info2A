@@ -58,7 +58,6 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
             RELOC Re = calloc (1, sizeof(*Re));
             ETIQ Et;
 
-            // WARNING et le cas == Target !?!?
 
             if ( ((ARG_INST)(I->arg1))->type == Label ) {
 
@@ -70,6 +69,7 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                     Re->addend = strdup((I->arg1)->val.char_chain);// stocke le NOM de l'etiquette car non def
                     (I->arg1)->val.entier = 0; // pour remplacer le nom de l'étiq par int = 0 car non def donc décalage nul
                     Re->type_r = find_R_type((I->lex)->value);// a définir selon l'instruction !
+                    reloc_table_text = add_to_end_list(reloc_table_text, Re);
                 }
 
                 else {
@@ -89,7 +89,6 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                         Re->type_r = find_R_type((I->lex)->value);// a définir selon l'instruction !
                         reloc_table_text = add_to_end_list(reloc_table_text, Re);
                     }
-
                     (I->arg1)->val.entier = Et->decalage;// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
 
                     }
@@ -101,45 +100,57 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
 
             }
 
-
+            // En arg2 uniquement, cas pseudo instr !
             if ( (((ARG_INST)(I->arg2))->type == Label )||  ( ((ARG_INST)(I->arg2))->type == Target) || ( ((ARG_INST)(I->arg2))->type == Bas_Target) ) {
 
-                (I->arg2)->type = Abs;
                 Re->section = strdup(".text"); // NOTE on doit avoir une char* d'après le sujet  ??
                 Re->adress = I->decalage; // valeur du décalage de l'APPEL de l'étiq (!= de sa définition)
 
 
                 if ( (I->arg2)->etiq_def == 0 ) {               //etiq globale
+
                     Re->addend = strdup((I->arg2)->val.char_chain);// stocke le NOM de l'etiquette car non def
-                    if ( ((I->arg2)->type == Label) || ((I->arg2)->type == Target))  (I->arg2)->val.entier = 0; // pour remplacer le nom de l'étiq par int = 0 car non def donc décalage nul
+                    if ( ((I->arg2)->type == Label) || ((I->arg2)->type == Target)) {
+                         (I->arg2)->val.entier = 0; // pour remplacer le nom de l'étiq par int = 0 car non def donc décalage nul
+
+                     }
                     if ((I->arg2)->type == Bas_Target){
                         (I->arg2)->val.entier = (I->arg1)->val.entier; // car alors on somme $rt + 0(adresse d'une etiq non def)
                     }
+                    (I->arg2)->type = Abs;
                     Re->type_r = find_R_type((I->lex)->value);// a définir selon l'instruction !
+                    reloc_table_text = add_to_end_list(reloc_table_text, Re);
                 }
 
 
-                // TODO TODO TODO CAS LW / SW 
-
                 else {
                     if ( (I->arg2)->etiq_def == 1 ) {               //etiq bien definie
-                    Et = look_for_etiq_and_return(symb_table, (I->arg2)->val.char_chain);
+                        printf("Ici on arg2 : %s et etiqdef : %d \n", (I->arg2)->val.char_chain, (I->arg2)->etiq_def);
+                        Et = look_for_etiq_and_return(symb_table, (I->arg2)->val.char_chain);
 
-                    //le cas Et->section == TEXT ne nécessite pas de relocation car nous sommes déjà dans la section Text
+                        //le cas Et->section == TEXT ne nécessite pas de relocation car nous sommes déjà dans la section Text
 
-                    if (Et->section == PDATA) {                 // etiq def dans .data
-                        Re->addend = strdup(".data");           //NOTE conversion en char*: est-ce vraiment utile pour la suite ?
-                        Re->type_r = find_R_type((I->lex)->value);// a définir selon l'instruction !
-                        reloc_table_text = add_to_end_list(reloc_table_text, Re);
-                    }
+                        if (Et->section == PDATA) {                 // etiq def dans .data
+                            Re->addend = strdup(".data");           //NOTE conversion en char*: est-ce vraiment utile pour la suite ?
+                            Re->type_r = find_R_type((I->lex)->value);// a définir selon l'instruction !
+                            reloc_table_text = add_to_end_list(reloc_table_text, Re);
+                        }
 
-                    if (Et->section == BSS){                    // etiq def dans .bss
-                        Re->addend = strdup(".bss") ;            //NOTE conversion en char*: est-ce vraiment utile pour la suite ?
-                        Re->type_r = find_R_type((I->lex)->value);// a définir selon l'instruction !
-                        reloc_table_text = add_to_end_list(reloc_table_text, Re);
-                    }
+                        if (Et->section == BSS){                    // etiq def dans .bss
+                            Re->addend = strdup(".bss") ;            //NOTE conversion en char*: est-ce vraiment utile pour la suite ?
+                            Re->type_r = find_R_type((I->lex)->value);// a définir selon l'instruction !
+                            reloc_table_text = add_to_end_list(reloc_table_text, Re);
+                        }
 
-                    (I->arg2)->val.entier = Et->decalage;// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
+                        if ((I->arg2)->type == Label){
+                            (I->arg2)->val.entier = Et->decalage;// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
+                        }
+                        if ((I->arg2)->type == Target){
+                            (I->arg2)->val.entier = upper_16(Et->decalage);// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
+                        }
+                        if ((I->arg2)->type == Bas_Target){
+                            (I->arg2)->val.entier = lower_16(Et->decalage + (I->arg1)->val.entier );// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
+                        }
 
                     }
                     else {
@@ -159,6 +170,7 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                     Re->addend = strdup((I->arg3)->val.char_chain);// stocke le NOM de l'etiquette car non def
                     (I->arg3)->val.entier = 0; // pour remplacer le nom de l'étiq par int = 0 car non def donc décalage nul
                     Re->type_r = find_R_type((I->lex)->value);// a définir selon l'instruction !
+                    reloc_table_text = add_to_end_list(reloc_table_text, Re);
                 }
 
                 else {
@@ -181,6 +193,7 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
 
                     (I->arg3)->val.entier = Et->decalage;// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
                     }
+
                     else {
                     printf("ERREUR LIGNE : %d\n", (I->lex)->nline);
                     ERROR_MSG("Valeur etiq_def invalide apres etiquette !\n");
@@ -208,6 +221,7 @@ LIST reloc_and_replace_etiq_by_dec_in_data (LIST l, LIST symb_table)
             (Da->D)->type = DEC_LABEL;
             if ( Da-> etiq_def == 0 ){
                 (Da->D)->val.DEC_LABEL = 0;
+                reloc_table_data = add_to_end_list(reloc_table_data, Re);
             }
             if ( Da-> etiq_def == 1 ){
                 ETIQ Et = look_for_etiq_and_return(symb_table, (Da->D)->val.LABEL);
