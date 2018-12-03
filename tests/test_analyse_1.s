@@ -5,6 +5,7 @@
 	BLT $4,$5,boucle #test decalage
 	# ERROR pseudo-instr : arg2 = None alors que arg3 = 4
     Lw $t0, lunchtime
+    Lw $t0, etiqnondef
     LW $6, -200($7)
     ADDI $t1,$zero,8
 boucle:
@@ -24,7 +25,7 @@ etiq2:    #err => if .word après aligné sur 4
     .word boucle
 etiq3:    #OK
     .asciiz "ils disent : \"au ru!\""
-etiq4:    # pas tester car faut corriger gestion str avant  
+etiq4:    # pas tester car faut corriger gestion str avant
 .bss
 menu:
     .space 24
