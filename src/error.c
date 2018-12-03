@@ -17,8 +17,8 @@ void print_error_lex(char* msg, unsigned int nline, int pos, char* line) {
     int column = pos+1;
     int i;
 
-    fprintf( stderr, "%c[%d;%dm", 0x1B, STYLE_BOLD, COLOR_WHITE );  // set style ans color
-    fprintf( stderr, "\nERROR : %d:%d:   ", nline, column );
+    fprintf( stderr, "%c[%d;%dm", 0x1B, STYLE_BOLD, COLOR_RED );  // set style ans color
+    fprintf( stderr, "\nERROR : line:%d - col:%d   ", nline, column );
     fprintf( stderr, "%c[%dm", 0x1B, 0 );  // reset style and color
     fprintf( stderr, "%s\n", msg );
 

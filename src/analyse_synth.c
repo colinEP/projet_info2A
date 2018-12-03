@@ -74,6 +74,22 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
                             if (look_for_etiq(*p_symb_table, val_lexem)) {
                                 ERROR_MSG("ERR LINE %d : Redefinition d'etiquette !\n", line);
                             }
+
+                            // si la prochaine directive est un .word, il faut aligner l'adresse de l'etiquette
+                            LIST test_word = list_lex;
+                            while (     ( ((LEXEM)test_word->next->element)->lex_type==DEUX_PTS )
+                                   || ( ( ((LEXEM)test_word->next->element)->lex_type==SYMBOLE ) && ( ((LEXEM)test_word->next->next->element)->lex_type==DEUX_PTS ) )  // pour exclure instruction
+                                   ||   ( ((LEXEM)test_word->next->element)->lex_type==NL )
+                                   ||   ( ((LEXEM)test_word->next->element)->lex_type==COMMENT ) )
+                            {
+                                test_word = test_word->next;
+                                if ( strcmp( ((LEXEM)test_word->next->element)->value , ".word" ) ) {
+                                    // alignement en mémoire du mot
+                                    *pdecalage = *pdecalage + 3 - ((*pdecalage-1+4)%4);  // +4 car pour gérer le cas dec=0  (en c : -1%4 = -1)
+                                    break; // marche sans mais bon
+                                }
+                            }
+
                             *p_symb_table = add_to_symb_table(val_lexem, *pdecalage, line, section, TRUE, *p_symb_table);
                             list_lex = list_lex->next; // on va passer les DEUX_PTS
                         }
@@ -381,12 +397,9 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
 
             case PASCIIZ:
                 if (type_lexem == STRING) {
-                    // /!\ le lexeme vaut ""chaine de char""   => donc il faut enlever des guillements aux extrémités
-                    char* str = strdup(val_lexem);
-                    str[strlen(str)-1] = '\0';   // on envèle le dernier guillement
-                    *pcurrent_list = add_to_current_list(PASCIIZ, str+1, *pdecalage, line, *pcurrent_list);   // str+1 pour enlever le 1er guillement
-                    *pdecalage += strlen(str+1)+1;   //+1 pour le \0
-                    free(str);
+
+                    *pcurrent_list = add_to_current_list(PASCIIZ, val_lexem, *pdecalage, line, *pcurrent_list);
+                    *pdecalage += strlen(val_lexem)+1;   //+1 pour le \0
 
                     if ( (( (LEXEM)(list_lex->next)->element) ->lex_type) == VIRGULE ) {
                         list_lex = list_lex->next; // on saute la virgule qui suit

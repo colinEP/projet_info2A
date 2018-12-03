@@ -19,13 +19,11 @@ byebye:
 .data
 lunchtime:
     .word 12
-etiq1:    #OK
-    .byte 4
-etiq2:    #err => if .word après aligné sur 4
+    .byte 4 ,5 , 6
     .word boucle
-etiq3:    #OK
     .asciiz "ils disent : \"au ru!\""
-etiq4:    # pas tester car faut corriger gestion str avant
+    .byte 4
+
 .bss
 menu:
     .space 24

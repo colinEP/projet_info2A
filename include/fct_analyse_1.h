@@ -10,7 +10,7 @@ enum{TEXT, PDATA, BSS, NONE};
 typedef struct{
     operand_type type;
     union {
-        char PBYTE;
+        char PBYTE; 
         int PWORD;
         char* PASCIIZ;
         char* LABEL;

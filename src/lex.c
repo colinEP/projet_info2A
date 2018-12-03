@@ -102,7 +102,34 @@ QUEUE lex_read_line( char *line, int nline, QUEUE list_lex) {
         pos = (current_address-line)-strlen(token);
         int type = lex_analyse(token, nline, pos, line);
 
-        list_lex = add_to_queue_lex(list_lex, token, type, nline);
+        if (type==STRING) {
+            char str[STRLEN];  // on sait que le token ne sera pas plus que STRLEN-2 au max
+                               // pas besoin de faire de calloc car strdup dans add_to_queue_lex
+            int len = strlen(token);
+            int i;
+            int j=0;
+            // a ce moment on sait que les string sont bien fermées
+            for (i=1 ; i<len-1 ; i++) {  // on vire les " extérieurs
+                if(token[i] != '\\') {
+                    str[j] = token[i];
+                    j++;
+                }
+                else {
+                    i++;
+                    if      (token[i]=='t')  str[j]='\t';
+                    else if (token[i]=='n')  str[j]='\n';
+                    else if (token[i]=='\'') str[j]='\'';
+                    else if (token[i]=='\\') str[j]='\\';
+                    else if (token[i]=='\"') str[j]='\"';
+                    else if (token[i]=='0')  str[j]='\0';
+                    else print_error_lex("Caractère d'échappement inconnu (échappements traités : \\t \\n \\\\ \\\" \\0)", nline, pos+i, line);
+                    j++;
+                }
+            }
+            str[j]='\0';
+            list_lex = add_to_queue_lex(list_lex, str, type, nline);
+        }
+        else list_lex = add_to_queue_lex(list_lex, token, type, nline);
 
         /* Une fois le token utilisé, il faut le free */
         free(token);
