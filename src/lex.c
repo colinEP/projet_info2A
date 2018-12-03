@@ -118,7 +118,7 @@ QUEUE lex_read_line( char *line, int nline, QUEUE list_lex) {
                     i++;
                     if      (token[i]=='t')  str[j]='\t';
                     else if (token[i]=='n')  str[j]='\n';
-                    else if (token[i]=='\'') str[j]='\'';
+                    //else if (token[i]=='\'') str[j]='\'';
                     else if (token[i]=='\\') str[j]='\\';
                     else if (token[i]=='\"') str[j]='\"';
                     else if (token[i]=='0')  str[j]='\0';

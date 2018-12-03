@@ -78,7 +78,7 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
                             // si la prochaine directive est un .word, il faut aligner l'adresse de l'etiquette
                             LIST test_word = list_lex;
                             while (     ( ((LEXEM)test_word->next->element)->lex_type==DEUX_PTS )
-                                   || ( ( ((LEXEM)test_word->next->element)->lex_type==SYMBOLE ) && ( ((LEXEM)test_word->next->next->element)->lex_type==DEUX_PTS ) )  // pour exclure instruction
+                                   || ( ( ((LEXEM)test_word->next->element)->lex_type==SYMBOLE ) && ( ((LEXEM)test_word->next->next->element)->lex_type==DEUX_PTS ) )  // pour exclure instruction MEME SI ON EST DANS DATA et qu'a priori c'est pas possible
                                    ||   ( ((LEXEM)test_word->next->element)->lex_type==NL )
                                    ||   ( ((LEXEM)test_word->next->element)->lex_type==COMMENT ) )
                             {
