@@ -163,7 +163,7 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                         if (Et->section == TEXT){                    // etiq def dans .text = "locale"
                         if ( (I->Exp_Type_2) == Rel){
                             if ((Et->section) == TEXT){
-                                (I->arg2)->val.entier = (Et->decalage-(I->decalage)) -4 ;// NOTE correct ?
+                                (I->arg2)->val.entier = (Et->decalage-(I->decalage)) -4 ;// NOTE correct ?!
                             }
                             else {
                             printf("ERREUR LIGNE : %d\n", (I->lex)->nline);
