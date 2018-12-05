@@ -58,7 +58,7 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
         lexem      = list_lex->element;
         type_lexem = lexem->lex_type;
         val_lexem  = lexem->value;
-        line       = lexem -> nline;
+        line       = lexem->nline;
 
 
         switch (S)

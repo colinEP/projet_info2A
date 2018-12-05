@@ -212,9 +212,6 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
                     char* offset_char = calloc( 1, i+1 );
                     memcpy( base_char, val_lexem+i+1, j-i-1 ); // ajout du \0 automatique ! car calloc initialise à 0
                     memcpy( offset_char, val_lexem, i );
-                    printf("%d %d \n", i , j);
-                    printf("AAAAA %s\n",base_char );
-                    printf("BBBBB %s\n",offset_char );
 
                     ((INSTR)(list_instr->element))->Exp_Type_2 = Reg;
                     ((INSTR)(list_instr->element))->Exp_Type_3 = Imm;
