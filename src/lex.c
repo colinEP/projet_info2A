@@ -20,6 +20,7 @@
 #include <queue_list.h>
 #include <test.h>
 #include <print_functions.h>
+#include <fct_analyse_1.h>
 
 #include <error.h>
 

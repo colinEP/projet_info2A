@@ -259,17 +259,19 @@ LIST look_for_undefined_etiq_in_instr(LIST l, LIST symb_table){ // met à 1 etiq
                 int a = 0;
                 int b = 1;
                 a = look_for_etiq(symb_table,(((ARG_INST)(I->arg1))->val.char_chain));
-                if(a==1){
+                if(a==1){ //si etiq dans symbtable
                     ETIQ Et = look_for_etiq_and_return(symb_table,(((ARG_INST)(I->arg1))->val.char_chain));
                     b = Et->def_in_file;
                 }
                 (I->arg1)->etiq_def = 1;
                 if ((a == 0)||(b ==0)) {                        // etiq non trouvée donc non déf --> il faut alors l'ajouter à la table des symboles
-                    char* name_etiq = strdup((I->arg1)->val.char_chain);
-                    int dec = 0;
-                    int line = (I->lex)->nline ;
-                    int sect = TEXT; // car list instr
-                    symb_table = add_to_symb_table(name_etiq, dec, line, sect, FALSE, symb_table);
+                    if (a ==0){                                 // si etiq pas encore dans symb_tab
+                        char* name_etiq = strdup((I->arg1)->val.char_chain);
+                        int dec = 0;
+                        int line = (I->lex)->nline ;
+                        int sect = TEXT; // car list instr
+                        symb_table = add_to_symb_table(name_etiq, dec, line, sect, FALSE, symb_table);
+                    }
                     (I->arg1)->etiq_def = 0;
                 }
 
@@ -284,11 +286,13 @@ LIST look_for_undefined_etiq_in_instr(LIST l, LIST symb_table){ // met à 1 etiq
                 }
                 (I->arg2)->etiq_def = 1;
                 if ((a == 0)||(b ==0)) {                          // etiq non trouvée donc non déf
-                    char* name_etiq = strdup((I->arg2)->val.char_chain);
-                    int dec = 0;
-                    int line = (I->lex)->nline ;
-                    int sect = TEXT; // car list instr
-                    symb_table = add_to_symb_table(name_etiq, dec, line, sect, FALSE, symb_table);
+                    if (a ==0){                                 // si etiq pas encore dans symb_tab
+                        char* name_etiq = strdup((I->arg2)->val.char_chain);
+                        int dec = 0;
+                        int line = (I->lex)->nline ;
+                        int sect = TEXT; // car list instr
+                        symb_table = add_to_symb_table(name_etiq, dec, line, sect, FALSE, symb_table);
+                    }
                     (I->arg2)->etiq_def = 0;
                 }
 
@@ -303,11 +307,13 @@ LIST look_for_undefined_etiq_in_instr(LIST l, LIST symb_table){ // met à 1 etiq
                 }
                 (I->arg3)->etiq_def = 1;
                 if ((a == 0)||(b ==0)) {                         // etiq non trouvée donc non déf
-                    char* name_etiq = strdup((I->arg3)->val.char_chain);
-                    int dec = 0;
-                    int line = (I->lex)->nline ;
-                    int sect = TEXT; // car list instr
-                    symb_table = add_to_symb_table(name_etiq, dec, line, sect, FALSE, symb_table);
+                    if (a ==0){                                 // si etiq pas encore dans symb_tab
+                        char* name_etiq = strdup((I->arg3)->val.char_chain);
+                        int dec = 0;
+                        int line = (I->lex)->nline ;
+                        int sect = TEXT; // car list instr
+                        symb_table = add_to_symb_table(name_etiq, dec, line, sect, FALSE, symb_table);
+                    }
                     (I->arg3)->etiq_def = 0;
                 }
         }

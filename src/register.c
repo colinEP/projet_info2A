@@ -167,32 +167,8 @@ int check_type_arg_inst(int type_lexem, char* val_lexem, int type_arg_expected) 
     }
 
     if (type_arg_expected == Bas) {
-        ERROR_MSG("Erreur transformation du Base_offset en 1 Imm et 1 Reg\n");
+        ERROR_MSG("Erreur transformation du Base_offset en 1 Imm et 1 Reg\n");  // normalement impossible
     }
-    //     if (type_lexem == AIBD ) {
-    //         int offset_int;
-    //         int reg_int;
-    //         int i=0;
-    //         int j=0;
-    //         while ( val_lexem[i]!='('){
-    //             i++;
-    //         }
-    //         i=j;
-    //         while ( val_lexem[j]!=')'){
-    //             j++;
-    //         }
-    //         char* offset_char = calloc( 1, i+1 );
-    //         char* reg_char = calloc( 1, j-i-1+1 );
-    //
-    //         memcpy( offset_char, val_lexem, i );
-    //     	   memcpy( reg_char, val_lexem+i+1, j-i-1 ); // ajout du \0 automatique !
-    //
-    //         offset_int = strtol(offset_char, NULL, 0);
-    //         reg_int = check_and_convert_register(reg_char);
-    //         return (reg_int + offset_int);
-    //     }
-    //     ERROR_MSG("Erreur, type argument inadapte pour cette instruction !\n");
-    // }
 
     if (type_arg_expected == None){
         ERROR_MSG("Erreur, argument en trop !\n");

@@ -34,5 +34,6 @@ void free_list_dico(LIST l);
 
 void free_lex( void* lex );
 
-#endif
 void free_list_lex( QUEUE l );
+
+#endif
