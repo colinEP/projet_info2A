@@ -79,29 +79,45 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                     //le cas Et->section == TEXT ne nécessite pas de relocation car nous sommes déjà dans la section Text
 
                     if (Et->section == PDATA) {                 // etiq def dans .data
+                        if ( (I->Exp_Type_1) == Rel) ERROR_MSG("type relatif nécessite usage d'une étiquette définie dans la même sectin !\n");
                         Re->addend = strdup(".data");           //NOTE conversion en char*: est-ce vraiment utile pour la suite ?
                         Re->type_r = find_R_type((I->lex)->value);// a définir selon l'instruction !
                         reloc_table_text = add_to_end_list(reloc_table_text, Re);
+                        (I->arg1)->val.entier = Et->decalage;// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
                     }
 
                     if (Et->section == BSS){                    // etiq def dans .bss
+                        if ( (I->Exp_Type_1) == Rel) ERROR_MSG("type relatif nécessite usage d'une étiquette définie dans la même sectin !\n");
                         Re->addend = strdup(".bss");             //NOTE conversion en char*: est-ce vraiment utile pour la suite ?
                         Re->type_r = find_R_type((I->lex)->value);// a définir selon l'instruction !
                         reloc_table_text = add_to_end_list(reloc_table_text, Re);
+                        (I->arg1)->val.entier = Et->decalage;// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
                     }
-                    (I->arg1)->val.entier = Et->decalage;// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
-
+                    if (Et->section == TEXT){                    // etiq def dans .text = "locale"
+                        if ( (I->Exp_Type_1) == Rel){
+                        if ((Et->section) == TEXT){
+                            (I->arg1)->val.entier = (Et->decalage-(I->decalage)) -4 ;// NOTE correct ?
+                        }
+                        else {
+                        printf("ERREUR LIGNE : %d\n", (I->lex)->nline);
+                        ERROR_MSG("Exp_Type_1 est Rel donc l'étiquette doit être définie dans .Text !\n");
+                        }
                     }
                     else {
-                    printf("ERREUR LIGNE : %d\n", (I->lex)->nline);
-                    ERROR_MSG("Valeur etiq_def invalide apres etiquette !\n");
+                        (I->arg1)->val.entier = Et->decalage; // ce cas est possible ?
+                    }
+                    }
+                    }
+                    else {
+                        printf("ERREUR LIGNE : %d\n", (I->lex)->nline);
+                        ERROR_MSG("Valeur etiq_def invalide apres etiquette !\n");
                     }
                 }
 
             }
 
             // En arg2 uniquement, cas pseudo instr !
-            if ( (((ARG_INST)(I->arg2))->type == Label )||  ( ((ARG_INST)(I->arg2))->type == Target) || ( ((ARG_INST)(I->arg2))->type == Bas_Target) ) {
+            if ( (((ARG_INST)(I->arg2))->type == Label )||( ((ARG_INST)(I->arg2))->type == Target) || ( ((ARG_INST)(I->arg2))->type == Bas_Target) ) {
 
                 Re->section = strdup(".text"); // NOTE on doit avoir une char* d'après le sujet  ??
                 Re->adress = I->decalage; // valeur du décalage de l'APPEL de l'étiq (!= de sa définition)
@@ -131,26 +147,44 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                         //le cas Et->section == TEXT ne nécessite pas de relocation car nous sommes déjà dans la section Text
 
                         if (Et->section == PDATA) {                 // etiq def dans .data
+                            if ( (I->Exp_Type_2) == Rel) ERROR_MSG("type relatif nécessite usage d'une étiquette définie dans la même sectin !\n");
                             Re->addend = strdup(".data");           //NOTE conversion en char*: est-ce vraiment utile pour la suite ?
                             Re->type_r = find_R_type((I->lex)->value);// a définir selon l'instruction !
                             reloc_table_text = add_to_end_list(reloc_table_text, Re);
                         }
 
                         if (Et->section == BSS){                    // etiq def dans .bss
+                            if ( (I->Exp_Type_2) == Rel) ERROR_MSG("type relatif nécessite usage d'une étiquette définie dans la même sectin !\n");
                             Re->addend = strdup(".bss") ;            //NOTE conversion en char*: est-ce vraiment utile pour la suite ?
                             Re->type_r = find_R_type((I->lex)->value);// a définir selon l'instruction !
                             reloc_table_text = add_to_end_list(reloc_table_text, Re);
+                        }
+
+                        if (Et->section == TEXT){                    // etiq def dans .text = "locale"
+                        if ( (I->Exp_Type_2) == Rel){
+                            if ((Et->section) == TEXT){
+                                (I->arg2)->val.entier = (Et->decalage-(I->decalage)) -4 ;// NOTE correct ?!
+                            }
+                            else {
+                            printf("ERREUR LIGNE : %d\n", (I->lex)->nline);
+                            ERROR_MSG("Exp_Type_3 est Rel donc l'étiquette doit être définie dans .Text !\n");
+                            }
+                        }
+                        else {
+                            (I->arg2)->val.entier = Et->decalage; // ce cas est possible ?
+                        }
                         }
 
                         if ((I->arg2)->type == Label){
                             (I->arg2)->val.entier = Et->decalage;// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
                         }
                         if ((I->arg2)->type == Target){
-                            (I->arg2)->val.entier = upper_16(Et->decalage);// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
+                            (I->arg2)->val.entier = upper_16(Et->decalage);
                         }
                         if ((I->arg2)->type == Bas_Target){
-                            (I->arg2)->val.entier = lower_16(Et->decalage + (I->arg1)->val.entier );// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
+                            (I->arg2)->val.entier = lower_16(Et->decalage + (I->arg1)->val.entier );
                         }
+                        (I->arg2)->type = Abs;
 
                     }
                     else {
@@ -158,7 +192,6 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                     ERROR_MSG("Valeur etiq_def invalide apres etiquette !\n");
                     }
                 }
-
             }
 
 
@@ -180,18 +213,35 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                     //le cas Et->section == TEXT ne nécessite pas de relocation car nous sommes déjà dans la section Text
 
                     if (Et->section == PDATA) {                 // etiq def dans .data
+                        if ( (I->Exp_Type_3) == Rel) ERROR_MSG("type relatif nécessite usage d'une étiquette définie dans la même sectin !\n");
                         Re->addend = strdup(".data");           //NOTE conversion en char*: est-ce vraiment utile pour la suite ?
                         Re->type_r = find_R_type((I->lex)->value);// a définir selon l'instruction !
                         reloc_table_text = add_to_end_list(reloc_table_text, Re);
+                        (I->arg3)->val.entier = Et->decalage;
                     }
 
                     if (Et->section == BSS){                    // etiq def dans .bss
+                        if ( (I->Exp_Type_3) == Rel) ERROR_MSG("type relatif nécessite usage d'une étiquette définie dans la même sectin !\n");
                         Re->addend = strdup(".bss")  ;           //NOTE conversion en char*: est-ce vraiment utile pour la suite ?
                         Re->type_r = find_R_type((I->lex)->value);// a définir selon l'instruction !
                         reloc_table_text = add_to_end_list(reloc_table_text, Re);
+                        (I->arg3)->val.entier = Et->decalage;
+                    }
+                    if (Et->section == TEXT){                    // etiq def dans .text = "locale" Pas besoin de reloc ?
+                        if ( (I->Exp_Type_3) == Rel){
+                            if ((Et->section) == TEXT){
+                                (I->arg3)->val.entier = (Et->decalage-(I->decalage)) -4 ;// NOTE correct ?
+                            }
+                            else {
+                            printf("ERREUR LIGNE : %d\n", (I->lex)->nline);
+                            ERROR_MSG("Exp_Type_3 est Rel donc l'étiquette doit être définie dans .Text !\n");
+                            }
+                        }
+                        else {
+                            (I->arg3)->val.entier = Et->decalage; // ce cas est possible ?
+                        }
                     }
 
-                    (I->arg3)->val.entier = Et->decalage;// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
                     }
 
                     else {
