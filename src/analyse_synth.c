@@ -365,11 +365,8 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
                     if (*pdecalage%4) ERROR_MSG("ERR LINE %d : problème d'alignement d'addressage en mémoire du mot !\n", line);
 
                     // conversion de la string en nombre
-                    val_convert = strtol(val_lexem, NULL, 0);
+                    val_convert = strtol(val_lexem, NULL, 0);  // renvoie un long int => nécessaire pour savoir le nombre rentre dans un entier
                     if (previous_type_lexem == MOINS) val_convert = -val_convert;
-                    // TODO TODO TODO TODO
-                    // TODO TODO TODO TODO
-                    printf("\nAAAAAAAAAAAAAAAAAA %ld verif taille operande .word (analyse_synth.c line 354)\n",val_convert) ;
                     if ( (val_convert<-2147483648) || (2147483647<val_convert) ) {
                         ERROR_MSG("ERR LINE %d : Nombre trop grand pour etre stocké dans un word (32 bits : -2147483648 < x < 2147483647)\n", line);
                     }
