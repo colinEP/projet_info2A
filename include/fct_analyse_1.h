@@ -1,9 +1,10 @@
 #ifndef _FCT_ANALYSE_H_
 #define _FCT_ANALYSE_H_
 
-typedef enum{START, INSTRUCTION, PWORD, PBYTE, PASCIIZ, PSPACE, LABEL, DEC_LABEL} operand_type;
+typedef enum {START, INSTRUCTION, PWORD, PBYTE, PASCIIZ, PSPACE, LABEL, DEC_LABEL} operand_type;
 
 typedef enum {None, Reg, Imm, Sa, Bas, Rel, Abs, Label, Target, Bas_Target} inst_op_type;
+//              0    1     2   3   4   5     6     7      8          9
 
 enum{TEXT, PDATA, BSS, NONE};
 

@@ -114,7 +114,7 @@ void print_list_instr( LIST l ) {
             //     a1 = strdup(((char*)(A1->val.char_chain) )) ;
             //     printf("   Arg1 : %s \n", a1);
             // }
-            printf("   Arg1 : %ld \n", ((long int)(A1->val.entier)));
+            printf("   Arg1 : %ld  \ttype:%d\texpected:%d\n", ((long int)(A1->val.entier)) , A1->type , I->Exp_Type_1);
         }
 
         if ((A2->type)== None) {
@@ -126,7 +126,7 @@ void print_list_instr( LIST l ) {
             //     a2 = strdup(((char*)(A2->val.char_chain) )) ;
             //     printf("   Arg2 : %s \n", a2);
             // }
-            printf("   Arg2 : %ld \n", ((long int)(A2->val.entier)));
+            printf("   Arg2 : %ld \ttype:%d\texpected:%d\n", ((long int)(A2->val.entier)) , A2->type , I->Exp_Type_2);
         }
 
         if ((A3->type) == None) {
@@ -138,7 +138,7 @@ void print_list_instr( LIST l ) {
             //     a3 = strdup(((char*)(A3->val.char_chain))) ;
             //     printf("   Arg3 : %s \n", a3);
             // }
-            printf("   Arg3 : %ld \n", ((long int)(A3->val.entier)));
+            printf("   Arg3 : %ld \ttype:%d\texpected:%d\n", ((long int)(A3->val.entier)) , A3->type , I->Exp_Type_3);
         }
         l = l->next;
     }

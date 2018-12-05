@@ -11,7 +11,8 @@
 #define _LEX_H_
 
 #include <stdio.h>
-//#include <queue.h>
+#include <queue_list.h>
+//typedef struct queue *QUEUE;
 
 enum {INIT , DEUX_PTS , VIRGULE , MOINS , COMMENT , REGISTRE ,
 //     0         1         2        3        4         5
@@ -21,7 +22,7 @@ enum {INIT , DEUX_PTS , VIRGULE , MOINS , COMMENT , REGISTRE ,
 //      12          13       14     15
 
 
-typedef struct lex {
+typedef struct {
     int nline;
     //int pos;
     int lex_type;
@@ -29,7 +30,7 @@ typedef struct lex {
     char* value;
 } *LEXEM;
 
-typedef struct queue *QUEUE;   // obligatoire sinon erreur !! MAIS POURQUOI !!!!
+
 
 QUEUE	lex_read_line( char *, int, QUEUE);
 QUEUE	lex_load_file( char *, unsigned int * , QUEUE);

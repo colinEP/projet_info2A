@@ -3,6 +3,7 @@
 .set noreorder #test
 .text
 	BNE $4,$5, boucle #test decalage
+	BLT $4,$5, boucle
 	# ERROR pseudo-instr : arg2 = None alors que arg3 = 4
     Lw $t0, etiq1
     Lw $t1, etiqnondef
@@ -12,13 +13,14 @@ boucle:
     BEQ $t0 , $t1 , byebye
     NOP
     J etiqnondef
+	J boucle
     NOP
 byebye:
     addi $t1 , $t1 , 8
 
 .data
 lunchtime:
-    .word 12
+    .word boucle
 	.word 2147483647
 	#.word 2147483648
 	#.word 9999999999

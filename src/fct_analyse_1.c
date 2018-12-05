@@ -215,7 +215,7 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
 
                     ((INSTR)(list_instr->element))->Exp_Type_2 = Reg;
                     ((INSTR)(list_instr->element))->Exp_Type_3 = Imm;
-                    ((INSTR)(list_instr->element))->nb_arg     = 3;     // WARNING ou nb_arg+1
+                    ((INSTR)(list_instr->element))->nb_arg     = 3;
 
                     // arg2 = base (type=Reg)
                     convert_value = check_type_arg_inst(lexem->lex_type, base_char, ((INSTR)(list_instr->element))->Exp_Type_2);
