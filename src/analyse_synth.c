@@ -187,7 +187,7 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
                     if (previous_type_lexem == MOINS) {
                         ERROR_MSG("ERR LINE %d : Manque chiffre apres signe moins !\n", line);
                     }
-                    if (nb_arg_ligne != nb_arg_needed) {
+                    if (nb_arg_ligne != ((INSTR)((*p_list_instr)->element))->nb_arg ) {  //on ne mettre nb_arg_needed car il peut changer de valeur (avec les base offset)
                         if (previous_type_lexem == VIRGULE) ERROR_MSG("ERR LINE %d : Argument attendu après une virgule\n", line);
                         else                                ERROR_MSG("ERR LINE %d : mauvais nombre d'arguments pour cette instruction !\n", line);
                     }
@@ -214,11 +214,13 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
 
                     if (type_lexem == SYMBOLE) { // cas etiquette
                         if (look_for_etiq(*p_symb_table, val_lexem) == 1) {         // si cette etiq est deja définie
-                            *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, 1, nb_arg_ligne);
+                            *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, 1, &nb_arg_ligne);
                         }
-                        else  *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, 0, nb_arg_ligne);  // si cette etiq n'est PAS deja définie
+                        else  *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, 0, &nb_arg_ligne);  // si cette etiq n'est PAS deja définie
                     }
-                    else *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, -1, nb_arg_ligne);
+                    else *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, -1, &nb_arg_ligne);
+
+
 
                     // ici on doit vérifier que l'on a pas une pseudo_instruction !
                     *p_list_instr = change_pseudo_instr(*p_list_instr, pdecalage);
@@ -284,12 +286,12 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
                 //     if ( ( (LEXEM)(list_lex->next->element))->lex_type == VIRGULE) {
                 //         if (type_lexem == SYMBOLE){ // cas etiquette
                 //             if (look_for_etiq(*p_symb_table, val_lexem) == 1){         // si cette etiq est deja définie
-                //                 *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, 1, nb_arg_ligne);
+                //                 *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, 1, &nb_arg_ligne);
                 //             }
-                //             else  *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, 0, nb_arg_ligne);  // si cette etiq n'est PAS deja définie
+                //             else  *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, 0, &nb_arg_ligne);  // si cette etiq n'est PAS deja définie
                 //         }
                 //
-                //         else *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, -1, nb_arg_ligne); //renvoit -1 car pas une étiquette
+                //         else *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, -1, &nb_arg_ligne); //renvoit -1 car pas une étiquette
                 //         S = INSTRUCTION;
                 //
                 //         if ( ( ( (LEXEM)(list_lex->next->next->element))->lex_type != NL) && ( ( (LEXEM)(list_lex->next->next->element))->lex_type != COMMENT) ) { // pour éviter le cas intr arg1, arg2, NL
@@ -304,12 +306,12 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
                 //         }
                 //         if (type_lexem == SYMBOLE) { // cas etiquette
                 //             if (look_for_etiq(*p_symb_table, val_lexem) == 1){         // si cette etiq est deja définie
-                //                 *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, 1, nb_arg_ligne);
+                //                 *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, 1, &nb_arg_ligne);
                 //             }
-                //             else  *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, 0, nb_arg_ligne);  // si cette etiq n'est PAS deja définie
+                //             else  *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, 0, &nb_arg_ligne);  // si cette etiq n'est PAS deja définie
                 //         }
                 //
-                //         else *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, -1, nb_arg_ligne);
+                //         else *p_list_instr = fill_arguments(lexem, *p_list_instr, previous_type_lexem, -1, &nb_arg_ligne);
                 //
                 //         // ici on doit vérifier que l'on a pas une pseudo_instruction !
                 //         *p_list_instr = change_pseudo_instr(*p_list_instr);

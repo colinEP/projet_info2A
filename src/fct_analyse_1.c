@@ -173,7 +173,7 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
      return list_instr;
  }
 
- LIST fill_arguments(LEXEM lexem, LIST list_instr, int previous_type_lexem, int etiq_definition, int nb_arg_ligne) // faire la verification des type d'arg ICI
+ LIST fill_arguments(LEXEM lexem, LIST list_instr, int previous_type_lexem, int etiq_definition, int* p_nb_arg_ligne) // faire la verification des type d'arg ICI
  {
      if (previous_type_lexem == MOINS){
          //lexem->value = strdup(mystrcat("-", lexem->value)); //pas du dup car calloc déjà dans mystrcat
@@ -182,7 +182,7 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
 
      if (etiq_definition != -1){
          // cas où l'on a une étiquette, pas besoin de checker expected_type ! ce sera fait après !
-         list_instr = add_label(nb_arg_ligne, Label, lexem->value, etiq_definition, list_instr);
+         list_instr = add_label(*p_nb_arg_ligne, Label, lexem->value, etiq_definition, list_instr);
          return list_instr;
      }
 
@@ -191,30 +191,65 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
         // là il faut checker le type_arg_expected lequel est stocké dans la list_instr
         char* val_lexem = lexem->value;
         int convert_value;
-        if (nb_arg_ligne == 1){
+        if (*p_nb_arg_ligne == 1) {
 
             convert_value = check_type_arg_inst(lexem->lex_type, val_lexem, ((INSTR)(list_instr->element))->Exp_Type_1);
             // renvoit une erreur si jamais les bons types ne sont pas reliés et renvoit un entier correspondant à convert value
-            list_instr = add_int(nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_1, convert_value, etiq_definition, list_instr);
+            list_instr = add_int(*p_nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_1, convert_value, etiq_definition, list_instr);
             return list_instr;
         }
 
-        if (nb_arg_ligne == 2){
+        if (*p_nb_arg_ligne == 2) {
+            if ( ((INSTR)list_instr->element)->Exp_Type_2 == Bas) {
+                if (lexem->lex_type == AIBD) {
+                    int i=0;
+                    int j=0;
+                    while ( val_lexem[i]!='(') i++;
+                    j=i;
+                    while ( val_lexem[j]!=')') j++;
+
+                    char* base_char   = calloc( 1, j-i-1+1 );  // +1 pour le \0
+                    char* offset_char = calloc( 1, i+1 );
+                    memcpy( base_char, val_lexem+i+1, j-i-1 ); // ajout du \0 automatique ! car calloc initialise à 0
+                    memcpy( offset_char, val_lexem, i );
+                    printf("%d %d \n", i , j);
+                    printf("AAAAA %s\n",base_char );
+                    printf("BBBBB %s\n",offset_char );
+
+                    ((INSTR)(list_instr->element))->Exp_Type_2 = Reg;
+                    ((INSTR)(list_instr->element))->Exp_Type_3 = Imm;
+                    ((INSTR)(list_instr->element))->nb_arg     = 3;     // WARNING ou nb_arg+1
+
+                    // arg2 = base (type=Reg)
+                    convert_value = check_type_arg_inst(lexem->lex_type, base_char, ((INSTR)(list_instr->element))->Exp_Type_2);
+                    list_instr = add_int(*p_nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_2, convert_value, etiq_definition, list_instr);
+
+                    *p_nb_arg_ligne = 3;   // ()*p_nb_arg_ligne) ++
+
+                    // arg3 = offset (type=Imm)
+                    convert_value = check_type_arg_inst(lexem->lex_type, offset_char, ((INSTR)(list_instr->element))->Exp_Type_3);
+                    list_instr = add_int(*p_nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_3, convert_value, etiq_definition, list_instr);
+
+                    return list_instr;
+                }
+                else ERROR_MSG("Erreur, type argument inadapte pour cette instruction (Base_offset attendu)!\n");
+            }
             convert_value = check_type_arg_inst(lexem->lex_type, val_lexem, ((INSTR)(list_instr->element))->Exp_Type_2);
             // renvoit une erreur si jamais les bons types ne sont pas reliés et renvoit un entier correspondant à convert value
-            list_instr = add_int(nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_2, convert_value, etiq_definition, list_instr);
+            list_instr = add_int(*p_nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_2, convert_value, etiq_definition, list_instr);
             return list_instr;
         }
-        if (nb_arg_ligne == 3){
+
+        if (*p_nb_arg_ligne == 3){
             convert_value = check_type_arg_inst(lexem->lex_type, val_lexem, ((INSTR)(list_instr->element))->Exp_Type_3);
             // renvoit une erreur si jamais les bons types ne sont pas reliés et renvoit un entier correspondant à convert value
-            list_instr = add_int(nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_3, convert_value, etiq_definition, list_instr);
+            list_instr = add_int(*p_nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_3, convert_value, etiq_definition, list_instr);
             return list_instr;
         }
-     }
+    }
 
-      return list_instr;
-  }
+    return list_instr;
+}
 
 
 LIST look_for_undefined_etiq_in_instr(LIST l, LIST symb_table){ // met à 1 etiq def si définie dans le code, sinon ajoute l'etiq à symb_table mais laisse etiq_def à 0
@@ -349,7 +384,7 @@ char *mystrcat( char *start, char *addend )
 	size_t alen = strlen( addend );
 	char   *str = calloc( 1, slen+alen+1 );
 	memcpy( str, start, slen );
-	memcpy( str+slen, addend, alen ); // ajout du \0 automatique !
+	memcpy( str+slen, addend, alen ); // ajout du \0 automatique ! car calloc met a 0
     return str;
 }
 

@@ -23,8 +23,7 @@ lunchtime:
 	#.word 2147483648
 	#.word 9999999999
 	.word -2147483648
-	.word -2147483649
-2147483648
+	#.word -2147483649
     .byte 4 ,5 , 6
     .word boucle
     .asciiz "ils disent : \"au ru!\""
