@@ -2,7 +2,7 @@
 # allons au ru
 .set noreorder #test
 .text
-	BLT $4,$5,boucle #test decalage
+	BNE $4,$5, boucle #test decalage
 	# ERROR pseudo-instr : arg2 = None alors que arg3 = 4
     Lw $t0, etiq1
     Lw $t1, etiqnondef
