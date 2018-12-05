@@ -471,6 +471,11 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
 
     } // fin while
 
+    // il faut inverser l'ordre des éléments de ces liste car on a ajouter les élément en tete de liste
+    *p_list_instr = revers_list(*p_list_instr);
+    *p_list_data  = revers_list(*p_list_data);
+    *p_list_bss   = revers_list(*p_list_bss);
+
 
     // --- deuxième parcours : on cherche les étiquettes ----
     // list_instr
@@ -481,10 +486,7 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
     *p_symb_table=look_for_undefined_etiq_in_bss(*p_list_bss, *p_symb_table);
 
 
-    // il faut inverser l'ordre des éléments de ces liste car on a ajouter les élément en tete de liste
-    *p_list_instr = revers_list(*p_list_instr);
-    *p_list_data  = revers_list(*p_list_data);
-    *p_list_bss   = revers_list(*p_list_bss);
+
 
     return;
 }
