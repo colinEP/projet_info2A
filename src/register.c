@@ -186,8 +186,9 @@ int check_type_arg_inst(int type_lexem, char* val_lexem, int type_arg_expected) 
         	memcpy( reg_char, val_lexem+i+1, j-i-1 ); // ajout du \0 automatique !
 
             offset_int = strtol(offset_char, NULL, 0);
+            //TODO verif 16 bits
             reg_int = check_and_convert_register(reg_char);
-            return (reg_int + offset_int);
+            return (reg_int + offset_int); //FAUX !WARNING WARNING WARNING 
         }
         ERROR_MSG("Erreur, type argument inadapte pour cette instruction !\n");
     }

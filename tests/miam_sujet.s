@@ -13,6 +13,7 @@ boucle:
     NOP
 byebye:
     JAL viteviteauru
+    JAL COUROUCOUCOU
 
 .data
 lunchtime:

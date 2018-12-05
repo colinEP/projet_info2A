@@ -19,6 +19,7 @@ byebye:
 .data
 lunchtime:
     .word 12
+	.word 2147483647
     .byte 4 ,5 , 6
     .word boucle
     .asciiz "ils disent : \"au ru!\""

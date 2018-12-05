@@ -3,14 +3,17 @@
 
 typedef enum{START, INSTRUCTION, PWORD, PBYTE, PASCIIZ, PSPACE, LABEL, DEC_LABEL} operand_type;
 
-typedef enum{None, Reg, Imm, Sa, Bas, Rel, Abs, Label, Target, Bas_Target} inst_op_type;
+typedef enum {None, Reg, Imm, Sa, Bas, Rel, Abs, Label, Target, Bas_Target} inst_op_type;
 
 enum{TEXT, PDATA, BSS, NONE};
+
+#include "queue_list.h"
+#include "lex.h"
 
 typedef struct{
     operand_type type;
     union {
-        char PBYTE; 
+        char PBYTE;
         int PWORD;
         char* PASCIIZ;
         char* LABEL;
