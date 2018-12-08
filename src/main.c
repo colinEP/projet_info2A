@@ -21,6 +21,7 @@
 #include <analyse_synth.h>
 #include <print_functions.h>
 #include <fct_analyse_1.h>
+#include <reloc.h>
 
 #include <error.h>
 //#include <etiq.h>
@@ -124,7 +125,6 @@ int main ( int argc, char *argv[] ) {
     //TODO
     LIST reloc_table_text = reloc_and_replace_etiq_by_dec_in_instr (list_instr, symb_table);
     LIST reloc_table_data = reloc_and_replace_etiq_by_dec_in_data (list_data, symb_table);
-    
 
     print_symb_table(symb_table);
     print_list_instr(list_instr);

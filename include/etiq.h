@@ -1,10 +1,7 @@
 #ifndef _ETIQ_H_
 #define _ETIQ_H_
 #include <fct_analyse_1.h>
-
-typedef enum {R_MIPS_32=2, R_MIPS_26=4, R_MIPS_HI16=5, R_MIPS_LO16=6} reloc_type;
-
-
+#include <reloc.h>
 
 typedef struct {
     char* name;
@@ -24,9 +21,7 @@ typedef struct {
 
 int look_for_etiq( LIST symb_table, char* val_lexem);
 LIST add_to_symb_table(char* etiq, int decalage, int line, int section, int def, LIST symb_table);
-LIST reloc_and_replace_etiq_by_dec_in_data (LIST l, LIST symb_table);
-LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table);
 ETIQ look_for_etiq_and_return( LIST symb_table, char* lexem);
-reloc_type find_R_type(inst_op_type type) ;
+
 
 #endif
