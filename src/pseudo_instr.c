@@ -18,12 +18,6 @@
 #include <assert.h>
 
 
-
-
-// TODO TODO TODO
-// mettre à jour le décalage suite à ces pseudo_instruction !!
-// + le cas LW / SW
-
 LIST change_pseudo_instr(LIST list_instr, int* pdecalage)
 // normalement cette fonction est appelée alors que les arguments des pseudo_instruction ont déjà été vérifiés donc c'est bon !
 
@@ -119,9 +113,8 @@ LIST change_pseudo_instr(LIST list_instr, int* pdecalage)
      }
 
      if (strcmp(instruction,"BLT")==0){
-         // ici c'est arg 2 qui ne change pas
-         // arg 1  n'est pas à enregistrer car il reste dans la premiere cellule instr =! target
-
+         // sauvegarde de la valeur de target
+         printf("on a arg1: %ld et arg2 vaut : %ld \n",(I-> arg1)->val.entier, (I-> arg2)->val.entier  );
          if ((I->arg3)->type == Label){
              is_label = 1;
              is_def = (I-> arg3)-> etiq_def;
@@ -134,30 +127,27 @@ LIST change_pseudo_instr(LIST list_instr, int* pdecalage)
          free(((LEXEM)(I->lex))->value);
          ((LEXEM)(I->lex))->value = strdup("SLT");
          I-> nb_arg = 3;
-         I->Exp_Type_1 = Reg; // normalement inutile
-         I->Exp_Type_2 = Reg; // normalement inutile
+         I->Exp_Type_1 = Reg;
+         I->Exp_Type_2 = Reg;
          I->Exp_Type_3 = Reg;
 
-         // --- copie de arg1 en arg3 ----
-         if ((I->arg1)->type == Label){
-             (I-> arg3)->type = Label;
-             (I-> arg3)->etiq_def =  (I-> arg1)->etiq_def;
-             (I-> arg3)->val.char_chain = strdup ((I-> arg1)->val.char_chain);
-        }
-        else {
-            (I-> arg3)->type = Reg; //etiq def reste idem
-            (I-> arg3)->val.entier = (I-> arg1)->val.entier;
+        (I-> arg3)->type = Reg;
+        (I-> arg3)->val.entier = (I-> arg2)->val.entier;  //copie de $rs
+        (I-> arg3)->etiq_def = -1;
 
-        }
+        (I-> arg2)->type = Reg;
+        (I-> arg2)->val.entier = (I-> arg1)->val.entier;  //copie de $rt
+        (I-> arg2)->etiq_def = -1; //logiquement c'est inutile, tout comme la redefinition du type Reg
+
          // --- modification de arg1 ----
-        (I-> arg1)->type = Reg;  //utile au cas où c'était jadis une étiquette
+        (I-> arg1)->type = Reg;
         (I-> arg1)->val.entier = 1;
-        (I-> arg1)->etiq_def = -1;
+        (I-> arg1)->etiq_def = -1; //logiquement c'est inutile, tout comme la redefinition du type Reg
 
          LEXEM second_instr = calloc(1, sizeof(*second_instr));
          second_instr->nline = I->lex->nline;
          second_instr->lex_type = SYMBOLE;
-         second_instr->value = strdup("BNE") ;
+         second_instr->value = strdup("BNE");
 
          list_instr = add_to_list_instr(second_instr, *pdecalage, 3, list_instr, Reg, Reg, Rel); //etiq def est à -1 par defaut
          I = list_instr->element;
