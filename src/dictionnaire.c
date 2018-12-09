@@ -29,6 +29,12 @@ QUEUE open_dict(char *file) //fonctionne ! Cette fonction ouvre le dictionnaire 
     char arg1[10];
     char arg2[10];
     char arg3[10];
+    int opcode;
+    char c_b_1[10];
+    char c_b_2[10];
+    char c_b_3[10];
+    char c_b_4[10];
+    char c_b_5[10];
 
     QUEUE list_dico = new_queue();
 
@@ -40,14 +46,14 @@ QUEUE open_dict(char *file) //fonctionne ! Cette fonction ouvre le dictionnaire 
         ERROR_MSG("Error while trying to open %s file --- Aborts",file);
     }
 
-    while (fscanf (fp, "%s %d %s %s %s", inst, &nb_arg, arg1, arg2, arg3) != EOF){
+    while (fscanf (fp, "%s %d %s %s %s %d %s %s %s %s %s", inst, &nb_arg, arg1, arg2, arg3, &opcode, c_b_1, c_b_2, c_b_3, c_b_4, c_b_5 ) != EOF){
     // on recupère au plus les 15 premiers caracteres de l'inst => pas de risque de buffer-overflow
             // fscanf (fp,"%*[^\n]");      // si buffer excedent, on le vide
             // if ( strlen(inst) == 15) {  // test si taille inst trop longue
             //     ERROR_MSG("Instruction dans le dico (line %d) trop longue (length max = 14 characters)", nline);
             // }
             //printf (" Instruction %s et nb_arguments: %d \n", inst, nb_arg); // pour DEBUG
-            list_dico = add_definition(list_dico, inst, nb_arg, arg1, arg2, arg3);
+            list_dico = add_definition(list_dico, inst, nb_arg, arg1, arg2, arg3, opcode, c_b_1, c_b_2, c_b_3, c_b_4, c_b_5);
             nline++;
         }
 
@@ -110,7 +116,7 @@ char* put_in_uppercase (char* chaine)
 
 
 
-QUEUE add_definition ( QUEUE Q, char* inst, int nb_arg, char* a_type_1, char* a_type_2, char* a_type_3) // EVENTUELLEMENT A METTRE DANS LE CODE AVEC SEUL APPEL A ajouter_fin
+QUEUE add_definition ( QUEUE Q, char* inst, int nb_arg, char* a_type_1, char* a_type_2, char* a_type_3,int opcode, char* c_b_1, char* c_b_2, char* c_b_3, char* c_b_4, char* c_b_5) // EVENTUELLEMENT A METTRE DANS LE CODE AVEC SEUL APPEL A ajouter_fin
 {
     DICO_LINE def = calloc (1, sizeof(*def));
 
@@ -119,6 +125,12 @@ QUEUE add_definition ( QUEUE Q, char* inst, int nb_arg, char* a_type_1, char* a_
     def->arg_type_1  = strdup(a_type_1);
     def->arg_type_2  = strdup(a_type_2);
     def->arg_type_3  = strdup(a_type_3);
+    def->opcode         = opcode;
+    def->code_bin_1  = strdup(c_b_1);
+    def->code_bin_2  = strdup(c_b_2);
+    def->code_bin_3  = strdup(c_b_3);
+    def->code_bin_4  = strdup(c_b_4);
+    def->code_bin_5  = strdup(c_b_5);
 
     Q = ajouter_fin(Q, def);
     return Q;

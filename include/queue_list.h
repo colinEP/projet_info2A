@@ -36,4 +36,6 @@ void free_lex( void* lex );
 
 void free_list_lex( QUEUE l );
 
+int lengh_of_list(LIST l);
+
 #endif

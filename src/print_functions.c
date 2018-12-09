@@ -62,11 +62,11 @@ void print_list_dico( LIST l ) {
     LIST p;
     DICO_LINE dico;
     printf("\n====== Dico d'instruction ======\n");
-    printf("\nInstruct | nb_arg | type_arg1 | type_arg2 | type_arg3\n");
+    printf("\nInstruct | nb_arg | type_arg1 | type_arg2 | type_arg3 |  opcode  |  cb1 |   cb2 |  cb3   |  cb4  |  cb5\n");
     //printf("         |        |           |           |\n");
     for ( p=l ; p!=NULL ; p=p->next ) {
         dico = p->element;
-        printf("  %s\t      %d\t       %s\t   %s\t      %s\t\n", dico->instruction, dico->arg, dico->arg_type_1, dico->arg_type_2, dico->arg_type_3);
+        printf("  %s\t      %d\t       %s\t   %s\t      %s\t      %d\t   %s\t   %s\t   %s\t    %s\t   %s\t \n", dico->instruction, dico->arg, dico->arg_type_1, dico->arg_type_2, dico->arg_type_3, dico->opcode, dico->code_bin_1, dico->code_bin_2, dico->code_bin_3, dico->code_bin_4, dico->code_bin_5);
     }
 }
 

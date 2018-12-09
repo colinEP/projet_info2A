@@ -484,6 +484,8 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
     *p_list_data  = revers_list(*p_list_data);
     *p_list_bss   = revers_list(*p_list_bss);
 
+    int size_list_instr = lengh_of_list(*p_list_instr);
+    printf("Taille liste instr : %d \n", size_list_instr);
 
     // --- deuxième parcours : on cherche les étiquettes ----
     // list_instr

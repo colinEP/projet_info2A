@@ -114,7 +114,6 @@ LIST change_pseudo_instr(LIST list_instr, int* pdecalage)
 
      if (strcmp(instruction,"BLT")==0){
          // sauvegarde de la valeur de target
-         printf("on a arg1: %ld et arg2 vaut : %ld \n",(I-> arg1)->val.entier, (I-> arg2)->val.entier  );
          if ((I->arg3)->type == Label){
              is_label = 1;
              is_def = (I-> arg3)-> etiq_def;

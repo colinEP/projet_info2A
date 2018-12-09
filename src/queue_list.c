@@ -107,6 +107,17 @@ LIST queue_to_list( QUEUE q ) {
     return l;
 }
 
+int lengh_of_list(LIST l) {
+
+    if (l==NULL) return 0;   // cas liste vide
+    int i =0;
+    while( l!=NULL ) {
+        i = i+1;
+        l = l->next;
+    }
+    return i;
+}
+
 
 
 /** Cette fonction n'est pas générique pour le type abstrait list
