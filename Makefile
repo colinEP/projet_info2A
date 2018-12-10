@@ -17,7 +17,7 @@ INCLUDE=-I$(INCDIR)
 # Pour activer les sorties INFO_MSG, ajouter -DVERBOSE aux CFLAGS
 #CFLAGS=-Wall -ansi $(INCLUDE)
 CFLAGS=-Wall -DVERBOSE $(INCLUDE)
-LFLAGS=-lm
+LFLAGS=-lm ./libpelf.so
 
 CFLAGS_DBG=$(CFLAGS) -g -DDEBUG -Wall
 CFLAGS_RLS=$(CFLAGS)
