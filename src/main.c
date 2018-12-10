@@ -134,6 +134,17 @@ int main ( int argc, char *argv[] ) {
     print_reloc_table( reloc_table_data);
 
 
+    /* ---------------- test_binaire -------------------*/
+
+    int bin = 0x022;
+    printf("EXEMPLE : en decimal, 0x022 vaut : %d \n",bin );
+
+    int bin2 = 34;
+    printf("EXEMPLE : en decimal, 34 vaut : %hx \n",bin );
+
+
+    instr_in_binar(list_instr, 4 , dictionnaire);
+
     /* ---------------- make mips_elf -------------------*/
      main_init_function();
 
