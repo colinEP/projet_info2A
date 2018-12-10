@@ -271,7 +271,7 @@ section make_rel32_section(char *relname, Elf32_Rel relocations[], int nb_reloc)
 * the output binary is called exemple.o
 */
 
-int my_main_function() {
+int main() {
 
     /* prepare sections*/
     section     text = NULL;

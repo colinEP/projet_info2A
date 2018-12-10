@@ -29,7 +29,7 @@ extern "C" {
 #define PELF_HOST_ENDIANNESS ELFDATA2LSB
 #endif
 
-#include <elf.h> //  <pelf/elf.h>
+#include <pelf/elf.h>
 
 
 typedef union {
@@ -189,7 +189,7 @@ int   elf_write_relocatable( char *filename, char *machine, int noreorder,
   return #type;			     \
   break;
 
-#include <elf-mips32.h> // initialement <pelf/elf-mips32.h>
+#include <pelf/elf-mips32.h>
 
 
 #ifdef __cplusplus

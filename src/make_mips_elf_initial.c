@@ -11,8 +11,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <pelf/pelf.h>
-#include <pelf/section.h>
+#include <pelf.h>   // initialement <pelf/pelf.h>
+#include <section.h> // initialement <pelf/section.h>
 
 
 /**
@@ -54,6 +54,7 @@ int elf_get_sym_index_from_name(section symtab, section shstrtab, section strtab
 * @return the completed shstrtab section
 */
 section make_shstrtab_section( void ) {
+
     section shstrtab = new_section( ".shstrtab", SECTION_CHUNK_SZ );
     add_string_to_table( shstrtab, "" ); /* ELF string tables start with a '0' */
     add_string_to_table( shstrtab, ".text" );
@@ -326,12 +327,14 @@ int main_init_function() {
        "tab" is in strtab, has value (relative @) 16 and is defined in the bss section
     */
     Elf32_Sym syms[2]= {{0}};
+    // boucle
     syms[0].st_name = elf_get_string_offset( strtab->start, strtab->sz, sym_char[0] );
     syms[0].st_size = 0;
     syms[0].st_value = 4;
     syms[0].st_info = ELF32_ST_INFO( STB_LOCAL, STT_NOTYPE );
     syms[0].st_other = 0;
     syms[0].st_shndx  = elf_get_string_index( shstrtab->start, shstrtab->sz, ".text" );
+    // tab
     syms[1].st_name = elf_get_string_offset( strtab->start, strtab->sz, sym_char[1]);
     syms[1].st_value = 16;
     syms[1].st_size = 0;

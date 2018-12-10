@@ -22,7 +22,7 @@
 #include <print_functions.h>
 #include <fct_analyse_1.h>
 #include <reloc.h>
-
+#include <make_elf.h>
 #include <error.h>
 //#include <etiq.h>
 
@@ -134,7 +134,8 @@ int main ( int argc, char *argv[] ) {
     print_reloc_table( reloc_table_data);
 
 
-
+    /* ---------------- make mips_elf -------------------*/
+     main_init_function();
 
 
 
