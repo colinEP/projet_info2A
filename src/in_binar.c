@@ -237,9 +237,9 @@ void instr_in_binar(LIST list_instr, int size_list, QUEUE dictionnaire)
                         ERROR_MSG("Erreur, 16 bits libres sont nécessaires pour stocker argument !\n");
                     }
                     val_5 = (I->arg3)->val.entier;
-                    printf("from 5_0 a3 vaut avant décalage : %d\n",val_5 );
+                    //printf("from 5_0 a3 vaut avant décalage : %d\n",val_5 );
                     val_5 =  val_5 >> 2; // DECALAGE pour avoir 18 bits sur 16
-                    printf("from 5_0 a3 vaut après décalage : %d\n",val_5 );
+                    //printf("from 5_0 a3 vaut après décalage : %d\n",val_5 );
                 }
                 if ((I->arg3)->type == Abs) {
                     if( strcmp(from_10_6, "_") || strcmp(from_15_11, "_")|| strcmp(from_20_16, "_")|| strcmp(from_25_21, "_")){ // càd que juste avant on n'a pas laissé de "place" pour mettre 26 bits
@@ -265,14 +265,14 @@ void instr_in_binar(LIST list_instr, int size_list, QUEUE dictionnaire)
         tab_instr_bin[i] = binar_value;
         i = i+1;
         list_instr = list_instr->next;
-
     }
 
     return ;
 }
 
 void data_in_binar(LIST list_data, int size_list){
-
+    // si c'est un .word mettre au début des 32 bits
+    // si c'est un .byte un .asciiz, .space ou .byte : ajout indifférencié ?
 }
 
 

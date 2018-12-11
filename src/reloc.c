@@ -61,6 +61,7 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                         reloc_table_text = add_to_end_list(reloc_table_text, Re);
                         (I->arg1)->val.entier = Et->decalage;// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
                         (I->arg1)->type = Abs;
+                        (I->arg1)->type = (I->Exp_Type_1);
                     }
 
                     if (Et->section == BSS){                    // etiq def dans .bss
@@ -69,7 +70,8 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                         Re->type_r = find_R_type(I->Exp_Type_1);// a définir selon l'instruction !
                         reloc_table_text = add_to_end_list(reloc_table_text, Re);
                         (I->arg1)->val.entier = Et->decalage;// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
-                        (I->arg1)->type = Abs;
+                        //(I->arg1)->type = Abs;
+                        (I->arg1)->type = (I->Exp_Type_1);
                     }
                     if (Et->section == TEXT){                    // etiq def dans .text = "locale"
                         if ( (I->Exp_Type_1) == Rel){
@@ -81,7 +83,7 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                             Re->type_r = find_R_type(I->Exp_Type_1);// a définir selon l'instruction !
                             reloc_table_text = add_to_end_list(reloc_table_text, Re);
                             (I->arg1)->val.entier = Et->decalage;// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
-                            (I->arg1)->type = Abs;
+                            (I->arg1)->type = (I->Exp_Type_1);
                         }
                     }
                     }
@@ -121,7 +123,7 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                         Re->type_r = find_R_type(I->Exp_Type_2); // a définir selon l'instruction !
                     }
                     reloc_table_text = add_to_end_list(reloc_table_text, Re);
-                    (I->arg2)->type = Abs;
+                    (I->arg2)->type = Abs; //nécessairement !
                 }
 
 
@@ -142,7 +144,8 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                                 Re->type_r = find_R_type(I->Exp_Type_2);// a définir selon l'instruction !
                             }
                             reloc_table_text = add_to_end_list(reloc_table_text, Re);
-                            (I->arg2)->type = Abs;
+                            //(I->arg2)->type = Abs;
+                            (I->arg2)->type = (I->Exp_Type_2);
                         }
 
                         if (Et->section == BSS){                    // etiq def dans .bss
@@ -155,7 +158,8 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                                 Re->type_r = find_R_type(I->Exp_Type_2);// a définir selon l'instruction !
                             }
                             reloc_table_text = add_to_end_list(reloc_table_text, Re);
-                            (I->arg2)->type = Abs;
+                            //(I->arg2)->type = Abs;
+                            (I->arg2)->type = (I->Exp_Type_2);
                         }
 
                         if (Et->section == TEXT){                    // etiq def dans .text = "locale"
@@ -183,8 +187,10 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                         if ((I->arg2)->type == Bas_Target){
                             (I->arg2)->val.entier = lower_16(Et->decalage + (I->arg1)->val.entier );
                         }
-                        if ( (I->Exp_Type_2) == Rel) (I->arg2)->type = Rel;
-                        else (I->arg2)->type = Abs;
+                        // if ( (I->Exp_Type_2) == Rel) (I->arg2)->type = Rel;
+                        // if ( (I->Exp_Type_2) == Imm) (I->arg2)->type = Imm;
+                        // else (I->arg2)->type = Abs;
+                        (I->arg2)->type = (I->Exp_Type_2);
 
                     }
                     else {
@@ -209,7 +215,7 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                     (I->arg3)->val.entier = 0; // pour remplacer le nom de l'étiq par int = 0 car non def donc décalage nul
                     Re->type_r = find_R_type((I->arg3)->type);// a définir selon l'instruction !
                     reloc_table_text = add_to_end_list(reloc_table_text, Re);
-                    (I->arg3)->type = Abs;
+                    (I->arg3)->type = I->Exp_Type_3;
                 }
 
                 else {
@@ -224,7 +230,8 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                         Re->type_r = find_R_type((I->arg3)->type);// a définir selon l'instruction !
                         reloc_table_text = add_to_end_list(reloc_table_text, Re);
                         (I->arg3)->val.entier = Et->decalage;
-                        (I->arg3)->type = Abs;
+                        //(I->arg3)->type = Abs;
+                         (I->arg3)->type=I->Exp_Type_3;
                     }
 
                     if (Et->section == BSS){                    // etiq def dans .bss
@@ -233,7 +240,7 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                         Re->type_r = find_R_type((I->arg3)->type);// a définir selon l'instruction !
                         reloc_table_text = add_to_end_list(reloc_table_text, Re);
                         (I->arg3)->val.entier = Et->decalage;
-                        (I->arg3)->type = Abs;
+                        (I->arg3)->type=I->Exp_Type_3;
                     }
                     if (Et->section == TEXT){                    // etiq def dans .text = "locale"
                         if ( (I->Exp_Type_3) == Rel){
@@ -245,7 +252,7 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                             Re->type_r = find_R_type(I->Exp_Type_3);// a définir selon l'instruction !
                             reloc_table_text = add_to_end_list(reloc_table_text, Re);
                             (I->arg3)->val.entier = Et->decalage;// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
-                            (I->arg3)->type = Abs;
+                            (I->arg3)->type=I->Exp_Type_3;
                         }
                     }
                     }
