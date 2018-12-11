@@ -96,7 +96,7 @@ LIST add_to_current_list(operand_type type_op, void* pvalue, int dec, int line, 
     data-> decalage = dec;
     data-> line = line;
     data -> D = fill_val_op(pvalue, type_op);
-    current_list = add_to_head_list(current_list, data);  //TODO head => end
+    current_list = add_to_head_list(current_list, data); 
     return current_list;
 }
 

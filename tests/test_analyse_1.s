@@ -32,5 +32,5 @@ lunchtime:
 
 .bss
 menu:
-    .space 24
+    .space 20
 etiq5:    #OK

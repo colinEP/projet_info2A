@@ -2,7 +2,7 @@
 # allons au ru
 .set noreorder   $t5
 
-gedg "jsd jf     
+#gedg "jsd jf
 200($)45
 452(zz)
 0x4j
@@ -45,4 +45,4 @@ lunchtime:
     .asciiz "ils disent : \"au,: ru!\"\\\\\\\\"
 .bss
 menu:
-    .space 24   "
+    .space jesuisuneetiq

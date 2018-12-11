@@ -453,9 +453,9 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
                     val_convert = strtol(val_lexem, NULL, 0);
                     if (previous_type_lexem == MOINS) val_convert = -val_convert;
                     if ( (val_convert<-128) || (127<val_convert) ) {
-                        ERROR_MSG("ERR LINE %d : Nombre trop grand pour etre stocké dans un byte (32 bits : -128 < x < 127)\n", line);
+                        ERROR_MSG("ERR LINE %d : Nombre trop grand pour etre stocké dans un byte (8 bits : -128 < x < 127)\n", line);
                     }
-                    *pcurrent_list = add_to_current_list(PSPACE, &val_convert, *pdecalage, line, *pcurrent_list);
+                    *pcurrent_list = add_to_current_list(PBYTE, &val_convert, *pdecalage, line, *pcurrent_list);
                     (*pdecalage)++;
                 }
 

@@ -136,14 +136,15 @@ int main ( int argc, char *argv[] ) {
 
     /* ---------------- test_binaire -------------------*/
 
-    int bin = 0x022;
-    printf("EXEMPLE : en decimal, 0x022 vaut : %d \n",bin );
+    // int bin = 0x022;
+    // printf("EXEMPLE : en decimal, 0x022 vaut : %d \n",bin );
+    //
+    // int bin2 = 34;
+    // printf("EXEMPLE : en decimal, 34 vaut : %hx \n",bin );
 
-    int bin2 = 34;
-    printf("EXEMPLE : en decimal, 34 vaut : %hx \n",bin );
 
-
-    instr_in_binar(list_instr, 4 , dictionnaire);
+    instr_in_binar(list_instr, 50 , dictionnaire); // WARNING a changer
+    data_in_binar(list_data, 50);   // WARNING WARNING à changer
 
     /* ---------------- make mips_elf -------------------*/
      main_init_function();

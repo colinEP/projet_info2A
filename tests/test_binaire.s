@@ -13,3 +13,12 @@ boucle:
     NOP
 byebye:
     addi $t1 , $t1 , 8
+
+.data
+lunchtime:
+    .word 12
+    .word boucle
+	.space 5
+	.byte 3
+	.space 1
+    .asciiz "ils disent : \"au ru!\""

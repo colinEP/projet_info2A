@@ -20,13 +20,12 @@
 
 void instr_in_binar(LIST list_instr, int size_list, QUEUE dictionnaire)
 {
-    int tab_instr_bin[size_list];
+    int tab_instr_binar[size_list];
     int i=0;
-    unsigned int binar_value;
 
     // parcourir la liste
     while (list_instr != NULL){
-        int binar_value = 0;
+        unsigned int binar_value = 0;
         INSTR I = list_instr->element;
         char* instruction =  strdup( ((LEXEM)(I->lex))->value );
         instruction = strdup(put_in_uppercase (instruction));
@@ -262,7 +261,7 @@ void instr_in_binar(LIST list_instr, int size_list, QUEUE dictionnaire)
 
 
         printf("Pour cette instruction, binar_value vaut : %d\n\n",binar_value);
-        tab_instr_bin[i] = binar_value;
+        tab_instr_binar[i] = binar_value;
         i = i+1;
         list_instr = list_instr->next;
     }
@@ -270,9 +269,98 @@ void instr_in_binar(LIST list_instr, int size_list, QUEUE dictionnaire)
     return ;
 }
 
-void data_in_binar(LIST list_data, int size_list){
+void data_in_binar(LIST list_data, int size_list){ // FONCTIONNE !
     // si c'est un .word mettre au début des 32 bits
-    // si c'est un .byte un .asciiz, .space ou .byte : ajout indifférencié ?
+    // si c'est un .byte un .asciiz, .space ou .byte : ajout indifférencié !
+    // si c'est un DEC_LABEL = .word nécéssairement !
+
+    // NOTE : un octet en binaire = 2 symboles en hexa !
+
+    int tab_data_binar[size_list];
+    int i=0;
+    int j=0;
+    unsigned int binar_value = 0;
+
+
+    // parcourir la liste
+    while (list_data != NULL){
+        DATA Dat = list_data->element;
+        if ((((Dat->D)->type) == PWORD ) || (((Dat->D)->type) == DEC_LABEL )){
+            if ((j != 0)){
+                // full with zeros
+                binar_value = binar_value << (32-j);
+                tab_data_binar[i] = binar_value;
+                i = i+1;
+                printf("Pour cette directive, binar_value vaut : %d\n\n",binar_value);
+                binar_value = 0; // remise à 0 pour la suite
+            }
+            j=0;
+            binar_value = (Dat->D)->val.PWORD;
+            tab_data_binar[i] = binar_value;
+            i = i+1;
+            printf("Pour cette directive, binar_value vaut : %d\n\n",binar_value);
+            binar_value = 0;
+        }
+
+
+
+        else { // coucou le .byte, .asciiz ou .space !
+
+            if (j==32){
+                tab_data_binar[i] = binar_value;
+                i = i+1;
+                printf("Pour cette directive, binar_value vaut : %d\n\n",binar_value);
+                j = 0;
+                binar_value = 0;
+            }
+
+
+            if (((Dat->D)->type) == PBYTE) {
+                // alors ce sont des valeurs numériques qui tiennent sur 8 bits
+                binar_value = (binar_value << 8) | ( (Dat->D)->val.PBYTE & 255  );
+                j = j + 8;
+            }
+            if ( (Dat->D)->type == PSPACE ){
+                // alors on réserve x octets à 0
+                int M = (Dat->D)->val.PSPACE;
+                int k = 0;
+                while (k<M){
+                    binar_value = (binar_value << 8); // rajout d'un octet de 0
+                    j = j + 8;
+                    if (j == 32){
+                        tab_data_binar[i] = binar_value;
+                        i = i+1;
+                        printf("Pour cette directive, binar_value vaut : %d\n\n",binar_value);
+                        j = 0;
+                        binar_value = 0;
+                    }
+                    k = k+1;
+                }
+            }
+
+            if ((Dat->D)->type == PASCIIZ ){
+                // ajouter une à une les lettres en table ascii qui tiennent sur un octet chacune
+                int k = 0;
+                while ((Dat->D)->val.PASCIIZ[k] != '\0') {
+                    binar_value = (binar_value << 8) | ( ((int)((Dat->D)->val.PASCIIZ[k])) & 255  );
+                    j = j + 8;
+                    if (j == 32){
+                        tab_data_binar[i] = binar_value;
+                        i = i+1;
+                        printf("Pour cette directive, binar_value vaut : %d\n\n",binar_value);
+                        j = 0;
+                        binar_value = 0;
+                    }
+                    k = k+1;
+                }
+            }
+        } // HOP On sort du else car la cellule DATA a été traitée, on passe à la suivante !
+
+        list_data = list_data->next;
+
+        }
+
+    return;
 }
 
 
