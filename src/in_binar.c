@@ -18,9 +18,9 @@
 
 
 
-void instr_in_binar(LIST list_instr, int size_list, QUEUE dictionnaire)
+int* instr_in_binar(LIST list_instr, int size_list, QUEUE dictionnaire)
 {
-    int tab_instr_binar[size_list];
+    int* tab_instr_binar = calloc (size_list, sizeof(int));
     int i=0;
 
     // parcourir la liste
@@ -266,17 +266,17 @@ void instr_in_binar(LIST list_instr, int size_list, QUEUE dictionnaire)
         list_instr = list_instr->next;
     }
 
-    return ;
+    return tab_instr_binar;
 }
 
-void data_in_binar(LIST list_data, int size_list){ // FONCTIONNE !
+int* data_in_binar(LIST list_data, int size_list){ // FONCTIONNE !
     // si c'est un .word mettre au début des 32 bits
     // si c'est un .byte un .asciiz, .space ou .byte : ajout indifférencié !
     // si c'est un DEC_LABEL = .word nécéssairement !
 
     // NOTE : un octet en binaire = 2 symboles en hexa !
 
-    int tab_data_binar[size_list];
+    int* tab_data_binar = calloc (size_list, sizeof(int));
     int i=0;
     int j=0;
     unsigned int binar_value = 0;
@@ -360,7 +360,7 @@ void data_in_binar(LIST list_data, int size_list){ // FONCTIONNE !
 
         }
 
-    return;
+    return tab_data_binar;
 }
 
 
