@@ -57,5 +57,21 @@ ETIQ look_for_etiq_and_return( LIST symb_table, char* lexem)
          }
          symb_table = symb_table->next;
      }
-     ERROR_MSG("Probleme d'etiquette non trouvee dans table des symboles !\n");
+     ERROR_MSG("Probleme etiquette %s non trouvee dans table des symboles !\n",((ETIQ) (symb_table->element))->name );
  }
+
+
+char** make_sym_char_table(LIST symb_table, int size_list){
+    char** sym_char = calloc(size_list, sizeof(char*));
+    int i=0;
+
+    // parcourir la liste
+    while (symb_table != NULL){
+        sym_char[i] = strdup(((ETIQ) (symb_table->element))->name);
+        i = i+1;
+        symb_table = symb_table->next;
+    }
+
+    return sym_char;
+
+}

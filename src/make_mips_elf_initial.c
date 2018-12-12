@@ -10,6 +10,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <make_elf.h>
 
 #include <pelf.h>   // initialement <pelf/pelf.h>
 #include <section.h> // initialement <pelf/section.h>
@@ -56,6 +57,7 @@ int elf_get_sym_index_from_name(section symtab, section shstrtab, section strtab
 section make_shstrtab_section( void ) {
 
     section shstrtab = new_section( ".shstrtab", SECTION_CHUNK_SZ );
+    //printf("JE SUIS DANS LE make_shstrtab_section 1 ! \n\n");
     add_string_to_table( shstrtab, "" ); /* ELF string tables start with a '0' */
     add_string_to_table( shstrtab, ".text" );
     add_string_to_table( shstrtab, ".rel.text" );
@@ -65,6 +67,8 @@ section make_shstrtab_section( void ) {
     add_string_to_table( shstrtab, ".symtab" );
     add_string_to_table( shstrtab, ".strtab" );
     add_string_to_table( shstrtab, ".shstrtab" );
+
+    //printf("JE SUIS DANS LE make_shstrtab_section 2 ! \n\n");
 
     return shstrtab;
 }
@@ -84,7 +88,8 @@ section make_strtab_section( char* symbols[], int nb_sym) {
     add_string_to_table( strtab, "" ); /* ELF string tables start with a '0' */
     int i= 0;
     for (i= 0; i< nb_sym; i++) {
-        add_string_to_table( strtab,symbols[i] );
+        add_string_to_table( strtab, symbols[i] );
+
     }
 
     return strtab;
@@ -271,8 +276,7 @@ section make_rel32_section(char *relname, Elf32_Rel relocations[], int nb_reloc)
 *
 * the output binary is called exemple.o
 */
-
-int main_init_function() {
+int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_instr, int size_data, int size_table) {
 
     /* prepare sections*/
     section     text = NULL;
@@ -284,22 +288,33 @@ int main_init_function() {
     section  reltext = NULL;
     section  reldata = NULL;
 
+
     /* make predefined section table*/
     shstrtab = make_shstrtab_section();
 
     /* make hard coded program data already in big endian */
-    int text_prog[]= {0x20106400,0x04006220,0xFEFF4310};
-    int data_prog[]= {0x10000000};
+    // int text_prog[]= {0x20106400,0x04006220,0xFEFF4310};
+    // int data_prog[]= {0x10000000};
+    // int bss_prog = 16+8;
+    // char * sym_char[] = {"boucle","tab"};
+    // char* machine = "mips";
+    // char* name = "exemple.o";
+    // /* pelf options */
+    // int noreorder = 1;
+
+
+    int* text_prog= text_tab;
+    int* data_prog= data_tab;
     int bss_prog = 16+8;
-    char * sym_char[] = {"boucle","tab"};
+    char ** sym_char = sym_tab;
     char* machine = "mips";
-    char* name = "exemple.o";
+    char* name = "my_exemple.o";
     /* pelf options */
     int noreorder =1;
 
 
     /* Create text, data and bss sections*/
-    text     = make_text_section(text_prog, 3);
+    text     = make_text_section(text_prog, size_instr);
 
     if ( !text ) {
         fprintf( stderr, "Unable to write .text section (missing information).\n" );
@@ -312,15 +327,16 @@ int main_init_function() {
         return -1;
     }
 
+
     bss = make_bss_section(  bss_prog);
     if ( !bss ) {
         fprintf( stderr, "Unable to write .bss section (missing information).\n" );
         return -1;
     }
 
-    /* Write all string linked to symbols*/
-    strtab   = make_strtab_section( sym_char, 2);
 
+    /* Write all string linked to symbols*/
+    strtab   = make_strtab_section( sym_char, 2); // WARNING WARNING SEG_FAULT
 
     /* make hard coded symbols data (needs shstrtab and strtab)
        "boucle" is in strtab, has value (relative @) 4 and is defined in the text section
@@ -393,3 +409,131 @@ int main_init_function() {
     return 0;
 
 }
+
+//
+//
+//
+// --------------------------------------------------------------------------------
+// --------------------------- VERSION DES PROFS-----------------------------------
+// --------------------------- ne pas modifier ! ----------------------------------
+// int main_init_function() {
+//
+//     /* prepare sections*/
+//     section     text = NULL;
+//     section     data = NULL;
+//     section      bss = NULL;
+//     section shstrtab = NULL;
+//     section   strtab = NULL;
+//     section   symtab = NULL;
+//     section  reltext = NULL;
+//     section  reldata = NULL;
+//
+//     /* make predefined section table*/
+//     shstrtab = make_shstrtab_section();
+//
+//     /* make hard coded program data already in big endian */
+//     int text_prog[]= {0x20106400,0x04006220,0xFEFF4310};
+//     int data_prog[]= {0x10000000};
+//     int bss_prog = 16+8;
+//     char * sym_char[] = {"boucle","tab"};
+//     char* machine = "mips";
+//     char* name = "exemple.o";
+//     /* pelf options */
+//     int noreorder =1;
+//
+//
+//     /* Create text, data and bss sections*/
+//     text     = make_text_section(text_prog, 3);
+//
+//     if ( !text ) {
+//         fprintf( stderr, "Unable to write .text section (missing information).\n" );
+//         return -1;
+//     }
+//
+//     data = make_data_section(  data_prog, 1);
+//     if ( !data ) {
+//         fprintf( stderr, "Unable to write .data section (missing information).\n" );
+//         return -1;
+//     }
+//
+//     bss = make_bss_section(  bss_prog);
+//     if ( !bss ) {
+//         fprintf( stderr, "Unable to write .bss section (missing information).\n" );
+//         return -1;
+//     }
+//
+//     /* Write all string linked to symbols*/
+//     strtab   = make_strtab_section( sym_char, 2);
+//
+//
+//     /* make hard coded symbols data (needs shstrtab and strtab)
+//        "boucle" is in strtab, has value (relative @) 4 and is defined in the text section
+//        "tab" is in strtab, has value (relative @) 16 and is defined in the bss section
+//     */
+//     Elf32_Sym syms[2]= {{0}};
+//     // boucle
+//     syms[0].st_name = elf_get_string_offset( strtab->start, strtab->sz, sym_char[0] );
+//     syms[0].st_size = 0;
+//     syms[0].st_value = 4;
+//     syms[0].st_info = ELF32_ST_INFO( STB_LOCAL, STT_NOTYPE );
+//     syms[0].st_other = 0;
+//     syms[0].st_shndx  = elf_get_string_index( shstrtab->start, shstrtab->sz, ".text" );
+//     // tab
+//     syms[1].st_name = elf_get_string_offset( strtab->start, strtab->sz, sym_char[1]);
+//     syms[1].st_value = 16;
+//     syms[1].st_size = 0;
+//     syms[1].st_info = ELF32_ST_INFO( STB_LOCAL, STT_NOTYPE );
+//     syms[1].st_other = 0;
+//     syms[1].st_shndx = elf_get_string_index( shstrtab->start, shstrtab->sz, ".bss" );
+//
+//     symtab   = make_symtab_section( shstrtab, strtab, syms,2);
+//
+//
+//     /* make hard coded text and data relocation entries (needs symtab and strtab)
+//       first relocation "ADDI $2, $3, boucle" at adress 4 of the text section is a R_MIPS_LO16 with respect to the symbole "boucle" so the relocation is made with respect to the .text section symbol (since the value of boucle, 4, will be the addend)
+//       second relocation ".word tab" at adress 0 of the data section is a R_MIPS_32 with respect to the symbole "tab" so the relocation is made with respect to the .bss section symbol (since the value of tab, 16, will be the addend)
+//     */
+//     Elf32_Rel text_reloc[1];
+//     text_reloc[0].r_offset =4;
+//     text_reloc[0].r_info=ELF32_R_INFO(elf_get_sym_index_from_name(symtab, shstrtab, strtab,".text"),R_MIPS_LO16);
+//     Elf32_Rel data_reloc[1];
+//     data_reloc[0].r_offset =0;
+//     data_reloc[0].r_info=ELF32_R_INFO(elf_get_sym_index_from_name(symtab, shstrtab,strtab,".bss"),R_MIPS_32);
+//
+//
+//     reltext  = make_rel32_section( ".rel.text", text_reloc,1);
+//     reldata  = make_rel32_section( ".rel.data", data_reloc,1);
+//
+//
+//     /*write these sections in file*/
+//     elf_write_relocatable( name, machine, noreorder,
+//                            text->start, text->sz,
+//                            data->start, data->sz,
+//                            bss->start, bss->sz,
+//                            shstrtab->start, shstrtab->sz,
+//                            strtab->start, strtab->sz,
+//                            symtab->start, symtab->sz,
+//                            reltext->start, reltext->sz,
+//                            reldata->start, reldata->sz);
+//
+//
+//     print_section( text );
+//     print_section( data );
+//     print_section( bss );
+//     print_section( strtab );
+//     print_section( symtab );
+//
+//
+//     /*clean up */
+//     del_section(     text );
+//     del_section(     data );
+//     del_section(      bss );
+//     del_section( shstrtab );
+//     del_section(   strtab );
+//     del_section(   symtab );
+//     del_section(  reltext );
+//     del_section(  reldata );
+//
+//     return 0;
+//
+// }

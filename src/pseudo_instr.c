@@ -203,6 +203,7 @@ LIST change_pseudo_SW_LW(LIST list_instr, int* pdecalage){
 
               (I-> arg1)->type = Reg; // UTILE
               (I-> arg3)->type = None;
+              (I->arg1)->val.entier = 1; // = $at
 
 
               LEXEM second_instr = calloc(1, sizeof(*second_instr));

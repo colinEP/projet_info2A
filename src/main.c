@@ -24,7 +24,7 @@
 #include <reloc.h>
 #include <make_elf.h>
 #include <error.h>
-//#include <etiq.h>
+#include <in_binar.h>
 
 #include <assert.h>
 
@@ -118,8 +118,9 @@ int main ( int argc, char *argv[] ) {
     LIST list_data  = new_list();
     LIST list_bss   = new_list();
     LIST symb_table = new_list();
+    int size_list_instr, size_list_data, size_sym_table;
     // On doit passer les pointeurs des listes car leur addresse de début change dans analyse_synth!
-    analyse_synth(&list_instr, &list_data, &list_bss, &symb_table, list_lex, dictionnaire);
+    analyse_synth(&list_instr, &list_data, &list_bss, &symb_table, list_lex, dictionnaire, &size_list_instr, &size_list_data, &size_sym_table);
 
     /* ----- Relocation ------- */    //NOTE prototype dans etiq.h ?????
     //TODO
@@ -143,12 +144,16 @@ int main ( int argc, char *argv[] ) {
     // printf("EXEMPLE : en decimal, 34 vaut : %hx \n",bin );
 
 
-    instr_in_binar(list_instr, 50 , dictionnaire); // WARNING a changer
-    data_in_binar(list_data, 50);   // WARNING WARNING à changer
+    int* tab_instr_binaire = NULL;
+    tab_instr_binaire = instr_in_binar(list_instr, size_list_instr , dictionnaire);
+    int* tab_data_binaire = NULL;
+    tab_data_binaire = data_in_binar(list_data, size_list_data); // WARNING size data FAUSSE !
+    char** sym_char = NULL;
+    sym_char =  make_sym_char_table(symb_table, size_sym_table); // NOTE fonction dans etiq.c
 
     /* ---------------- make mips_elf -------------------*/
-     main_init_function();
-
+     main_init_function(tab_instr_binaire, tab_data_binaire, sym_char, size_list_instr, size_list_data, size_sym_table);
+     //main_init_function();
 
 
     // char* str = ((LEXEM)list_lex->element)->value;
