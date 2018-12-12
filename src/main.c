@@ -121,7 +121,7 @@ int main ( int argc, char *argv[] ) {
     // On doit passer les pointeurs des listes car leur addresse de début change dans analyse_synth!
     analyse_synth(&list_instr, &list_data, &list_bss, &symb_table, list_lex, dictionnaire);
     // DEBUG
-    print_list_instr(list_instr);
+    //print_list_instr(list_instr);
 
 
     /* ----- Relocation ------- */    //NOTE prototype dans etiq.h ?????

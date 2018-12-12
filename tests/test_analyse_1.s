@@ -10,6 +10,7 @@
 	Lw $t2, etiqnondef
 etiq:	Lw $t2, etiq
 	Lw $t2, boucle
+	LW $10, testoffsetneg
 	LW $6, -200($7)
 
     ADDI $t1,$zero,8
@@ -24,6 +25,7 @@ byebye:
 
 .data
 lunchtime:
+	.word -1   # ATTENTION TEST TRES IMPORTANT : A REVOIR
     .word boucle
 	.word 2147483647
 	#.word 2147483648
@@ -35,7 +37,11 @@ lunchtime:
     .asciiz "ils disent : \"au ru!\""
     .byte 4
 
+
 .bss
 menu:
     .space 20
 etiq5:    #OK
+	#.space 65500   #pour test offset negatif
+	.space 100000   #pour test offset negatif   =0x186a0
+testoffsetneg:

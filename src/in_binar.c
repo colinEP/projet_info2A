@@ -260,7 +260,7 @@ void instr_in_binar(LIST list_instr, int size_list, QUEUE dictionnaire)
         }
 
 
-        printf("Pour cette instruction, binar_value vaut : %d\n\n",binar_value);
+        printf("Pour cette instruction, binar_value vaut : %08x\n\n",binar_value);
         tab_instr_binar[i] = binar_value;
         i = i+1;
         list_instr = list_instr->next;
@@ -291,14 +291,14 @@ void data_in_binar(LIST list_data, int size_list){ // FONCTIONNE !
                 binar_value = binar_value << (32-j);
                 tab_data_binar[i] = binar_value;
                 i = i+1;
-                printf("Pour cette directive, binar_value vaut : %d\n\n",binar_value);
+                printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
                 binar_value = 0; // remise à 0 pour la suite
             }
             j=0;
             binar_value = (Dat->D)->val.PWORD;
             tab_data_binar[i] = binar_value;
             i = i+1;
-            printf("Pour cette directive, binar_value vaut : %d\n\n",binar_value);
+            printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
             binar_value = 0;
         }
 
@@ -309,7 +309,7 @@ void data_in_binar(LIST list_data, int size_list){ // FONCTIONNE !
             if (j==32){
                 tab_data_binar[i] = binar_value;
                 i = i+1;
-                printf("Pour cette directive, binar_value vaut : %d\n\n",binar_value);
+                printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
                 j = 0;
                 binar_value = 0;
             }
@@ -330,7 +330,7 @@ void data_in_binar(LIST list_data, int size_list){ // FONCTIONNE !
                     if (j == 32){
                         tab_data_binar[i] = binar_value;
                         i = i+1;
-                        printf("Pour cette directive, binar_value vaut : %d\n\n",binar_value);
+                        printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
                         j = 0;
                         binar_value = 0;
                     }
@@ -347,7 +347,7 @@ void data_in_binar(LIST list_data, int size_list){ // FONCTIONNE !
                     if (j == 32){
                         tab_data_binar[i] = binar_value;
                         i = i+1;
-                        printf("Pour cette directive, binar_value vaut : %d\n\n",binar_value);
+                        printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
                         j = 0;
                         binar_value = 0;
                     }

@@ -205,7 +205,6 @@ LIST change_pseudo_SW_LW(LIST list_instr, int* pdecalage){
               (I-> arg1)->val.entier = 1; // = $at
               (I-> arg3)->type = None;
 
-
               LEXEM second_instr = calloc(1, sizeof(*second_instr));
               second_instr->nline = I->lex->nline;
               second_instr->lex_type = SYMBOLE;
@@ -215,7 +214,6 @@ LIST change_pseudo_SW_LW(LIST list_instr, int* pdecalage){
               I = list_instr->element;
               (I-> arg1)->type = Reg;
               (I-> arg1)->val.entier = reg;
-
 
               (I-> arg2)->type = Bas_Target;
               (I-> arg2)->etiq_def = is_def;
@@ -242,21 +240,22 @@ LIST change_pseudo_SW_LW(LIST list_instr, int* pdecalage){
               I->Exp_Type_2 = Imm;
               I->Exp_Type_3 = None;
 
-              (I-> arg1)->val.entier = 1; // = $at
-              (I-> arg1)->type = Reg; // UTILE
-
+              // arg1 reste inchangé
               (I-> arg2)->type = Target; //type Target permettra de remplacer par sa valeur après relocation
               //etiq_def2 reste le même
               is_def = (I->arg2)->etiq_def;
               name_etiq = strdup((I->arg2)->val.char_chain);
+              // PB:  pour avoir l'adresse du poiteur, il faut qu'il y ait eu relocation !
 
+              (I-> arg1)->type = Reg; // UTILE
+              (I-> arg1)->val.entier = 1; // = $at
               (I-> arg3)->type = None;
-
 
               LEXEM second_instr = calloc(1, sizeof(*second_instr));
               second_instr->nline = I->lex->nline;
               second_instr->lex_type = SYMBOLE;
               second_instr->value = strdup("SW") ;
+
               list_instr = add_to_list_instr(second_instr, *pdecalage, 2, list_instr, Reg, Bas, None); //etiq def est à -1 par defaut
               I = list_instr->element;
               (I-> arg1)->type = Reg;
@@ -289,6 +288,6 @@ int upper_16(int val_32b){
 int lower_16(int val_32b){
      // il suffit de mettre un masque !
      int val_16b;
-     val_16b = val_32b & 0x7FFF; // car 0x7FFF correspond en binaire à (0) 1111 1111 1111 1111
+     val_16b = val_32b & 0xFFFF; // car 0xFFFF correspond en binaire à (0) 1111 1111 1111 1111
      return val_16b;
  }
