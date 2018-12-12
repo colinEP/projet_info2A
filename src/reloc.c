@@ -21,9 +21,11 @@
 LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
 {
         // Ajout à la table des relocation + mise à jour de l'argument de la list_instr
+        // /!\ /!\ WARNING ce qu'on appelle addend dans la foncrtion est en réalité le symbole sur quoi on fait la relocation
 
         LIST reloc_table_text = new_list();
         INSTR I;
+
         while (l!= NULL){
             I = l->element;
             RELOC Re = calloc (1, sizeof(*Re));
@@ -112,18 +114,32 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                     if ( ((I->arg2)->type == Label) || ((I->arg2)->type == Target)) {
                          (I->arg2)->val.entier = 0; // pour remplacer le nom de l'étiq par int = 0 car non def donc décalage nul
 
-                     }
-                    if ((I->arg2)->type == Bas_Target){
-                        (I->arg2)->val.entier = (I->arg1)->val.entier; // car alors on somme $rt + 0(=adresse d'une etiq non def)
                     }
                     if (((I->arg2)->type == Bas_Target)||((I->arg2)->type == Target) ){
+
                         Re->type_r = find_R_type((I->arg2)->type);// a définir selon l'instruction !
                     }
+                    if ((I->arg2)->type == Bas_Target){
+                        Et = look_for_etiq_and_return(symb_table, (I->arg2)->val.char_chain);
+                        I->arg3->val.entier = lower_16( Et->decalage );
+                        I->arg3->type = Imm;
+                        I->Exp_Type_3 = Imm;
+
+                        I->arg2->val.entier = 1; // $at
+                        I->arg2->type = Reg;
+                        I->Exp_Type_2 = Reg;
+
+                        I->nb_arg = 3; // INUTILE ??
+                        // TODO
+                        // verif si offset
+                        // dans la boucle, enregistrer instruction précédent
+                    }
+
                     if (((I->arg2)->type == Label) ){
                         Re->type_r = find_R_type(I->Exp_Type_2); // a définir selon l'instruction !
                     }
                     reloc_table_text = add_to_end_list(reloc_table_text, Re);
-                    (I->arg2)->type = Abs; //nécessairement !
+                    (I->arg2)->type = I->Exp_Type_2; //nécessairement !
                 }
 
 
@@ -170,9 +186,25 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                                 Re->addend = strdup(".text");             //NOTE conversion en char*: est-ce vraiment utile pour la suite ?
                                 if (((I->arg2)->type == Bas_Target)||((I->arg2)->type == Target) ){
                                     Re->type_r = find_R_type((I->arg2)->type);// a définir selon l'instruction !
+
                                 }
                                 if (((I->arg2)->type == Label) ){
                                     Re->type_r = find_R_type(I->Exp_Type_2);// a définir selon l'instruction !
+                                }
+                                if ((I->arg2)->type == Bas_Target){
+                                    Et = look_for_etiq_and_return(symb_table, (I->arg2)->val.char_chain);
+                                    I->arg3->val.entier = lower_16( Et->decalage );
+                                    I->arg3->type = Imm;
+                                    I->Exp_Type_3 = Imm;
+
+                                    I->arg2->val.entier = 1; // $at
+                                    I->arg2->type = Reg;
+                                    I->Exp_Type_2 = Reg;
+
+                                    I->nb_arg = 3; // INUTILE ??
+                                    // TODO
+                                    // verif si offset
+                                    // dans la boucle, enregistrer instruction précédent
                                 }
                                 reloc_table_text = add_to_end_list(reloc_table_text, Re);
                             }

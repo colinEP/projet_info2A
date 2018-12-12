@@ -2,11 +2,16 @@
 # allons au ru
 .set noreorder #test
 .text
-	BNE $4,$5, boucle #test decalage
-	BLT $4,$5, boucle
-    Lw $t0, etiq1
-    Lw $t1, etiqnondef
-    LW $6, -200($7)
+
+	#BNE $4,$5, boucle #test decalage
+	#BLT $4,$5, boucle
+    #Lw $t0, etiq1
+
+	Lw $t2, etiqnondef
+etiq:	Lw $t2, etiq
+	Lw $t2, boucle
+	LW $6, -200($7)
+
     ADDI $t1,$zero,8
 boucle:
     BEQ $t0 , $t1 , byebye
