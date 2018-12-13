@@ -8,4 +8,4 @@ BEQ $2, $3, boucle
 .word tab
 .bss
 .space 0x10
-tab: .space 8
+tab: .space 8   

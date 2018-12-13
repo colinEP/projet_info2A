@@ -138,6 +138,9 @@ int main ( int argc, char *argv[] ) {
     size_sym_table = lengh_of_list(symb_table);
     printf("Taille symb table : %d \n", size_sym_table);
 
+    int spaces_needed_in_bss = lengh_of_space_in_bss(list_bss);
+    printf("spaces nedded : %d\n",spaces_needed_in_bss );
+
 
     print_symb_table(symb_table);
     print_list_instr(list_instr);
@@ -164,7 +167,7 @@ int main ( int argc, char *argv[] ) {
     sym_char =  make_sym_char_table(symb_table, size_sym_table); // NOTE fonction dans etiq.c
 
     /* ---------------- make mips_elf -------------------*/
-    main_init_function(tab_instr_binaire, tab_data_binaire, sym_char, size_list_instr, size_list_data, size_sym_table);
+    main_init_function(tab_instr_binaire, tab_data_binaire, sym_char, size_list_instr, size_list_data, size_sym_table, spaces_needed_in_bss, symb_table);
      //main_init_function();
 
      // char* str = ((LEXEM)list_lex->element)->value;

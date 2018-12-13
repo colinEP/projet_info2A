@@ -8,7 +8,7 @@ typedef struct {
     int nline;
     int section;
     int decalage;
-    int def_in_file;
+    int def_in_file; // a 1 si oui, sinon 0
 }* ETIQ;
 
 typedef struct {

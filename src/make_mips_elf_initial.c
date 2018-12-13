@@ -14,6 +14,8 @@
 
 #include <pelf.h>   // initialement <pelf/pelf.h>
 #include <section.h> // initialement <pelf/section.h>
+#include <queue_list.h>
+#include <Elf32.h>
 
 
 /**
@@ -279,7 +281,7 @@ section make_rel32_section(char *relname, Elf32_Rel relocations[], int nb_reloc)
 
 
 
-int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_instr, int size_data, int size_table) {
+int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_instr, int size_data, int size_table, int spaces_needed_in_bss, LIST table_des_symboles) {
 
     /* prepare sections*/
     section     text = NULL;
@@ -308,7 +310,7 @@ int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_in
 
     int* text_prog= text_tab;
     int* data_prog= data_tab;
-    int bss_prog = 16+8;
+    int bss_prog = spaces_needed_in_bss;
     char ** sym_char = sym_tab;
     char* machine = "mips";
     char* name = "my_exemple.o";
@@ -339,27 +341,28 @@ int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_in
 
 
     /* Write all string linked to symbols*/
-    strtab   = make_strtab_section( sym_char, 2); // WARNING WARNING SEG_FAULT
+    strtab   = make_strtab_section( sym_char, size_table);
 
     /* make hard coded symbols data (needs shstrtab and strtab)
        "boucle" is in strtab, has value (relative @) 4 and is defined in the text section
        "tab" is in strtab, has value (relative @) 16 and is defined in the bss section
     */
-    Elf32_Sym syms[2]= {{0}};
-    // boucle
-    syms[0].st_name = elf_get_string_offset( strtab->start, strtab->sz, sym_char[0] );
-    syms[0].st_size = 0;
-    syms[0].st_value = 4;
-    syms[0].st_info = ELF32_ST_INFO( STB_LOCAL, STT_NOTYPE );
-    syms[0].st_other = 0;
-    syms[0].st_shndx  = elf_get_string_index( shstrtab->start, shstrtab->sz, ".text" );
-    // tab
-    syms[1].st_name = elf_get_string_offset( strtab->start, strtab->sz, sym_char[1]);
-    syms[1].st_value = 16;
-    syms[1].st_size = 0;
-    syms[1].st_info = ELF32_ST_INFO( STB_LOCAL, STT_NOTYPE );
-    syms[1].st_other = 0;
-    syms[1].st_shndx = elf_get_string_index( shstrtab->start, shstrtab->sz, ".bss" );
+    Elf32_Sym *syms = make_syms(size_table, sym_tab, strtab, shstrtab, table_des_symboles);
+    // Elf32_Sym syms[2]= {{0}};
+    // // boucle
+    // syms[0].st_name = elf_get_string_offset( strtab->start, strtab->sz, sym_char[0] );
+    // syms[0].st_size = 0;
+    // syms[0].st_value = 4;
+    // syms[0].st_info = ELF32_ST_INFO( STB_LOCAL, STT_NOTYPE );
+    // syms[0].st_other = 0;
+    // syms[0].st_shndx  = elf_get_string_index( shstrtab->start, shstrtab->sz, ".text" );
+    // // tab
+    // syms[1].st_name = elf_get_string_offset( strtab->start, strtab->sz, sym_char[1]);
+    // syms[1].st_value = 16;
+    // syms[1].st_size = 0;
+    // syms[1].st_info = ELF32_ST_INFO( STB_LOCAL, STT_NOTYPE );
+    // syms[1].st_other = 0;
+    // syms[1].st_shndx = elf_get_string_index( shstrtab->start, shstrtab->sz, ".bss" );
 
     symtab   = make_symtab_section( shstrtab, strtab, syms,2);
 

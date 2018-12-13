@@ -429,3 +429,15 @@ int look_for_instr_and_return_binar_info( LIST dictionnaire, char* instruction, 
      return taille ;
 
  }
+
+ int lengh_of_space_in_bss(LIST l){
+
+     if (l==NULL) return 0;   // cas liste vide
+
+     int i =0;
+     while( l!=NULL ) {
+         i = i + ((DATA)(l->element))->D->val.PSPACE;
+         l = l->next;
+     }
+     return i;
+ }
