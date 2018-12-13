@@ -11,13 +11,6 @@ typedef struct {
     int def_in_file; // a 1 si oui, sinon 0
 }* ETIQ;
 
-typedef struct {
-    char* section; //INUTILE NON ? Puisque spécifié par reloc_instr ou reloc_data
-    unsigned int adress;
-    reloc_type type_r;
-    char* addend; // valeur de la section de definition OU nom de l'etiq si non def
-}* RELOC;
-
 
 int look_for_etiq( LIST symb_table, char* val_lexem);
 LIST add_to_symb_table(char* etiq, int decalage, int line, int section, int def, LIST symb_table);

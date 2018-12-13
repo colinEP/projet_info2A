@@ -131,8 +131,8 @@ int main ( int argc, char *argv[] ) {
     printf("Taille liste instr : %d \n", size_list_instr);
 
     // pour .data, ce qui nous intéresse c'est le nombre de int que cela va nécéssiter en binaire !
-    // don on n'utilse pas la fonction lengh_of_list mais une autre qui considère le décalage ! // cette fonction est dans in_binar.c
-    size_list_data = lengh_of_tab_data_in_binar(list_data);
+    // don on n'utilse pas la fonction lengh_of_list mais une autre qui considère le décalage !
+    size_list_data = lengh_of_tab_data_in_binar(list_data); // cette fonction est dans in_binar.c
     printf("Taille équivalente tableau de data en binaire : %d \n", size_list_data);
 
     size_sym_table = lengh_of_list(symb_table);
@@ -150,7 +150,7 @@ int main ( int argc, char *argv[] ) {
     print_reloc_table( reloc_table_data);
 
 
-    /* ---------------- test_binaire -------------------*/
+    /* ---------------- test et conversion en binaire -------------------*/
 
     // int bin = 0x022;
     // printf("EXEMPLE : en decimal, 0x022 vaut : %d \n",bin );
@@ -162,13 +162,13 @@ int main ( int argc, char *argv[] ) {
     int* tab_instr_binaire = NULL;
     tab_instr_binaire = instr_in_binar(list_instr, size_list_instr , dictionnaire);
     int* tab_data_binaire = NULL;
-    tab_data_binaire = data_in_binar(list_data, size_list_data); // WARNING size data FAUSSE !
+    tab_data_binaire = data_in_binar(list_data, size_list_data);
     char** sym_char = NULL;
     sym_char =  make_sym_char_table(symb_table, size_sym_table); // NOTE fonction dans etiq.c
 
     /* ---------------- make mips_elf -------------------*/
-    main_init_function(tab_instr_binaire, tab_data_binaire, sym_char, size_list_instr, size_list_data, size_sym_table, spaces_needed_in_bss, symb_table);
-     //main_init_function();
+    main_init_function(tab_instr_binaire, tab_data_binaire, sym_char, size_list_instr, size_list_data, size_sym_table, spaces_needed_in_bss, symb_table, reloc_table_text,reloc_table_data);
+    //main_init_function();
 
      // char* str = ((LEXEM)list_lex->element)->value;
     // str = "ils : \n\"au ru!\"";

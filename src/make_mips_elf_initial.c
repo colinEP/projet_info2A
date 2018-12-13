@@ -281,7 +281,7 @@ section make_rel32_section(char *relname, Elf32_Rel relocations[], int nb_reloc)
 
 
 
-int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_instr, int size_data, int size_table, int spaces_needed_in_bss, LIST table_des_symboles) {
+int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_instr, int size_data, int size_table, int spaces_needed_in_bss, LIST table_des_symboles, LIST reloc_table_text, LIST reloc_table_data) {
 
     /* prepare sections*/
     section     text = NULL;
@@ -296,17 +296,6 @@ int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_in
 
     /* make predefined section table*/
     shstrtab = make_shstrtab_section();
-
-    /* make hard coded program data already in big endian */
-    // int text_prog[]= {0x20106400,0x04006220,0xFEFF4310};
-    // int data_prog[]= {0x10000000};
-    // int bss_prog = 16+8;
-    // char * sym_char[] = {"boucle","tab"};
-    // char* machine = "mips";
-    // char* name = "exemple.o";
-    // /* pelf options */
-    // int noreorder = 1;
-
 
     int* text_prog= text_tab;
     int* data_prog= data_tab;
@@ -348,21 +337,6 @@ int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_in
        "tab" is in strtab, has value (relative @) 16 and is defined in the bss section
     */
     Elf32_Sym *syms = make_syms(size_table, sym_tab, strtab, shstrtab, table_des_symboles);
-    // Elf32_Sym syms[2]= {{0}};
-    // // boucle
-    // syms[0].st_name = elf_get_string_offset( strtab->start, strtab->sz, sym_char[0] );
-    // syms[0].st_size = 0;
-    // syms[0].st_value = 4;
-    // syms[0].st_info = ELF32_ST_INFO( STB_LOCAL, STT_NOTYPE );
-    // syms[0].st_other = 0;
-    // syms[0].st_shndx  = elf_get_string_index( shstrtab->start, shstrtab->sz, ".text" );
-    // // tab
-    // syms[1].st_name = elf_get_string_offset( strtab->start, strtab->sz, sym_char[1]);
-    // syms[1].st_value = 16;
-    // syms[1].st_size = 0;
-    // syms[1].st_info = ELF32_ST_INFO( STB_LOCAL, STT_NOTYPE );
-    // syms[1].st_other = 0;
-    // syms[1].st_shndx = elf_get_string_index( shstrtab->start, shstrtab->sz, ".bss" );
 
     symtab   = make_symtab_section( shstrtab, strtab, syms,2);
 
@@ -371,16 +345,11 @@ int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_in
       first relocation "ADDI $2, $3, boucle" at adress 4 of the text section is a R_MIPS_LO16 with respect to the symbole "boucle" so the relocation is made with respect to the .text section symbol (since the value of boucle, 4, will be the addend)
       second relocation ".word tab" at adress 0 of the data section is a R_MIPS_32 with respect to the symbole "tab" so the relocation is made with respect to the .bss section symbol (since the value of tab, 16, will be the addend)
     */
-    Elf32_Rel text_reloc[1];
-    text_reloc[0].r_offset =4;
-    text_reloc[0].r_info=ELF32_R_INFO(elf_get_sym_index_from_name(symtab, shstrtab, strtab,".text"),R_MIPS_LO16);
-    Elf32_Rel data_reloc[1];
-    data_reloc[0].r_offset =0;
-    data_reloc[0].r_info=ELF32_R_INFO(elf_get_sym_index_from_name(symtab, shstrtab,strtab,".bss"),R_MIPS_32);
+    Elf32_Rel* text_reloc = make_elf32_reloc(1, reloc_table_text, symtab, strtab, shstrtab );
+    Elf32_Rel* data_reloc = make_elf32_reloc(1, reloc_table_data, symtab, strtab, shstrtab ); // WARNING il faut calculer encore la taille des tables de reloc !! 
 
-
-    reltext  = make_rel32_section( ".rel.text", text_reloc,1);
-    reldata  = make_rel32_section( ".rel.data", data_reloc,1);
+    reltext  = make_rel32_section( ".rel.text", text_reloc, 1);
+    reldata  = make_rel32_section( ".rel.data", data_reloc, 1);
 
 
     /*write these sections in file*/
