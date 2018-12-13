@@ -120,12 +120,24 @@ int main ( int argc, char *argv[] ) {
     LIST symb_table = new_list();
     int size_list_instr, size_list_data, size_sym_table;
     // On doit passer les pointeurs des listes car leur addresse de début change dans analyse_synth!
-    analyse_synth(&list_instr, &list_data, &list_bss, &symb_table, list_lex, dictionnaire, &size_list_instr, &size_list_data, &size_sym_table);
+    analyse_synth(&list_instr, &list_data, &list_bss, &symb_table, list_lex, dictionnaire);
 
     /* ----- Relocation ------- */    //NOTE prototype dans etiq.h ?????
     //TODO
     LIST reloc_table_text = reloc_and_replace_etiq_by_dec_in_instr (list_instr, symb_table);
     LIST reloc_table_data = reloc_and_replace_etiq_by_dec_in_data (list_data, symb_table);
+
+    size_list_instr = lengh_of_list(list_instr);
+    printf("Taille liste instr : %d \n", size_list_instr);
+
+    // pour .data, ce qui nous intéresse c'est le nombre de int que cela va nécéssiter en binaire !
+    // don on n'utilse pas la fonction lengh_of_list mais une autre qui considère le décalage ! // cette fonction est dans in_binar.c
+    size_list_data = lengh_of_tab_data_in_binar(list_data);
+    printf("Taille équivalente tableau de data en binaire : %d \n", size_list_data);
+
+    size_sym_table = lengh_of_list(symb_table);
+    printf("Taille symb table : %d \n", size_sym_table);
+
 
     print_symb_table(symb_table);
     print_list_instr(list_instr);
@@ -152,11 +164,10 @@ int main ( int argc, char *argv[] ) {
     sym_char =  make_sym_char_table(symb_table, size_sym_table); // NOTE fonction dans etiq.c
 
     /* ---------------- make mips_elf -------------------*/
-     main_init_function(tab_instr_binaire, tab_data_binaire, sym_char, size_list_instr, size_list_data, size_sym_table);
+    main_init_function(tab_instr_binaire, tab_data_binaire, sym_char, size_list_instr, size_list_data, size_sym_table);
      //main_init_function();
 
-
-    // char* str = ((LEXEM)list_lex->element)->value;
+     // char* str = ((LEXEM)list_lex->element)->value;
     // str = "ils : \n\"au ru!\"";
     // printf("%s\n", str);
     // char* tmp;

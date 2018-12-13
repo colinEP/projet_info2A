@@ -21,4 +21,4 @@ lunchtime:
 	.space 5
 	.byte 3
 	.space 1
-    .asciiz "ils disent : \"au ru!\""
+    .asciiz "ils disent : \"au rrrrrru!\""

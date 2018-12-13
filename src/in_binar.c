@@ -388,3 +388,44 @@ int look_for_instr_and_return_binar_info( LIST dictionnaire, char* instruction, 
      }
      ERROR_MSG("Probleme d'instruction non trouvee dans dictionnaire !\n");
  }
+
+ int lengh_of_tab_data_in_binar(LIST l ){ // OK
+     if (l==NULL) return 0;   // cas liste vide
+
+     // NOTE en termes de décalage :
+     // PWORD = 4 octets
+     // PBYTE = 1 octet
+     // PSPACE x = x octets (réservés à 0)
+     // PASCIIZ = 1 octet par terme
+     // DONC EN FAIT seul nous intéresse le décalage du dernier élement de la liste, qu'il faudra éventuellement augmenter pour avoir un mutilple de 4 !
+
+     int dec = 0;
+     while( (l->next)!=NULL ) {
+         l = l->next;
+     }
+     DATA Dat = l->element;
+     //printf("Voici la valeur de la directive : %d\n",Dat->D->type );
+     dec = Dat->decalage; // dernier élément de la liste
+     // il faut ajouter la valeur de décalage correspondant au dernier terme !
+     if ((Dat->D->type == PWORD)||(Dat->D->type == DEC_LABEL)){ // car label seulement après .word
+         dec = dec + 4;
+     }
+     if (Dat->D->type == PBYTE){
+         dec = dec + 1;
+     }
+     if (Dat->D->type == PSPACE){
+         dec = dec + Dat->D->val.PSPACE;
+     }
+     if (Dat->D->type == PASCIIZ){
+        // printf("dec ici vaut : %d\n\n\n", dec);
+         dec = dec + (strlen(Dat->D->val.PASCIIZ) +1 ); // +1 pour le \0
+         //printf("strlen ici vaut : %ld\n\n\n", strlen(Dat->D->val.PASCIIZ));
+     }
+     while (dec%4){ // on doit être alignés sur un multiple de 4
+         dec = dec +1;
+     }
+     // la valeur dec est en octets, nous on la veut en int = 4 octets
+     int taille = dec/4;
+     return taille ;
+
+ }

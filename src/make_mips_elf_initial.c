@@ -276,6 +276,9 @@ section make_rel32_section(char *relname, Elf32_Rel relocations[], int nb_reloc)
 *
 * the output binary is called exemple.o
 */
+
+
+
 int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_instr, int size_data, int size_table) {
 
     /* prepare sections*/
@@ -321,7 +324,7 @@ int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_in
         return -1;
     }
 
-    data = make_data_section(  data_prog, 1);
+    data = make_data_section(  data_prog, size_data);
     if ( !data ) {
         fprintf( stderr, "Unable to write .data section (missing information).\n" );
         return -1;
@@ -410,13 +413,13 @@ int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_in
 
 }
 
-//
-//
-//
-// --------------------------------------------------------------------------------
-// --------------------------- VERSION DES PROFS-----------------------------------
-// --------------------------- ne pas modifier ! ----------------------------------
-// int main_init_function() {
+
+
+
+//--------------------------------------------------------------------------------
+//--------------------------- VERSION DES PROFS-----------------------------------
+//--------------------------- ne pas modifier ! ----------------------------------
+// int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_instr, int size_data, int size_table) {
 //
 //     /* prepare sections*/
 //     section     text = NULL;

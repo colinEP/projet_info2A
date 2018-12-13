@@ -18,7 +18,7 @@
 #include <assert.h>
 
 
-void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST* p_symb_table, LIST list_lex, LIST dictionnaire, int* p_size_list_instr, int* p_size_list_data, int* p_size_sym_table)
+void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST* p_symb_table, LIST list_lex, LIST dictionnaire)
 {
     // --- initialisation des variables ----
     int dec_data = 0; //décalage
@@ -492,16 +492,6 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
     *p_symb_table=look_for_undefined_etiq_in_data(*p_list_data, *p_symb_table);
     // list_bss
     *p_symb_table=look_for_undefined_etiq_in_bss(*p_list_bss, *p_symb_table);
-
-    *p_size_list_instr = lengh_of_list(*p_list_instr);
-    printf("Taille liste instr : %d \n", *p_size_list_instr);
-    *p_size_list_data = lengh_of_list(*p_list_data);
-    printf("Taille liste data : %d \n", *p_size_list_data);
-    *p_size_sym_table = lengh_of_list(*p_symb_table);
-    printf("Taille symb table : %d \n", *p_size_sym_table);
-
-
-
 
     return;
 }
