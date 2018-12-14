@@ -297,9 +297,9 @@ int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_in
     /* make predefined section table*/
     shstrtab = make_shstrtab_section();
 
-    int* text_prog= text_tab;
-    int* data_prog= data_tab;
-    int bss_prog = spaces_needed_in_bss;
+    int* text_prog= text_tab;  // INUTILE ! utilise driectement text_tab
+    int* data_prog= data_tab;  // IDEM
+    int bss_prog = spaces_needed_in_bss;   //IDEM
     char ** sym_char = sym_tab;
     char* machine = "mips";
     char* name = "my_exemple.o";
@@ -346,7 +346,7 @@ int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_in
       second relocation ".word tab" at adress 0 of the data section is a R_MIPS_32 with respect to the symbole "tab" so the relocation is made with respect to the .bss section symbol (since the value of tab, 16, will be the addend)
     */
     Elf32_Rel* text_reloc = make_elf32_reloc(1, reloc_table_text, symtab, strtab, shstrtab );
-    Elf32_Rel* data_reloc = make_elf32_reloc(1, reloc_table_data, symtab, strtab, shstrtab ); // WARNING il faut calculer encore la taille des tables de reloc !! 
+    Elf32_Rel* data_reloc = make_elf32_reloc(1, reloc_table_data, symtab, strtab, shstrtab ); // WARNING il faut calculer encore la taille des tables de reloc !!
 
     reltext  = make_rel32_section( ".rel.text", text_reloc, 1);
     reldata  = make_rel32_section( ".rel.data", data_reloc, 1);
