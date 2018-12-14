@@ -143,8 +143,12 @@ int main ( int argc, char *argv[] ) {
     int spaces_needed_in_bss = lengh_of_space_in_bss(list_bss);
     printf("spaces nedded : %d\n",spaces_needed_in_bss );
 
+    // bon petite fonction pour mettre dans le bon ordre la table des symboles ...
+    // Fallait le dire avant ...
+    LIST sort_symb_tab = new_list();
+    sort_symb_tab = sort_symb_table(sort_symb_tab, symb_table, list_lex);
 
-    print_symb_table(symb_table);
+    print_symb_table(sort_symb_tab);
     print_list_instr(list_instr);
     print_list_data(list_data);
     print_list_bss(list_bss);
