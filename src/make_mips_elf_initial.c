@@ -302,7 +302,7 @@ int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_in
     int bss_prog = spaces_needed_in_bss;   //IDEM
     char ** sym_char = sym_tab;
     char* machine = "mips";
-    char* name = "my_exemple.o";
+    char* name = "donnees_simples.o";
     /* pelf options */
     int noreorder =1;
 
