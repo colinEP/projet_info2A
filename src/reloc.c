@@ -266,11 +266,6 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                             }
                         }
 
-
-
-                        // if ( (I->Exp_Type_2) == Rel) (I->arg2)->type = Rel;
-                        // if ( (I->Exp_Type_2) == Imm) (I->arg2)->type = Imm;
-                        // else (I->arg2)->type = Abs;
                         (I->arg2)->type = (I->Exp_Type_2);
 
                     }
@@ -325,7 +320,8 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                     }
                     if (Et->section == TEXT){                    // etiq def dans .text = "locale"
                         if ( (I->Exp_Type_3) == Rel){
-                                (I->arg3)->val.entier = (Et->decalage-(I->decalage)) -4 ;// NOTE correct ?
+                                (I->arg3)->val.entier = (Et->decalage-(I->decalage)) -4 ;
+                                //printf("Dans reloc_and_replace_etiq_by_dec_in_instr arg3 valeur du decalage relatif : %ld\n", (I->arg3)->val.entier);
                                 (I->arg3)->type = Rel;
                             }
                         else {
@@ -333,6 +329,7 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                             Re->type_r = find_R_type(I->Exp_Type_3);// a définir selon l'instruction !
                             reloc_table_text = add_to_end_list(reloc_table_text, Re);
                             (I->arg3)->val.entier = Et->decalage;// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
+                            //printf("Dans reloc_and_replace_etiq_by_dec_in_instr arg3 on a dec = %d",(I->arg3)->val.entier );
                             (I->arg3)->type=I->Exp_Type_3;
                         }
                     }

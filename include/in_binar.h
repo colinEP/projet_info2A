@@ -7,7 +7,7 @@ int* instr_in_binar(LIST list_instr, int size_list, QUEUE dictionnaire);
 int* data_in_binar(LIST list_data, int size_list);
 int lengh_of_tab_data_in_binar(LIST l );
 int lengh_of_space_in_bss(LIST l);
-
+int swap(int value);
 
 
 #endif

@@ -190,6 +190,7 @@ int* instr_in_binar(LIST list_instr, int size_list, QUEUE dictionnaire)
                 // check le TYPE :
                 if (((I->arg1)->type == Reg)||((I->arg1)->type == Sa)) {
                     val_5 = (I->arg1)->val.entier;
+                    binar_value = binar_value | ( val_5 & 63 );
                 }
                 if (((I->arg1)->type == Imm)||((I->arg1)->type == Bas)||((I->arg1)->type == Rel)) {
                     if( strcmp(from_10_6, "_") || strcmp(from_15_11, "_")){ // càd que juste avant on n'a pas laissé de "place" pour mettre 16 bits
@@ -197,6 +198,7 @@ int* instr_in_binar(LIST list_instr, int size_list, QUEUE dictionnaire)
                     }
                     val_5 = (I->arg1)->val.entier;
                     val_5 =  val_5 >> 2; // DECALAGE pour avoir 18 bits sur 16
+                    binar_value = binar_value | ( val_5 & 65535 );
                 }
                 if ((I->arg1)->type == Abs) {
                     if( strcmp(from_10_6, "_") || strcmp(from_15_11, "_")|| strcmp(from_20_16, "_")|| strcmp(from_25_21, "_")){ // càd que juste avant on n'a pas laissé de "place" pour mettre 26 bits
@@ -204,12 +206,14 @@ int* instr_in_binar(LIST list_instr, int size_list, QUEUE dictionnaire)
                     }
                     val_5 = (I->arg1)->val.entier;
                     val_5 =  val_5 >> 2; // DECALAGE pour avoir 28 bits sur 26
+                    binar_value = binar_value | ( val_5 & 67108863 );
                 }
             }
             if (from_5_0[1] == '2'){
                 // check le TYPE :
                 if (((I->arg2)->type == Reg)||((I->arg2)->type == Sa)) {
                     val_5 = (I->arg2)->val.entier;
+                    binar_value = binar_value | ( val_5 & 63 );
                 }
                 if (((I->arg2)->type == Imm)||((I->arg2)->type == Bas)||((I->arg2)->type == Rel)) {
                     if( strcmp(from_10_6, "_") || strcmp(from_15_11, "_")){ // càd que juste avant on n'a pas laissé de "place" pour mettre 16 bits
@@ -217,6 +221,7 @@ int* instr_in_binar(LIST list_instr, int size_list, QUEUE dictionnaire)
                     }
                     val_5 = (I->arg2)->val.entier;
                     val_5 =  val_5 >> 2; // DECALAGE pour avoir 18 bits sur 16
+                    binar_value = binar_value | ( val_5 & 65535 );
                 }
                 if ((I->arg2)->type == Abs) {
                     if( strcmp(from_10_6, "_") || strcmp(from_15_11, "_")|| strcmp(from_20_16, "_")|| strcmp(from_25_21, "_")){ // càd que juste avant on n'a pas laissé de "place" pour mettre 26 bits
@@ -224,12 +229,15 @@ int* instr_in_binar(LIST list_instr, int size_list, QUEUE dictionnaire)
                     }
                     val_5 = (I->arg2)->val.entier;
                     val_5 =  val_5 >> 2; // DECALAGE pour avoir 28 bits sur 26
+                    binar_value = binar_value | ( val_5 & 67108863 );
                 }
             }
             if (from_5_0[1] == '3'){
                 // check le TYPE :
                 if (((I->arg3)->type == Reg)||((I->arg3)->type == Sa)) {
                     val_5 = (I->arg3)->val.entier;
+                    // ajouter la valeur
+                    binar_value = binar_value | ( val_5 & 63 );
                 }
                 if (((I->arg3)->type == Imm)||((I->arg3)->type == Bas)||((I->arg3)->type == Rel)) {
                     if( strcmp(from_10_6, "_") || strcmp(from_15_11, "_")){ // càd que juste avant on n'a pas laissé de "place" pour mettre 16 bits
@@ -237,19 +245,24 @@ int* instr_in_binar(LIST list_instr, int size_list, QUEUE dictionnaire)
                     }
                     val_5 = (I->arg3)->val.entier;
                     //printf("from 5_0 a3 vaut avant décalage : %d\n",val_5 );
-                    val_5 =  val_5 >> 2; // DECALAGE pour avoir 18 bits sur 16
+                    if ((I->arg3)->type == Rel) val_5 =  val_5 >> 2; // DECALAGE pour avoir 18 bits sur 16
                     //printf("from 5_0 a3 vaut après décalage : %d\n",val_5 );
+                    // ajouter la valeur
+                    binar_value = binar_value | ( val_5 & 65535 );
                 }
                 if ((I->arg3)->type == Abs) {
                     if( strcmp(from_10_6, "_") || strcmp(from_15_11, "_")|| strcmp(from_20_16, "_")|| strcmp(from_25_21, "_")){ // càd que juste avant on n'a pas laissé de "place" pour mettre 26 bits
                         ERROR_MSG("Erreur, 26 bits libres sont nécessaires pour stocker argument !\n");
                     }
                     val_5 = (I->arg3)->val.entier;
+                    //
                     val_5 =  val_5 >> 2; // DECALAGE pour avoir 28 bits sur 26
+                    // ajouter la valeur
+                    binar_value = binar_value | ( val_5 & 67108863 );
                 }
             }
-            // ajouter la valeur
-            binar_value = binar_value | ( val_5 & 63 );
+
+
         }
 
         if (isdigit(from_5_0[1])){
@@ -260,7 +273,9 @@ int* instr_in_binar(LIST list_instr, int size_list, QUEUE dictionnaire)
         }
 
 
-        printf("Pour cette instruction, binar_value vaut : %08x\n\n",binar_value);
+        printf("Pour cette instruction, binar_value vaut : %08x\n",binar_value);
+        binar_value = swap(binar_value);
+        printf("Pour cette instruction, binar_value SWAPEE vaut : %08x\n\n",binar_value);
         tab_instr_binar[i] = binar_value;
         i = i+1;
         list_instr = list_instr->next;
@@ -289,6 +304,7 @@ int* data_in_binar(LIST list_data, int size_list){ // FONCTIONNE !
             if ((j != 0)){
                 // full with zeros
                 binar_value = binar_value << (32-j);
+                binar_value = swap(binar_value);
                 tab_data_binar[i] = binar_value;
                 i = i+1;
                 printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
@@ -296,6 +312,7 @@ int* data_in_binar(LIST list_data, int size_list){ // FONCTIONNE !
             }
             j=0;
             binar_value = (Dat->D)->val.PWORD;
+            binar_value = swap(binar_value);
             tab_data_binar[i] = binar_value;
             i = i+1;
             printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
@@ -307,6 +324,7 @@ int* data_in_binar(LIST list_data, int size_list){ // FONCTIONNE !
         else { // coucou le .byte, .asciiz ou .space !
 
             if (j==32){
+                binar_value = swap(binar_value);
                 tab_data_binar[i] = binar_value;
                 i = i+1;
                 printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
@@ -328,6 +346,7 @@ int* data_in_binar(LIST list_data, int size_list){ // FONCTIONNE !
                     binar_value = (binar_value << 8); // rajout d'un octet de 0
                     j = j + 8;
                     if (j == 32){
+                        binar_value = swap(binar_value);
                         tab_data_binar[i] = binar_value;
                         i = i+1;
                         printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
@@ -345,6 +364,7 @@ int* data_in_binar(LIST list_data, int size_list){ // FONCTIONNE !
                     binar_value = (binar_value << 8) | ( ((int)((Dat->D)->val.PASCIIZ[k])) & 255  );
                     j = j + 8;
                     if (j == 32){
+                        binar_value = swap(binar_value);
                         tab_data_binar[i] = binar_value;
                         i = i+1;
                         printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
@@ -441,3 +461,12 @@ int look_for_instr_and_return_binar_info( LIST dictionnaire, char* instruction, 
      }
      return i;
  }
+
+
+int swap(int value){ // OK
+
+    int swaped_value = ((value >> 24) & 0x000000FF) | ((value >> 8) & 0x0000FF00) | ((value << 8) & 0x00FF0000)
+                    | ((value << 24) & 0xFF000000);
+
+    return swaped_value;
+}

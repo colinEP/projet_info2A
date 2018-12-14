@@ -281,7 +281,7 @@ section make_rel32_section(char *relname, Elf32_Rel relocations[], int nb_reloc)
 
 
 
-int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_instr, int size_data, int size_table, int spaces_needed_in_bss, LIST table_des_symboles, LIST reloc_table_text, LIST reloc_table_data) {
+int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_instr, int size_data, int size_table, int spaces_needed_in_bss, LIST table_des_symboles, LIST reloc_table_text, LIST reloc_table_data, int size_reloc_text, int size_reloc_data) {
 
     /* prepare sections*/
     section     text = NULL;
@@ -338,18 +338,18 @@ int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_in
     */
     Elf32_Sym *syms = make_syms(size_table, sym_tab, strtab, shstrtab, table_des_symboles);
 
-    symtab   = make_symtab_section( shstrtab, strtab, syms,2);
+    symtab   = make_symtab_section( shstrtab, strtab, syms, size_table);
 
 
     /* make hard coded text and data relocation entries (needs symtab and strtab)
       first relocation "ADDI $2, $3, boucle" at adress 4 of the text section is a R_MIPS_LO16 with respect to the symbole "boucle" so the relocation is made with respect to the .text section symbol (since the value of boucle, 4, will be the addend)
       second relocation ".word tab" at adress 0 of the data section is a R_MIPS_32 with respect to the symbole "tab" so the relocation is made with respect to the .bss section symbol (since the value of tab, 16, will be the addend)
     */
-    Elf32_Rel* text_reloc = make_elf32_reloc(1, reloc_table_text, symtab, strtab, shstrtab );
-    Elf32_Rel* data_reloc = make_elf32_reloc(1, reloc_table_data, symtab, strtab, shstrtab ); // WARNING il faut calculer encore la taille des tables de reloc !!
+    Elf32_Rel* text_reloc = make_elf32_reloc(size_reloc_text, reloc_table_text, symtab, strtab, shstrtab );
+    Elf32_Rel* data_reloc = make_elf32_reloc(size_reloc_data, reloc_table_data, symtab, strtab, shstrtab );
 
-    reltext  = make_rel32_section( ".rel.text", text_reloc, 1);
-    reldata  = make_rel32_section( ".rel.data", data_reloc, 1);
+    reltext  = make_rel32_section( ".rel.text", text_reloc, size_reloc_text);
+    reldata  = make_rel32_section( ".rel.data", data_reloc, size_reloc_data);
 
 
     /*write these sections in file*/
