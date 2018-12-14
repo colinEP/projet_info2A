@@ -304,6 +304,7 @@ int* data_in_binar(LIST list_data, int size_list){ // FONCTIONNE !
             if ((j != 0)){
                 // full with zeros
                 binar_value = binar_value << (32-j);
+                binar_value = swap(binar_value);
                 tab_data_binar[i] = binar_value;
                 i = i+1;
                 printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
@@ -323,6 +324,7 @@ int* data_in_binar(LIST list_data, int size_list){ // FONCTIONNE !
         else { // coucou le .byte, .asciiz ou .space !
 
             if (j==32){
+                binar_value = swap(binar_value);
                 tab_data_binar[i] = binar_value;
                 i = i+1;
                 printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
@@ -344,6 +346,7 @@ int* data_in_binar(LIST list_data, int size_list){ // FONCTIONNE !
                     binar_value = (binar_value << 8); // rajout d'un octet de 0
                     j = j + 8;
                     if (j == 32){
+                        binar_value = swap(binar_value);
                         tab_data_binar[i] = binar_value;
                         i = i+1;
                         printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
@@ -361,6 +364,7 @@ int* data_in_binar(LIST list_data, int size_list){ // FONCTIONNE !
                     binar_value = (binar_value << 8) | ( ((int)((Dat->D)->val.PASCIIZ[k])) & 255  );
                     j = j + 8;
                     if (j == 32){
+                        binar_value = swap(binar_value);
                         tab_data_binar[i] = binar_value;
                         i = i+1;
                         printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
