@@ -80,10 +80,13 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
                             while (     ( ((LEXEM)test_word->next->element)->lex_type==DEUX_PTS )
                                    || ( ( ((LEXEM)test_word->next->element)->lex_type==SYMBOLE ) && ( ((LEXEM)test_word->next->next->element)->lex_type==DEUX_PTS ) )  // pour exclure instruction MEME SI ON EST DANS DATA et qu'a priori c'est pas possible
                                    ||   ( ((LEXEM)test_word->next->element)->lex_type==NL )
-                                   ||   ( ((LEXEM)test_word->next->element)->lex_type==COMMENT ) )
+                                   ||   ( ((LEXEM)test_word->next->element)->lex_type==COMMENT )   )
+
                             {
                                 test_word = test_word->next;
-                                if ( strcmp( ((LEXEM)test_word->next->element)->value , ".word" ) ) {
+                                if (test_word->next == NULL) break;    // si définition d'étiquette en fin de fichier
+
+                                if ( !(strcmp( ((LEXEM)test_word->next->element)->value , ".word" )) ) {
                                     // alignement en mémoire du mot
                                     *pdecalage = *pdecalage + 3 - ((*pdecalage-1+4)%4);  // +4 car pour gérer le cas dec=0  (en c : -1%4 = -1)
                                     break; // marche sans mais bon
@@ -92,6 +95,7 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
 
                             *p_symb_table = add_to_symb_table(val_lexem, *pdecalage, line, section, TRUE, *p_symb_table);
                             list_lex = list_lex->next; // on va passer les DEUX_PTS
+
                         }
                         // CAS 2 : une instruction ?
                         else if ( look_for_inst(val_lexem, dictionnaire, &nb_arg_needed, &type_arg_expected_1, &type_arg_expected_2, &type_arg_expected_3) ) {

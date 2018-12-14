@@ -130,6 +130,8 @@ int main ( int argc, char *argv[] ) {
     size_list_instr = lengh_of_list(list_instr);
     printf("Taille liste instr : %d \n", size_list_instr);
 
+
+
     // pour .data, ce qui nous intéresse c'est le nombre de int que cela va nécéssiter en binaire !
     // don on n'utilse pas la fonction lengh_of_list mais une autre qui considère le décalage !
     size_list_data = lengh_of_tab_data_in_binar(list_data); // cette fonction est dans in_binar.c
