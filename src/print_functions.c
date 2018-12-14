@@ -66,7 +66,7 @@ void print_list_dico( LIST l ) {
     //printf("         |        |           |           |\n");
     for ( p=l ; p!=NULL ; p=p->next ) {
         dico = p->element;
-        printf("  %s\t      %d\t       %s\t   %s\t      %s\t      %d\t   %s\t   %s\t   %s\t    %s\t   %s\t \n", dico->instruction, dico->arg, dico->arg_type_1, dico->arg_type_2, dico->arg_type_3, dico->opcode, dico->code_bin_1, dico->code_bin_2, dico->code_bin_3, dico->code_bin_4, dico->code_bin_5);
+        printf("  %s\t      %d\t       %s\t   %s\t      %s\t    %d\t    %s\t   %s\t   %s\t    %s\t   %s\t \n", dico->instruction, dico->arg, dico->arg_type_1, dico->arg_type_2, dico->arg_type_3, dico->opcode, dico->code_bin_1, dico->code_bin_2, dico->code_bin_3, dico->code_bin_4, dico->code_bin_5);
     }
 }
 

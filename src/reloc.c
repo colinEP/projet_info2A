@@ -21,9 +21,12 @@
 LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
 {
         // Ajout à la table des relocation + mise à jour de l'argument de la list_instr
+        // /!\ /!\ WARNING ce qu'on appelle addend dans la foncrtion est en réalité le symbole sur quoi on fait la relocation
 
         LIST reloc_table_text = new_list();
         INSTR I;
+        INSTR previous_inst = NULL;
+
         while (l!= NULL){
             I = l->element;
             RELOC Re = calloc (1, sizeof(*Re));
@@ -50,47 +53,48 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
 
                 else {
                     if ( (I->arg1)->etiq_def == 1 ) {               //etiq bien definie
-                    Et = look_for_etiq_and_return(symb_table, (I->arg1)->val.char_chain);
+                        Et = look_for_etiq_and_return(symb_table, (I->arg1)->val.char_chain);
 
-                    //le cas Et->section == TEXT ne nécessite pas de relocation car nous sommes déjà dans la section Text
+                        //le cas Et->section == TEXT ne nécessite pas de relocation car nous sommes déjà dans la section Text
 
-                    if (Et->section == PDATA) {                 // etiq def dans .data
-                        if ( (I->Exp_Type_1) == Rel) ERROR_MSG("type relatif nécessite usage d'une étiquette définie dans la même section !\n");
-                        Re->addend = strdup(".data");           //NOTE conversion en char*: est-ce vraiment utile pour la suite ?
-                        Re->type_r = find_R_type(I->Exp_Type_1);// a définir selon l'instruction !
-                        reloc_table_text = add_to_end_list(reloc_table_text, Re);
-                        (I->arg1)->val.entier = Et->decalage;// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
-                        (I->arg1)->type = Abs;
-                    }
-
-                    if (Et->section == BSS){                    // etiq def dans .bss
-                        if ( (I->Exp_Type_1) == Rel) ERROR_MSG("type relatif nécessite usage d'une étiquette définie dans la même section !\n");
-                        Re->addend = strdup(".bss");             //NOTE conversion en char*: est-ce vraiment utile pour la suite ?
-                        Re->type_r = find_R_type(I->Exp_Type_1);// a définir selon l'instruction !
-                        reloc_table_text = add_to_end_list(reloc_table_text, Re);
-                        (I->arg1)->val.entier = Et->decalage;// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
-                        (I->arg1)->type = Abs;
-                    }
-                    if (Et->section == TEXT){                    // etiq def dans .text = "locale"
-                        if ( (I->Exp_Type_1) == Rel){
-                                (I->arg1)->val.entier = (Et->decalage-(I->decalage)) -4 ;// NOTE correct ?
-                                (I->arg1)->type = Rel;
-                            }
-                        else {
-                            Re->addend = strdup(".text");             //NOTE conversion en char*: est-ce vraiment utile pour la suite ?
+                        if (Et->section == PDATA) {                 // etiq def dans .data
+                            if ( (I->Exp_Type_1) == Rel) ERROR_MSG("type relatif nécessite usage d'une étiquette définie dans la même section !\n");
+                            Re->addend = strdup(".data");           //NOTE conversion en char*: est-ce vraiment utile pour la suite ?
                             Re->type_r = find_R_type(I->Exp_Type_1);// a définir selon l'instruction !
                             reloc_table_text = add_to_end_list(reloc_table_text, Re);
                             (I->arg1)->val.entier = Et->decalage;// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
                             (I->arg1)->type = Abs;
+                            (I->arg1)->type = (I->Exp_Type_1);
                         }
-                    }
+
+                        if (Et->section == BSS){                    // etiq def dans .bss
+                            if ( (I->Exp_Type_1) == Rel) ERROR_MSG("type relatif nécessite usage d'une étiquette définie dans la même section !\n");
+                            Re->addend = strdup(".bss");             //NOTE conversion en char*: est-ce vraiment utile pour la suite ?
+                            Re->type_r = find_R_type(I->Exp_Type_1);// a définir selon l'instruction !
+                            reloc_table_text = add_to_end_list(reloc_table_text, Re);
+                            (I->arg1)->val.entier = Et->decalage;// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
+                            //(I->arg1)->type = Abs;
+                            (I->arg1)->type = (I->Exp_Type_1);
+                        }
+                        if (Et->section == TEXT){                    // etiq def dans .text = "locale"
+                            if ( (I->Exp_Type_1) == Rel){
+                                    (I->arg1)->val.entier = (Et->decalage-(I->decalage)) -4 ;// NOTE correct ?
+                                    (I->arg1)->type = Rel;
+                                }
+                            else {
+                                Re->addend = strdup(".text");             //NOTE conversion en char*: est-ce vraiment utile pour la suite ?
+                                Re->type_r = find_R_type(I->Exp_Type_1);// a définir selon l'instruction !
+                                reloc_table_text = add_to_end_list(reloc_table_text, Re);
+                                (I->arg1)->val.entier = Et->decalage;// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
+                                (I->arg1)->type = (I->Exp_Type_1);
+                            }
+                        }
                     }
                     else {
                         printf("ERREUR LIGNE : %d\n", (I->lex)->nline);
                         ERROR_MSG("Valeur etiq_def invalide apres etiquette !\n");
                     }
                 }
-
             }
 
             // En arg2 uniquement, cas pseudo instr !
@@ -110,18 +114,32 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                     if ( ((I->arg2)->type == Label) || ((I->arg2)->type == Target)) {
                          (I->arg2)->val.entier = 0; // pour remplacer le nom de l'étiq par int = 0 car non def donc décalage nul
 
-                     }
-                    if ((I->arg2)->type == Bas_Target){
-                        (I->arg2)->val.entier = (I->arg1)->val.entier; // car alors on somme $rt + 0(=adresse d'une etiq non def)
                     }
                     if (((I->arg2)->type == Bas_Target)||((I->arg2)->type == Target) ){
+
                         Re->type_r = find_R_type((I->arg2)->type);// a définir selon l'instruction !
                     }
+                    if ((I->arg2)->type == Bas_Target) {
+                        Et = look_for_etiq_and_return(symb_table, (I->arg2)->val.char_chain);
+                        I->arg3->val.entier = lower_16( Et->decalage );
+                        I->arg3->type       = Imm;
+                        I->Exp_Type_3       = Imm;
+
+                        I->arg2->val.entier = 1; // $at
+                        I->arg2->type       = Reg;
+                        I->Exp_Type_2       = Reg;
+
+                        I->nb_arg = 3; // INUTILE ??
+
+                        // Vérification si offset est <0 (sur une réprésentation signée de 16 bits !!)
+                        // PAS BESOIN DE VERIF car si etiq non déf => decalage=0 => offset=0 >= 0
+                    }
+
                     if (((I->arg2)->type == Label) ){
                         Re->type_r = find_R_type(I->Exp_Type_2); // a définir selon l'instruction !
                     }
                     reloc_table_text = add_to_end_list(reloc_table_text, Re);
-                    (I->arg2)->type = Abs;
+                    (I->arg2)->type = I->Exp_Type_2; //nécessairement !
                 }
 
 
@@ -132,6 +150,13 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
 
                         //le cas Et->section == TEXT ne nécessite pas de relocation car nous sommes déjà dans la section Text
 
+                        if ((I->arg2)->type == Label){
+                            (I->arg2)->val.entier = Et->decalage;// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
+                        }
+                        if ((I->arg2)->type == Target){
+                            (I->arg2)->val.entier = upper_16(Et->decalage);
+                        }
+
                         if (Et->section == PDATA) {                 // etiq def dans .data
                             if ( (I->Exp_Type_2) == Rel) ERROR_MSG("type relatif nécessite usage d'une étiquette définie dans la même section !\n");
                             Re->addend = strdup(".data");           //NOTE conversion en char*: est-ce vraiment utile pour la suite ?
@@ -141,8 +166,30 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                             if (((I->arg2)->type == Label) ){
                                 Re->type_r = find_R_type(I->Exp_Type_2);// a définir selon l'instruction !
                             }
+                            if ((I->arg2)->type == Bas_Target) {
+                                Et = look_for_etiq_and_return(symb_table, (I->arg2)->val.char_chain);
+
+                                I->arg3->val.entier = lower_16( Et->decalage );
+                                I->arg3->type       = Imm;
+                                I->Exp_Type_3       = Imm;
+
+                                I->arg2->val.entier = 1; // $at
+                                I->arg2->type       = Reg;
+                                I->Exp_Type_2       = Reg;
+
+                                I->nb_arg = 3; // INUTILE ??
+
+                                // Vérification si offset est <0 (sur une réprésentation signée de 16 bits !!)
+                                if (I->arg3->val.entier & 0x00008000) {  //check du bit de poids fort sur 16 bits)
+                                    if (previous_inst->arg2->type==Imm) {  //normalement inutile
+                                        (previous_inst->arg2->val.entier)++;
+                                    }
+                                    else ERROR_MSG("ERR LINE %d : problème de gestion des pseudo-instructions LW et SW", (I->lex)->nline);
+                                }
+                            }
                             reloc_table_text = add_to_end_list(reloc_table_text, Re);
-                            (I->arg2)->type = Abs;
+                            //(I->arg2)->type = Abs;
+                            (I->arg2)->type = (I->Exp_Type_2);
                         }
 
                         if (Et->section == BSS){                    // etiq def dans .bss
@@ -154,8 +201,29 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                             if (((I->arg2)->type == Label) ){
                                 Re->type_r = find_R_type(I->Exp_Type_2);// a définir selon l'instruction !
                             }
+                            if ((I->arg2)->type == Bas_Target) {
+                                Et = look_for_etiq_and_return(symb_table, (I->arg2)->val.char_chain);
+                                I->arg3->val.entier = lower_16( Et->decalage );
+                                I->arg3->type       = Imm;
+                                I->Exp_Type_3       = Imm;
+
+                                I->arg2->val.entier = 1; // $at
+                                I->arg2->type       = Reg;
+                                I->Exp_Type_2       = Reg;
+
+                                I->nb_arg = 3; // INUTILE ??
+
+                                // Vérification si offset est <0 (sur une réprésentation signée de 16 bits !!)
+                                if (I->arg3->val.entier & 0x00008000) {  //check du bit de poids fort sur 16 bits)
+                                    if (previous_inst->arg2->type==Imm) {  //normalement inutile
+                                        (previous_inst->arg2->val.entier)++;
+                                    }
+                                    else ERROR_MSG("ERR LINE %d : problème de gestion des pseudo-instructions LW et SW", (I->lex)->nline);
+                                }
+                            }
                             reloc_table_text = add_to_end_list(reloc_table_text, Re);
-                            (I->arg2)->type = Abs;
+                            //(I->arg2)->type = Abs;
+                            (I->arg2)->type = (I->Exp_Type_2);
                         }
 
                         if (Et->section == TEXT){                    // etiq def dans .text = "locale"
@@ -166,25 +234,44 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                                 Re->addend = strdup(".text");             //NOTE conversion en char*: est-ce vraiment utile pour la suite ?
                                 if (((I->arg2)->type == Bas_Target)||((I->arg2)->type == Target) ){
                                     Re->type_r = find_R_type((I->arg2)->type);// a définir selon l'instruction !
+
                                 }
                                 if (((I->arg2)->type == Label) ){
                                     Re->type_r = find_R_type(I->Exp_Type_2);// a définir selon l'instruction !
                                 }
+                                if ((I->arg2)->type == Bas_Target) {
+                                    Et = look_for_etiq_and_return(symb_table, (I->arg2)->val.char_chain);
+
+                                    I->arg3->val.entier = lower_16( Et->decalage );
+                                    I->arg3->type       = Imm;
+                                    I->Exp_Type_3       = Imm;
+
+                                    I->arg2->val.entier = 1; // $at
+                                    I->arg2->type       = Reg;
+                                    I->Exp_Type_2       = Reg;
+
+                                    I->nb_arg = 3; // INUTILE ??
+
+                                    // Vérification si offset est <0 (sur une réprésentation signée de 16 bits !!)
+                                    if (I->arg3->val.entier & 0x00008000) {  //check du bit de poids fort sur 16 bits)
+                                        if (previous_inst->arg2->type==Imm) {  //normalement inutile
+                                            (previous_inst->arg2->val.entier)++;
+                                        }
+                                        else ERROR_MSG("ERR LINE %d : problème de gestion des pseudo-instructions LW et SW", (I->lex)->nline);
+                                    }
+                                    printf(" BBBB %08lx\n", I->arg3->val.entier);
+                                }
                                 reloc_table_text = add_to_end_list(reloc_table_text, Re);
+                                (I->arg2)->type = (I->Exp_Type_2);
                             }
                         }
 
-                        if ((I->arg2)->type == Label){
-                            (I->arg2)->val.entier = Et->decalage;// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
-                        }
-                        if ((I->arg2)->type == Target){
-                            (I->arg2)->val.entier = upper_16(Et->decalage);
-                        }
-                        if ((I->arg2)->type == Bas_Target){
-                            (I->arg2)->val.entier = lower_16(Et->decalage + (I->arg1)->val.entier );
-                        }
-                        if ( (I->Exp_Type_2) == Rel) (I->arg2)->type = Rel;
-                        else (I->arg2)->type = Abs;
+
+
+                        // if ( (I->Exp_Type_2) == Rel) (I->arg2)->type = Rel;
+                        // if ( (I->Exp_Type_2) == Imm) (I->arg2)->type = Imm;
+                        // else (I->arg2)->type = Abs;
+                        (I->arg2)->type = (I->Exp_Type_2);
 
                     }
                     else {
@@ -209,7 +296,7 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                     (I->arg3)->val.entier = 0; // pour remplacer le nom de l'étiq par int = 0 car non def donc décalage nul
                     Re->type_r = find_R_type((I->arg3)->type);// a définir selon l'instruction !
                     reloc_table_text = add_to_end_list(reloc_table_text, Re);
-                    (I->arg3)->type = Abs;
+                    (I->arg3)->type = I->Exp_Type_3;
                 }
 
                 else {
@@ -224,7 +311,8 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                         Re->type_r = find_R_type((I->arg3)->type);// a définir selon l'instruction !
                         reloc_table_text = add_to_end_list(reloc_table_text, Re);
                         (I->arg3)->val.entier = Et->decalage;
-                        (I->arg3)->type = Abs;
+                        //(I->arg3)->type = Abs;
+                         (I->arg3)->type=I->Exp_Type_3;
                     }
 
                     if (Et->section == BSS){                    // etiq def dans .bss
@@ -233,7 +321,7 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                         Re->type_r = find_R_type((I->arg3)->type);// a définir selon l'instruction !
                         reloc_table_text = add_to_end_list(reloc_table_text, Re);
                         (I->arg3)->val.entier = Et->decalage;
-                        (I->arg3)->type = Abs;
+                        (I->arg3)->type=I->Exp_Type_3;
                     }
                     if (Et->section == TEXT){                    // etiq def dans .text = "locale"
                         if ( (I->Exp_Type_3) == Rel){
@@ -245,7 +333,7 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                             Re->type_r = find_R_type(I->Exp_Type_3);// a définir selon l'instruction !
                             reloc_table_text = add_to_end_list(reloc_table_text, Re);
                             (I->arg3)->val.entier = Et->decalage;// remplacer char* nom etiq par valeur décalage de la DEFINITION de l'étiquette
-                            (I->arg3)->type = Abs;
+                            (I->arg3)->type=I->Exp_Type_3;
                         }
                     }
                     }
@@ -256,6 +344,7 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l, LIST symb_table)
                     }
                 }
             }
+            previous_inst = I; //sert pour faire le +1 à $at si offset négatif
             l = l->next;
         }
         return reloc_table_text;

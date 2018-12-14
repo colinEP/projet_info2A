@@ -24,7 +24,7 @@
 #include <reloc.h>
 #include <make_elf.h>
 #include <error.h>
-//#include <etiq.h>
+#include <in_binar.h>
 
 #include <assert.h>
 
@@ -118,6 +118,7 @@ int main ( int argc, char *argv[] ) {
     LIST list_data  = new_list();
     LIST list_bss   = new_list();
     LIST symb_table = new_list();
+    int size_list_instr, size_list_data, size_sym_table;
     // On doit passer les pointeurs des listes car leur addresse de début change dans analyse_synth!
     analyse_synth(&list_instr, &list_data, &list_bss, &symb_table, list_lex, dictionnaire);
 
@@ -125,6 +126,21 @@ int main ( int argc, char *argv[] ) {
     //TODO
     LIST reloc_table_text = reloc_and_replace_etiq_by_dec_in_instr (list_instr, symb_table);
     LIST reloc_table_data = reloc_and_replace_etiq_by_dec_in_data (list_data, symb_table);
+
+    size_list_instr = lengh_of_list(list_instr);
+    printf("Taille liste instr : %d \n", size_list_instr);
+
+    // pour .data, ce qui nous intéresse c'est le nombre de int que cela va nécéssiter en binaire !
+    // don on n'utilse pas la fonction lengh_of_list mais une autre qui considère le décalage !
+    size_list_data = lengh_of_tab_data_in_binar(list_data); // cette fonction est dans in_binar.c
+    printf("Taille équivalente tableau de data en binaire : %d \n", size_list_data);
+
+    size_sym_table = lengh_of_list(symb_table);
+    printf("Taille symb table : %d \n", size_sym_table);
+
+    int spaces_needed_in_bss = lengh_of_space_in_bss(list_bss);
+    printf("spaces nedded : %d\n",spaces_needed_in_bss );
+
 
     print_symb_table(symb_table);
     print_list_instr(list_instr);
@@ -134,23 +150,27 @@ int main ( int argc, char *argv[] ) {
     print_reloc_table( reloc_table_data);
 
 
-    /* ---------------- test_binaire -------------------*/
+    /* ---------------- test et conversion en binaire -------------------*/
 
-    int bin = 0x022;
-    printf("EXEMPLE : en decimal, 0x022 vaut : %d \n",bin );
+    // int bin = 0x022;
+    // printf("EXEMPLE : en decimal, 0x022 vaut : %d \n",bin );
+    //
+    // int bin2 = 34;
+    // printf("EXEMPLE : en decimal, 34 vaut : %hx \n",bin );
 
-    int bin2 = 34;
-    printf("EXEMPLE : en decimal, 34 vaut : %hx \n",bin );
 
-
-    instr_in_binar(list_instr, 4 , dictionnaire);
+    int* tab_instr_binaire = NULL;
+    tab_instr_binaire = instr_in_binar(list_instr, size_list_instr , dictionnaire);
+    int* tab_data_binaire = NULL;
+    tab_data_binaire = data_in_binar(list_data, size_list_data);
+    char** sym_char = NULL;
+    sym_char =  make_sym_char_table(symb_table, size_sym_table); // NOTE fonction dans etiq.c
 
     /* ---------------- make mips_elf -------------------*/
-     main_init_function();
+    main_init_function(tab_instr_binaire, tab_data_binaire, sym_char, size_list_instr, size_list_data, size_sym_table, spaces_needed_in_bss, symb_table, reloc_table_text,reloc_table_data);
+    //main_init_function();
 
-
-
-    // char* str = ((LEXEM)list_lex->element)->value;
+     // char* str = ((LEXEM)list_lex->element)->value;
     // str = "ils : \n\"au ru!\"";
     // printf("%s\n", str);
     // char* tmp;

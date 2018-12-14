@@ -453,9 +453,9 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
                     val_convert = strtol(val_lexem, NULL, 0);
                     if (previous_type_lexem == MOINS) val_convert = -val_convert;
                     if ( (val_convert<-128) || (127<val_convert) ) {
-                        ERROR_MSG("ERR LINE %d : Nombre trop grand pour etre stocké dans un byte (32 bits : -128 < x < 127)\n", line);
+                        ERROR_MSG("ERR LINE %d : Nombre trop grand pour etre stocké dans un byte (8 bits : -128 < x < 127)\n", line);
                     }
-                    *pcurrent_list = add_to_current_list(PSPACE, &val_convert, *pdecalage, line, *pcurrent_list);
+                    *pcurrent_list = add_to_current_list(PBYTE, &val_convert, *pdecalage, line, *pcurrent_list);
                     (*pdecalage)++;
                 }
 
@@ -484,8 +484,6 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
     *p_list_data  = revers_list(*p_list_data);
     *p_list_bss   = revers_list(*p_list_bss);
 
-    int size_list_instr = lengh_of_list(*p_list_instr);
-    printf("Taille liste instr : %d \n", size_list_instr);
 
     // --- deuxième parcours : on cherche les étiquettes ----
     // list_instr
@@ -494,9 +492,6 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
     *p_symb_table=look_for_undefined_etiq_in_data(*p_list_data, *p_symb_table);
     // list_bss
     *p_symb_table=look_for_undefined_etiq_in_bss(*p_list_bss, *p_symb_table);
-
-
-
 
     return;
 }
