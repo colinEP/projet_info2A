@@ -33,7 +33,7 @@ lunchtime:
 	.word -2147483648
 	#.word -2147483649
     .byte 4 ,5 , 6
-	.#space 1000000  #=> ca marche
+	#.space 1000000  #=> ca marche
     .word boucle
     .asciiz "ils disent : \"au ru!\""
     .byte 4
