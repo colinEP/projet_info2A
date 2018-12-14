@@ -141,6 +141,12 @@ int main ( int argc, char *argv[] ) {
     int spaces_needed_in_bss = lengh_of_space_in_bss(list_bss);
     printf("spaces nedded : %d\n",spaces_needed_in_bss );
 
+    int size_reloc_text = lengh_of_list(reloc_table_text);
+    printf("Taille reloc text table : %d \n", size_reloc_text);
+
+    int size_reloc_data = lengh_of_list(reloc_table_data);
+    printf("Taille reloc text table : %d \n", size_reloc_data);
+
 
     print_symb_table(symb_table);
     print_list_instr(list_instr);
@@ -167,7 +173,7 @@ int main ( int argc, char *argv[] ) {
     sym_char =  make_sym_char_table(symb_table, size_sym_table); // NOTE fonction dans etiq.c
 
     /* ---------------- make mips_elf -------------------*/
-    main_init_function(tab_instr_binaire, tab_data_binaire, sym_char, size_list_instr, size_list_data, size_sym_table, spaces_needed_in_bss, symb_table, reloc_table_text,reloc_table_data);
+    main_init_function(tab_instr_binaire, tab_data_binaire, sym_char, size_list_instr, size_list_data, size_sym_table, spaces_needed_in_bss, symb_table, reloc_table_text,reloc_table_data, size_reloc_text, size_reloc_data);
     //main_init_function();
 
      // char* str = ((LEXEM)list_lex->element)->value;

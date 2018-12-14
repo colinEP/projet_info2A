@@ -260,7 +260,9 @@ int* instr_in_binar(LIST list_instr, int size_list, QUEUE dictionnaire)
         }
 
 
-        printf("Pour cette instruction, binar_value vaut : %08x\n\n",binar_value);
+        printf("Pour cette instruction, binar_value vaut : %08x\n",binar_value);
+        binar_value = swap(binar_value);
+        printf("Pour cette instruction, binar_value SWAPEE vaut : %08x\n\n",binar_value);
         tab_instr_binar[i] = binar_value;
         i = i+1;
         list_instr = list_instr->next;
@@ -296,6 +298,7 @@ int* data_in_binar(LIST list_data, int size_list){ // FONCTIONNE !
             }
             j=0;
             binar_value = (Dat->D)->val.PWORD;
+            binar_value = swap(binar_value);
             tab_data_binar[i] = binar_value;
             i = i+1;
             printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
@@ -441,3 +444,12 @@ int look_for_instr_and_return_binar_info( LIST dictionnaire, char* instruction, 
      }
      return i;
  }
+
+
+int swap(int value){ // OK 
+
+    int swaped_value = ((value >> 24) & 0x000000FF) | ((value >> 8) & 0x0000FF00) | ((value << 8) & 0x00FF0000)
+                    | ((value << 24) & 0xFF000000);
+
+    return swaped_value;
+}
