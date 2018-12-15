@@ -9,6 +9,10 @@
 #include <lex.h>
 #include <queue_list.h>
 #include <dictionnaire.h>
+#include <fct_analyse_1.h>
+#include <etiq.h>
+
+
 
 
 
@@ -142,11 +146,98 @@ void free_list_dico(LIST l) {
         free( ( (DICO_LINE) (l->element) ) ->arg_type_1);
         free( ( (DICO_LINE) (l->element) ) ->arg_type_2);
         free( ( (DICO_LINE) (l->element) ) ->arg_type_3);
+        free( ( (DICO_LINE) (l->element) ) ->code_bin_1);
+        free( ( (DICO_LINE) (l->element) ) ->code_bin_2);
+        free( ( (DICO_LINE) (l->element) ) ->code_bin_3);
+        free( ( (DICO_LINE) (l->element) ) ->code_bin_4);
+        free( ( (DICO_LINE) (l->element) ) ->code_bin_5);
 
         free(l->element);
         free(l);
     }
 }
+
+void free_list_inst(LIST l) {
+    if (l==NULL) return;
+    else {
+        free_list_inst(l->next);
+        // lex free avec free_list_lex
+        /* free ARG_INT */   // on suppose val.char_chain déjà free
+        free( ( (INSTR)l->element )->arg1);
+        free( ( (INSTR)l->element )->arg2);
+        free( ( (INSTR)l->element )->arg3);
+
+        free(l->element);
+        free(l);
+    }
+}
+
+void free_list_data(LIST l) {
+    if (l==NULL) return;
+    else {
+        free_list_data(l->next);
+
+        /* free data_op */
+        free_data_op( ( (DATA)l->element )->D);
+
+        free(l->element);
+        free(l);
+    }
+}
+
+void free_data_op(data_op d) {
+    if      (d->type==PASCIIZ) free(d->val.PASCIIZ);   // avant c'était la meme str que dans le lexem, mais maintenant y'a un strdup entre
+    else if (d->type==LABEL)   free(d->val.LABEL);     // impossible ? car transformé en DEC_LABEL
+    free(d);
+}
+
+void free_symb_table(LIST l) {
+    if (l==NULL) return;
+    else {
+        free_symb_table(l->next);
+
+        free( ( (ETIQ)l->element )->name);
+
+        free(l->element);
+        free(l);
+    }
+}
+
+void free_sort_symb_tab(LIST l) {
+    if (l==NULL) return;
+    else {
+        free_sort_symb_tab(l->next);
+
+        //free( ( (ETIQ)l->element )->name); // DEJA FREE PAR free_symb_table
+
+        //free(l->element);                  // DEJA FREE PAR free_symb_table
+        free(l);
+    }
+}
+
+
+void free_reloc_table(LIST l) {
+    if (l==NULL) return;
+    else {
+        free_reloc_table(l->next);
+
+        free( ( (RELOC)l->element )->section);
+        free( ( (RELOC)l->element )->addend);
+
+        free(l->element);
+        free(l);
+    }
+}
+
+// void free_list_(LIST l) {
+//     if (l==NULL) return;
+//     else {
+//         free_list_(l->next);
+//
+//         free(l->element);
+//         free(l);
+//     }
+// }
 
 
 /* pour l'instant elle n'est pas utilisée */

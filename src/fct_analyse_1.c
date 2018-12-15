@@ -78,7 +78,7 @@ data_op fill_val_op(void* pvalue, operand_type type_op)
                 D->val.PBYTE = *(char*)pvalue;
                 break;
             case PASCIIZ:
-                D->val.PASCIIZ = (char*)pvalue;
+                D->val.PASCIIZ = (char*)strdup(pvalue);
                 break;
             case PSPACE:
                 D->val.PSPACE = (*(unsigned int*)pvalue);
@@ -96,7 +96,7 @@ LIST add_to_current_list(operand_type type_op, void* pvalue, int dec, int line, 
     data-> decalage = dec;
     data-> line = line;
     data -> D = fill_val_op(pvalue, type_op);
-    current_list = add_to_head_list(current_list, data); 
+    current_list = add_to_head_list(current_list, data);
     return current_list;
 }
 
@@ -104,7 +104,7 @@ LIST add_to_current_list(operand_type type_op, void* pvalue, int dec, int line, 
 
  LIST add_label(int nb_arg_ligne, inst_op_type type, char* value, int etiq_definition, LIST list_instr) // cas 0 ??
 {   // copie les etiquette en char* pour le moment
-    // traduit les AIBD en BAS numérique : offset(reg) = reg + offset
+    
      ARG_INST A;
      if ( nb_arg_ligne == 1 ) {
          A = ((ARG_INST)(((INSTR)(list_instr->element))->arg1));

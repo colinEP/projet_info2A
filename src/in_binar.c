@@ -18,7 +18,7 @@
 
 
 
-int* instr_in_binar(LIST list_instr, int size_list, QUEUE dictionnaire)
+int* instr_in_binar(LIST list_instr, int size_list, LIST dictionnaire)
 {
     int* tab_instr_binar = calloc (size_list, sizeof(int));
     int i=0;

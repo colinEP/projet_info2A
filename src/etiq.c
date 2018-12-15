@@ -110,9 +110,9 @@ LIST sort_symb_table(LIST sort_list, LIST symb_table, LIST list_lex) {
 
             if (symb!=NULL) {   // c'est une étiquette
                 if ( !look_for_etiq(sort_list, lex->value) ) {  // il n'y est pas encore
-                    // WARNING Pas de copie pour l'instant
-                    cp_symb = calloc(1,sizeof(*cp_symb));
-                    memcpy(cp_symb, symb, sizeof(*cp_symb));
+                    // WARNING Pas de copie pour l'instant => pas besoin
+                    // cp_symb = calloc(1,sizeof(*cp_symb));
+                    // memcpy(cp_symb, symb, sizeof(*cp_symb));
                     sort_list = add_to_end_list( sort_list , symb );
                 }
             }

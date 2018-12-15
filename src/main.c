@@ -199,11 +199,21 @@ int main ( int argc, char *argv[] ) {
     INFO_MSG("Libération de la mémoire");
     free_list_dico(dictionnaire);
     free_list_lex(list_lex);
-    // free_list_inst  //TODO
-    // free_list_data  //TODO
-    // free_list_bss   //TODO
-    // free_symb_table //TODO
-    // free_sort_symb_tab //TODO   //meme fct
+    // free_list_inst(list_instr);    //16:1    + 3:1
+    free_list_data(list_data);
+    free_list_data(list_bss);      // bss meme struct que data
+    free_symb_table(symb_table);
+    free_sort_symb_tab(sort_symb_tab); // pas la m^eme fonction car les 2 tables
+                                       // partagent pas le m^eme maillon de liste
+                                       // mais elles partagent le m^eme element (ETIQ) !
+                                       // => 2 fct pour pas free 2 fois
+    free_reloc_table(reloc_table_text);
+    free_reloc_table(reloc_table_data);
+
+    free(tab_instr_binaire);
+    free(tab_data_binaire);
+    free(sym_char);
+
 
 
     INFO_MSG("Fin du programme %s", argv[0]);

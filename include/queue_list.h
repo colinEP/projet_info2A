@@ -2,8 +2,9 @@
 #define _QUEUE_LIST_H_
 
 #include <stdio.h>
-//#include <lex.h>
+//#include <fct_analyse_1.h>
 
+typedef struct d_op* data_op;
 
 typedef struct queue
 {
@@ -27,15 +28,22 @@ LIST revers_list(LIST l);
 
 LIST new_list();
 
-LIST queue_to_list( QUEUE q );
-void free_list_lex( LIST l );
-void free_list_dico(LIST l);
-//void free_list_lex( QUEUE l );
+int lengh_of_list(LIST l);
+
+LIST queue_to_list  ( QUEUE q );
+void free_list_lex  ( LIST l );
+void free_list_dico ( LIST l );
+void free_list_inst ( LIST l );
+void free_list_data ( LIST l );
+void free_data_op   ( data_op d );
+void free_symb_table( LIST l );
+void free_sort_symb_tab( LIST l );
+void free_reloc_table(LIST l);
+
 
 void free_lex( void* lex );
 
-void free_list_lex( QUEUE l );
 
-int lengh_of_list(LIST l);
+
 
 #endif
