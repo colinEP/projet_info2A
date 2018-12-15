@@ -203,7 +203,7 @@ int main ( int argc, char *argv[] ) {
     // free_list_data  //TODO
     // free_list_bss   //TODO
     // free_symb_table //TODO
-    // free_sort_symb_tab //TODO   // deja fait ????
+    // free_sort_symb_tab //TODO   //meme fct
 
 
     INFO_MSG("Fin du programme %s", argv[0]);
