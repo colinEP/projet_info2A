@@ -28,7 +28,7 @@ int* instr_in_binar(LIST list_instr, int size_list, LIST dictionnaire)
         unsigned int binar_value = 0;
         INSTR I = list_instr->element;
         char* instruction =  strdup( ((LEXEM)(I->lex))->value );
-        instruction = strdup(put_in_uppercase (instruction));
+        instruction = put_in_uppercase (instruction);
         int opc;
         char * from_25_21;
         char * from_20_16;
@@ -279,7 +279,15 @@ int* instr_in_binar(LIST list_instr, int size_list, LIST dictionnaire)
         tab_instr_binar[i] = binar_value;
         i = i+1;
         list_instr = list_instr->next;
+
+        free(instruction);
+        free(from_25_21);
+        free(from_20_16);
+        free(from_15_11);
+        free(from_10_6);
+        free(from_5_0);
     }
+
 
     return tab_instr_binar;
 }
@@ -400,8 +408,8 @@ int look_for_instr_and_return_binar_info( LIST dictionnaire, char* instruction, 
              *from_25_21 = strdup(D->code_bin_1);
              *from_20_16 = strdup(D->code_bin_2);
              *from_15_11 = strdup(D->code_bin_3);
-             *from_10_6 = strdup(D->code_bin_4);
-             *from_5_0 = strdup(D->code_bin_5);
+             *from_10_6  = strdup(D->code_bin_4);
+             *from_5_0   = strdup(D->code_bin_5);
              return D->opcode;
          }
          dictionnaire = dictionnaire->next;

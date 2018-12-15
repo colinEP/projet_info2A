@@ -22,6 +22,7 @@ lunchtime:
     .word 12
     .word boucle
     .asciiz "ils disent : \"au ru!\""
+    .word COUROUCOUCOU
 
 .text
     BEQ $t0 , $t1 , byebye

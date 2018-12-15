@@ -123,7 +123,6 @@ int lengh_of_list(LIST l) {
 }
 
 
-
 /** Cette fonction n'est pas générique pour le type abstrait list
  *  Elle libère seulement les listes de lexeme
  */
@@ -131,12 +130,16 @@ void free_list_lex(LIST l) {
     if (l==NULL) return;
 	else {
 		free_list_lex( l->next);
-        free( ( (LEXEM) (l->element) ) ->value);    // conversion du type void* en type LEXEM
-        //free_lex(l->element);      // en passant free_lex en paramètre, on pourra rendre la fonction générique
-		free(l->element);
+        free_lex((LEXEM)l->element);      // en passant free_lex en paramètre, on pourra rendre la fonction générique
 		free(l);
 	}
 }
+
+void free_lex(LEXEM lex) {
+    free(lex->value);
+    free(lex);
+}
+
 
 void free_list_dico(LIST l) {
     if (l==NULL) return;
@@ -161,7 +164,9 @@ void free_list_inst(LIST l) {
     if (l==NULL) return;
     else {
         free_list_inst(l->next);
-        // lex free avec free_list_lex
+
+        free_lex(((INSTR)l->element)->lex);
+
         /* free ARG_INT */   // on suppose val.char_chain déjà free
         free( ( (INSTR)l->element )->arg1);
         free( ( (INSTR)l->element )->arg2);
@@ -229,6 +234,14 @@ void free_reloc_table(LIST l) {
     }
 }
 
+void free_sym_char(char** sym_char, int size) {
+    int i;
+    for (i=0 ; i<size ; i++) {
+        free(sym_char[i]);
+    }
+    free(sym_char);
+}
+
 // void free_list_(LIST l) {
 //     if (l==NULL) return;
 //     else {
@@ -238,10 +251,3 @@ void free_reloc_table(LIST l) {
 //         free(l);
 //     }
 // }
-
-
-/* pour l'instant elle n'est pas utilisée */
-void free_lex(void* lex_ambigu) {
-    LEXEM lex = (LEXEM)lex_ambigu;
-    free(lex->value);
-}

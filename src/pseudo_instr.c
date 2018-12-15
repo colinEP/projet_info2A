@@ -30,7 +30,7 @@ LIST change_pseudo_instr(LIST list_instr, int* pdecalage)
      int is_label = 0;
      int is_def = 0;
 
-     if (strcmp(instruction,"NOP")==0){ // OK
+    if (strcmp(instruction,"NOP")==0){ // OK
 
          free(((LEXEM)(I->lex))->value);
          ((LEXEM)(I->lex))->value = strdup("SLL");
@@ -47,10 +47,9 @@ LIST change_pseudo_instr(LIST list_instr, int* pdecalage)
          (I-> arg1)->etiq_def = -1;
          (I-> arg2)->etiq_def = -1;
          (I-> arg3)->etiq_def = -1;
-         return list_instr;
      }
 
-     if (strcmp(instruction,"MOVE")==0){ //OK
+    else if (strcmp(instruction,"MOVE")==0){ //OK
          //  ici peu de cas car pour arg1 et arg2, ils restent les mêmes, qu'ils soient Reg ou Label
          free(((LEXEM)(I->lex))->value);
          (I->lex)->value = strdup("ADD");
@@ -59,10 +58,9 @@ LIST change_pseudo_instr(LIST list_instr, int* pdecalage)
          (I-> arg3)->type = Reg;
          (I-> arg3)->val.entier = 0;
          (I-> arg3)->etiq_def = -1;
-         return list_instr;
      }
 
-     if (strcmp(instruction,"NEG")==0){ //OK
+    else if (strcmp(instruction,"NEG")==0){ //OK
          // cas arg 1 :  il reste le même, qu'il soit Label ou Reg
          // idem pour Exp_Type_2
 
@@ -71,7 +69,7 @@ LIST change_pseudo_instr(LIST list_instr, int* pdecalage)
           I-> nb_arg = 3;
           I->Exp_Type_3 = Reg;
 
-         if ((I-> arg2)->type == Label) {
+         if ((I-> arg2)->type == Label) {    ERROR_MSG(" AVOIR PLUS EN DETAIL !! C'est impossible d'avoir une étiquette pour un registre !");
              (I-> arg3)->type = Label;
              (I-> arg3)->etiq_def = (I-> arg2)->etiq_def;
              (I-> arg3)->val.char_chain = strdup((I-> arg2)->val.char_chain);
@@ -83,10 +81,9 @@ LIST change_pseudo_instr(LIST list_instr, int* pdecalage)
 
          (I-> arg2)->type = Reg;
          (I-> arg2)->val.entier = 0;
-         return list_instr;
        }
 
-     if (strcmp(instruction,"LI")==0){ //OK
+    else if (strcmp(instruction,"LI")==0){ //OK
          // cas arg 1 :  il reste le même, qu'il soit Label ou Reg
 
          free(((LEXEM)(I->lex))->value);
@@ -108,11 +105,10 @@ LIST change_pseudo_instr(LIST list_instr, int* pdecalage)
 
          (I-> arg2)->type = Reg;
          (I-> arg2)->val.entier = 0;
-         return list_instr;
 
      }
 
-     if (strcmp(instruction,"BLT")==0){
+    else if (strcmp(instruction,"BLT")==0){
          // sauvegarde de la valeur de target
          if ((I->arg3)->type == Label){
              is_label = 1;
@@ -149,6 +145,8 @@ LIST change_pseudo_instr(LIST list_instr, int* pdecalage)
          second_instr->value = strdup("BNE");
 
          list_instr = add_to_list_instr(second_instr, *pdecalage, 3, list_instr, Reg, Reg, Rel); //etiq def est à -1 par defaut
+         free_lex(second_instr);  // add_to_list_instr a fait une copie
+
          I = list_instr->element;
          (I-> arg1)->type = Reg;
          (I-> arg1)->val.entier = 1;
@@ -157,7 +155,7 @@ LIST change_pseudo_instr(LIST list_instr, int* pdecalage)
          if (is_label){
              (I-> arg3)->type = Label;
              (I-> arg3)->etiq_def = is_def;
-             (I-> arg3)->val.char_chain = strdup(char1);
+             (I-> arg3)->val.char_chain = char1;
          }
          else {
              (I-> arg3)->type = Rel;
@@ -167,116 +165,114 @@ LIST change_pseudo_instr(LIST list_instr, int* pdecalage)
          // maj du decalage car instruction insérée
          *pdecalage += 4;
 
-         return list_instr;
      }
-
+     free(instruction);
      return list_instr;
- }
+}
 
-LIST change_pseudo_SW_LW(LIST list_instr, int* pdecalage){
-      INSTR I = list_instr->element;
-      char* instruction =  strdup( ((LEXEM)(I->lex))->value );
-      instruction = put_in_uppercase (instruction);
-      int reg;
-      int is_def;
-      char* name_etiq;
+LIST change_pseudo_SW_LW(LIST list_instr, int* pdecalage) {
+    INSTR I = list_instr->element;
+    char* instruction =  strdup( ((LEXEM)(I->lex))->value );
+    instruction = put_in_uppercase (instruction);
+    int reg;
+    int is_def;
+    char* name_etiq;
 
-      // ------- cas LW ---------
-     if (strcmp(instruction,"LW")==0){
-          if ((I->arg2)->type == Label){ // cas où arg2 est une target
-              if ((I->arg1)->type =! Reg){ // bizarre de mettre cette erreur ici, certes.... WARNING WARNING
-                  ERROR_MSG("Arg1 de LW doit etre un registre !\n");
-              }
-              reg = (int)((I->arg1)->val.entier);
-              (I->lex)->value = strdup("LUI");
-              I-> nb_arg = 2;
-              I->Exp_Type_1 = Reg;
-              I->Exp_Type_2 = Imm;
-              I->Exp_Type_3 = None;
+    // ------- cas LW ---------
+    if (strcmp(instruction,"LW")==0){
+        if ((I->arg2)->type == Label){ // cas où arg2 est une target
+            if ((I->arg1)->type =! Reg){ // bizarre de mettre cette erreur ici, certes.... WARNING WARNING
+                ERROR_MSG("Arg1 de LW doit etre un registre !\n");
+            }
+            reg = (int)((I->arg1)->val.entier);
+            (I->lex)->value = strdup("LUI");
+            I-> nb_arg = 2;
+            I->Exp_Type_1 = Reg;
+            I->Exp_Type_2 = Imm;
+            I->Exp_Type_3 = None;
 
-              // arg1 reste inchangé
-              (I-> arg2)->type = Target; //type Target permettra de remplacer par sa valeur après relocation
-              //etiq_def2 reste le même
-              is_def = (I->arg2)->etiq_def;
-              name_etiq = strdup((I->arg2)->val.char_chain);
-              // PB:  pour avoir l'adresse du poiteur, il faut qu'il y ait eu relocation !
+            // arg1 reste inchangé
+            (I-> arg2)->type = Target; //type Target permettra de remplacer par sa valeur après relocation
+            //etiq_def2 reste le même
+            is_def = (I->arg2)->etiq_def;
+            name_etiq = strdup((I->arg2)->val.char_chain);
+            // PB:  pour avoir l'adresse du poiteur, il faut qu'il y ait eu relocation !
 
-              (I-> arg1)->type = Reg; // UTILE
-              (I-> arg1)->val.entier = 1; // = $at
-              (I-> arg3)->type = None;
+            (I-> arg1)->type = Reg; // UTILE
+            (I-> arg1)->val.entier = 1; // = $at
+            (I-> arg3)->type = None;
 
-              LEXEM second_instr = calloc(1, sizeof(*second_instr));
-              second_instr->nline = I->lex->nline;
-              second_instr->lex_type = SYMBOLE;
-              second_instr->value = strdup("LW") ;
+            LEXEM second_instr = calloc(1, sizeof(*second_instr));
+            second_instr->nline = I->lex->nline;
+            second_instr->lex_type = SYMBOLE;
+            second_instr->value = strdup("LW") ;
 
-              list_instr = add_to_list_instr(second_instr, *pdecalage, 2, list_instr, Reg, Bas, None); //etiq def est à -1 par defaut
-              I = list_instr->element;
-              (I-> arg1)->type = Reg;
-              (I-> arg1)->val.entier = reg;
+            list_instr = add_to_list_instr(second_instr, *pdecalage, 2, list_instr, Reg, Bas, None); //etiq def est à -1 par defaut
+            free_lex(second_instr);  // add_to_list_instr a fait une copie
 
-              (I-> arg2)->type = Bas_Target;
-              (I-> arg2)->etiq_def = is_def;
-              (I-> arg2)->val.char_chain = strdup(name_etiq);
+            I = list_instr->element;
+            (I-> arg1)->type = Reg;
+            (I-> arg1)->val.entier = reg;
 
-              (I-> arg3)->type = None;
+            (I-> arg2)->type = Bas_Target;
+            (I-> arg2)->etiq_def = is_def;
+            (I-> arg2)->val.char_chain = name_etiq;   // strdup déjà fait
 
-              // maj du decalage car instruction insérée
-              *pdecalage += 4;
+            (I-> arg3)->type = None;
 
-              return list_instr;
-          }
-      }
-      // ------- cas SW ---------
-     if (strcmp(instruction,"SW")==0){
-          if (((I->arg2)->type) == Label){ // cas où arg2 est une target
-             if (((I->arg1)->type) =! Reg){ // bizarre de mettre cette erreur ici, certes.... WARNING WARNING
-                 ERROR_MSG("Arg1 de SW doit etre un registre !\n");
-             }
-             reg = (int)((I->arg1)->val.entier);
-             (I->lex)->value = strdup("LUI");
-              I-> nb_arg = 2;
-              I->Exp_Type_1 = Reg;
-              I->Exp_Type_2 = Imm;
-              I->Exp_Type_3 = None;
+            // maj du decalage car instruction insérée
+            *pdecalage += 4;
+        }
+    }
+    // ------- cas SW ---------
+    else if (strcmp(instruction,"SW")==0){
+        if (((I->arg2)->type) == Label){ // cas où arg2 est une target
+            if (((I->arg1)->type) =! Reg){ // bizarre de mettre cette erreur ici, certes.... WARNING WARNING
+                ERROR_MSG("Arg1 de SW doit etre un registre !\n");
+            }
+            reg = (int)((I->arg1)->val.entier);
+            (I->lex)->value = strdup("LUI");
+            I-> nb_arg = 2;
+            I->Exp_Type_1 = Reg;
+            I->Exp_Type_2 = Imm;
+            I->Exp_Type_3 = None;
 
-              // arg1 reste inchangé
-              (I-> arg2)->type = Target; //type Target permettra de remplacer par sa valeur après relocation
-              //etiq_def2 reste le même
-              is_def = (I->arg2)->etiq_def;
-              name_etiq = strdup((I->arg2)->val.char_chain);
-              // PB:  pour avoir l'adresse du poiteur, il faut qu'il y ait eu relocation !
+            // arg1 reste inchangé
+            (I-> arg2)->type = Target; //type Target permettra de remplacer par sa valeur après relocation
+            //etiq_def2 reste le même
+            is_def = (I->arg2)->etiq_def;
+            name_etiq = strdup((I->arg2)->val.char_chain);
+            // PB:  pour avoir l'adresse du poiteur, il faut qu'il y ait eu relocation !
 
-              (I-> arg1)->type = Reg; // UTILE
-              (I-> arg1)->val.entier = 1; // = $at
-              (I-> arg3)->type = None;
+            (I-> arg1)->type = Reg; // UTILE
+            (I-> arg1)->val.entier = 1; // = $at
+            (I-> arg3)->type = None;
 
-              LEXEM second_instr = calloc(1, sizeof(*second_instr));
-              second_instr->nline = I->lex->nline;
-              second_instr->lex_type = SYMBOLE;
-              second_instr->value = strdup("SW") ;
+            LEXEM second_instr = calloc(1, sizeof(*second_instr));
+            second_instr->nline = I->lex->nline;
+            second_instr->lex_type = SYMBOLE;
+            second_instr->value = strdup("SW") ;
 
-              list_instr = add_to_list_instr(second_instr, *pdecalage, 2, list_instr, Reg, Bas, None); //etiq def est à -1 par defaut
-              I = list_instr->element;
-              (I-> arg1)->type = Reg;
-              (I-> arg1)->val.entier = reg;
+            list_instr = add_to_list_instr(second_instr, *pdecalage, 2, list_instr, Reg, Bas, None); //etiq def est à -1 par defaut
+            free_lex(second_instr);  // add_to_list_instr a fait une copie
 
-              (I-> arg2)->type = Bas_Target;
-              (I-> arg2)->etiq_def = is_def;
-              (I-> arg2)->val.char_chain = strdup(name_etiq);
+            I = list_instr->element;
+            (I-> arg1)->type = Reg;
+            (I-> arg1)->val.entier = reg;
 
-              (I-> arg3)->type = None;
+            (I-> arg2)->type = Bas_Target;
+            (I-> arg2)->etiq_def = is_def;
+            (I-> arg2)->val.char_chain = name_etiq;   // strdup déjà fait
 
-              // maj du decalage car instruction insérée
-              *pdecalage += 4;
+            (I-> arg3)->type = None;
 
-              return list_instr;
-          }
-      }
-
-     return list_instr;
-  }
-
+            // maj du decalage car instruction insérée
+            *pdecalage += 4;
+        }
+    }
+    free(instruction);
+    return list_instr;
+}
 
 int upper_16(int val_32b){
      // il suffit de faire un décalage !

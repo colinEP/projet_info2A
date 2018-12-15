@@ -165,6 +165,8 @@ int main ( int argc, char *argv[] ) {
     print_reloc_table( reloc_table_text);
     print_reloc_table( reloc_table_data);
 
+    //print_list_lex(list_lex);
+
 
     /* ---------------- test et conversion en binaire -------------------*/
 
@@ -199,7 +201,7 @@ int main ( int argc, char *argv[] ) {
     INFO_MSG("Libération de la mémoire");
     free_list_dico(dictionnaire);
     free_list_lex(list_lex);
-    // free_list_inst(list_instr);    //16:1    + 3:1
+    free_list_inst(list_instr);    //16:1    + 3:1
     free_list_data(list_data);
     free_list_data(list_bss);      // bss meme struct que data
     free_symb_table(symb_table);
@@ -212,7 +214,8 @@ int main ( int argc, char *argv[] ) {
 
     free(tab_instr_binaire);
     free(tab_data_binaire);
-    free(sym_char);
+    free_sym_char(sym_char, size_sym_table);
+
 
 
 

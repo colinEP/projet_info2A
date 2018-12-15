@@ -50,10 +50,14 @@ LIST add_to_list_instr(LEXEM l, int dec, int nbarg, LIST list_instr, int exp_typ
     I-> decalage = dec;
     I-> nb_arg = nbarg;
     I-> lex = l;
+    I-> lex = calloc(1, sizeof(*l));
+    I-> lex = memcpy(I->lex, l, sizeof(*l));
+    I-> lex->value = strdup(l->value);
+
     I->Exp_Type_1 = exp_typ_1;
     I->Exp_Type_2 = exp_typ_2;
     I->Exp_Type_3 = exp_typ_3;
-    list_instr = add_to_head_list(list_instr, I);  //TODO head => end
+    list_instr = add_to_head_list(list_instr, I);
     return list_instr;
 }
 
@@ -84,7 +88,7 @@ data_op fill_val_op(void* pvalue, operand_type type_op)
                 D->val.PSPACE = (*(unsigned int*)pvalue);
                 break;
             case LABEL:
-                D->val.LABEL = (char*)pvalue;
+                D->val.LABEL = (char*)strdup(pvalue);
                 break;
         }
     return D;
@@ -104,7 +108,7 @@ LIST add_to_current_list(operand_type type_op, void* pvalue, int dec, int line, 
 
  LIST add_label(int nb_arg_ligne, inst_op_type type, char* value, int etiq_definition, LIST list_instr) // cas 0 ??
 {   // copie les etiquette en char* pour le moment
-    
+
      ARG_INST A;
      if ( nb_arg_ligne == 1 ) {
          A = ((ARG_INST)(((INSTR)(list_instr->element))->arg1));
@@ -175,6 +179,11 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
 
  LIST fill_arguments(LEXEM lexem, LIST list_instr, int previous_type_lexem, int etiq_definition, int* p_nb_arg_ligne) // faire la verification des type d'arg ICI
  {
+     //pour pas modifier la list de lexem avec le cas du moins
+     // LEXEM lexem = calloc(1, sizeof(*lexem));
+     // lexem = memcpy(lexem, lexem_arg, sizeof(*lexem));
+     // lexem->value = strdup(lexem->value);
+
      if (previous_type_lexem == MOINS){
          //lexem->value = strdup(mystrcat("-", lexem->value)); //pas du dup car calloc déjà dans mystrcat
          lexem->value = (mystrcat("-", lexem->value));
@@ -183,6 +192,7 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
      if (etiq_definition != -1){
          // cas où l'on a une étiquette, pas besoin de checker expected_type ! ce sera fait après !
          list_instr = add_label(*p_nb_arg_ligne, Label, lexem->value, etiq_definition, list_instr);
+         // free_lex(lexem);
          return list_instr;
      }
 
@@ -196,6 +206,7 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
             convert_value = check_type_arg_inst(lexem->lex_type, val_lexem, ((INSTR)(list_instr->element))->Exp_Type_1);
             // renvoit une erreur si jamais les bons types ne sont pas reliés et renvoit un entier correspondant à convert value
             list_instr = add_int(*p_nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_1, convert_value, etiq_definition, list_instr);
+            // free_lex(lexem);
             return list_instr;
         }
 
@@ -227,6 +238,7 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
                     convert_value = check_type_arg_inst(lexem->lex_type, offset_char, ((INSTR)(list_instr->element))->Exp_Type_3);
                     list_instr = add_int(*p_nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_3, convert_value, etiq_definition, list_instr);
 
+                    // free_lex(lexem);
                     return list_instr;
                 }
                 else ERROR_MSG("Erreur, type argument inadapte pour cette instruction (Base_offset attendu)!\n");
@@ -234,6 +246,7 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
             convert_value = check_type_arg_inst(lexem->lex_type, val_lexem, ((INSTR)(list_instr->element))->Exp_Type_2);
             // renvoit une erreur si jamais les bons types ne sont pas reliés et renvoit un entier correspondant à convert value
             list_instr = add_int(*p_nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_2, convert_value, etiq_definition, list_instr);
+            // free_lex(lexem);
             return list_instr;
         }
 
@@ -241,10 +254,11 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
             convert_value = check_type_arg_inst(lexem->lex_type, val_lexem, ((INSTR)(list_instr->element))->Exp_Type_3);
             // renvoit une erreur si jamais les bons types ne sont pas reliés et renvoit un entier correspondant à convert value
             list_instr = add_int(*p_nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_3, convert_value, etiq_definition, list_instr);
+            // free_lex(lexem);
             return list_instr;
         }
     }
-
+    // free_lex(lexem);
     return list_instr;
 }
 
@@ -266,7 +280,7 @@ LIST look_for_undefined_etiq_in_instr(LIST l, LIST symb_table){ // met à 1 etiq
                 (I->arg1)->etiq_def = 1;
                 if ((a == 0)||(b ==0)) {                        // etiq non trouvée donc non déf --> il faut alors l'ajouter à la table des symboles
                     if (a ==0){                                 // si etiq pas encore dans symb_tab
-                        char* name_etiq = strdup((I->arg1)->val.char_chain);
+                        char* name_etiq = (I->arg1)->val.char_chain;  //pas de strdup car add_to_symb_table le fait déjà
                         int dec = 0;
                         int line = (I->lex)->nline ;
                         int sect = TEXT; // car list instr
@@ -287,7 +301,7 @@ LIST look_for_undefined_etiq_in_instr(LIST l, LIST symb_table){ // met à 1 etiq
                 (I->arg2)->etiq_def = 1;
                 if ((a == 0)||(b ==0)) {                          // etiq non trouvée donc non déf
                     if (a ==0){                                 // si etiq pas encore dans symb_tab
-                        char* name_etiq = strdup((I->arg2)->val.char_chain);
+                        char* name_etiq = (I->arg2)->val.char_chain;   //pas de strdup car add_to_symb_table le fait déjà
                         int dec = 0;
                         int line = (I->lex)->nline ;
                         int sect = TEXT; // car list instr
@@ -308,7 +322,7 @@ LIST look_for_undefined_etiq_in_instr(LIST l, LIST symb_table){ // met à 1 etiq
                 (I->arg3)->etiq_def = 1;
                 if ((a == 0)||(b ==0)) {                         // etiq non trouvée donc non déf
                     if (a ==0){                                 // si etiq pas encore dans symb_tab
-                        char* name_etiq = strdup((I->arg3)->val.char_chain);
+                        char* name_etiq = (I->arg3)->val.char_chain;   //pas de strdup car add_to_symb_table le fait déjà
                         int dec = 0;
                         int line = (I->lex)->nline ;
                         int sect = TEXT; // car list instr
@@ -339,7 +353,7 @@ LIST look_for_undefined_etiq_in_data(LIST l, LIST symb_table){ // met à 1 etiq 
                 ((DATA)(l->element))-> etiq_def = 1;
 
                 if ((a == 0)||(b ==0)) {                                         // etiq non trouvée donc non déf
-                    char* name_etiq = strdup(((data_op)(((DATA)(l->element))->D))->val.LABEL);
+                    char* name_etiq = ((data_op)(((DATA)(l->element))->D))->val.LABEL;  //pas de strdup car add_to_symb_table le fait déjà
                     int dec = 0;
                     int line = ((DATA)(l->element))->line;
                     int sect = PDATA; // car list .data
@@ -364,8 +378,8 @@ LIST look_for_undefined_etiq_in_bss(LIST l, LIST symb_table){ // met à 1 etiq d
                 a = look_for_etiq(symb_table, ((data_op)(((DATA)(l->element))->D))->val.LABEL);
                 ((DATA)(l->element))-> etiq_def = 1;
 
-                if (a == 0){                                        // etiq non trouvée donc non déf
-                    char* name_etiq = strdup(((data_op)(((DATA)(l->element))->D))->val.LABEL);
+                if (a == 0){   // Impossible dans BSS ??                            // etiq non trouvée donc non déf
+                    char* name_etiq = ((data_op)(((DATA)(l->element))->D))->val.LABEL;   //pas de strdup car add_to_symb_table le fait déjà
                     int dec = 0;
                     int line = ((DATA)(l->element))->line;
                     int sect = BSS; // car list .bss

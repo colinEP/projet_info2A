@@ -79,6 +79,7 @@ char** make_sym_char_table(LIST symb_table, int size_list){
 
 ETIQ look_for_etiq_and_return_no_error( LIST symb_table, char* lexem) {
     while (symb_table != NULL) {
+        //printf("%s    %s \n", ((ETIQ) (symb_table->element))->name , lexem);
         if ( !strcmp(((ETIQ) (symb_table->element))->name, lexem) ) {
             return symb_table->element;
         }
@@ -92,7 +93,6 @@ LIST sort_symb_table(LIST sort_list, LIST symb_table, LIST list_lex) {
     LEXEM lex;
     LEXEM old_lex;
     ETIQ symb;
-    ETIQ cp_symb;
     LIST p;
     for ( p=list_lex ; p!=NULL ; p=p->next ) {
         lex = (LEXEM)p->element;

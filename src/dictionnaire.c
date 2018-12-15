@@ -91,6 +91,7 @@ int look_for_inst(char* lex_init, LIST l_dico, int* pnb_arg, int* exp_typ_1, int
             *exp_typ_1 = convert_inst_op_type(((DICO_LINE) l_dico->element)->arg_type_1);
             *exp_typ_2 = convert_inst_op_type(((DICO_LINE) l_dico->element)->arg_type_2);
             *exp_typ_3 = convert_inst_op_type(((DICO_LINE) l_dico->element)->arg_type_3);
+            free(lex);
             return 1; //alors l'instruction a été trouvée !
         }
         l_dico = l_dico->next;

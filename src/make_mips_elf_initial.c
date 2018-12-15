@@ -31,6 +31,7 @@
 int elf_get_sym_index_from_name(section symtab, section shstrtab, section strtab, char* sym_name) {
     int i=0;
     Elf32_Sym* symboles = (Elf32_Sym*) symtab->start;
+
     int section_offset = elf_get_string_index( shstrtab->start, shstrtab->sz, sym_name );
     int offset = elf_get_string_offset( strtab->start, strtab->sz, sym_name );
 
@@ -340,7 +341,6 @@ int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_in
 
     symtab   = make_symtab_section( shstrtab, strtab, syms, size_table);
 
-
     /* make hard coded text and data relocation entries (needs symtab and strtab)
       first relocation "ADDI $2, $3, boucle" at adress 4 of the text section is a R_MIPS_LO16 with respect to the symbole "boucle" so the relocation is made with respect to the .text section symbol (since the value of boucle, 4, will be the addend)
       second relocation ".word tab" at adress 0 of the data section is a R_MIPS_32 with respect to the symbole "tab" so the relocation is made with respect to the .bss section symbol (since the value of tab, 16, will be the addend)
@@ -380,6 +380,10 @@ int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_in
     del_section(   symtab );
     del_section(  reltext );
     del_section(  reldata );
+
+    free(syms);
+    free(text_reloc);
+    free(data_reloc);
 
     return 0;
 
