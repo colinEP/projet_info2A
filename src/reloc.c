@@ -13,6 +13,8 @@
 #include <etiq.h>
 #include <reloc.h>
 
+#include <analyse_synth.h>
+
 #include <error.h>
 
 
@@ -354,6 +356,27 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l_instr, LIST symb_table)
                             reloc_table_text = add_to_end_list(reloc_table_text, Re);
                             free( (I->arg3)->val.char_chain ); // free de la str avant de remplacer par le decalage
                             (I->arg3)->val.entier = Et->decalage;
+
+                            /* S'il faut tester taille dec des symoble */
+
+                            // printf("%d   %s    %d    %d\n", I->lex->lex_type, Et->name ,I->Exp_Type_3, Et->decalage);
+                            // int tmp;
+                            // scanf("%d", &tmp);
+                            // (I->arg3)->val.entier = check_size_dec(Et->decalage, I->Exp_Type_3);
+                            //
+                            // long int check_size_dec(int decalage, inst_op_type exp_type) {
+                            //     if      (exp_type==Imm) {
+                            //         if ((convert_value <-32768)||(convert_value >32767)){
+                            //             ERROR_MSG("Erreur, decalage etiquette trop grand pour  immediat over 16 bits long !\n");
+                            //         }
+                            //     }
+                            //     else if (exp_type==rel) {
+                            //
+                            //     }
+                            //     else if (exp_type==Abs) {
+                            //
+                            //     }
+                            // }
 
                         }
                         if (Et->section == TEXT){                    // etiq def dans .text = "locale"

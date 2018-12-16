@@ -194,9 +194,6 @@ LIST change_pseudo_SW_LW(LIST list_instr, int* pdecalage) {
             if ( ((I-> arg1)->type!=Reg)) {
                ERROR_MSG("ERR LINE %d : Le 1er argument de LW (pseudo-instr) doit etre un registre", I->lex->nline);
             }
-            if ((I->arg1)->type =! Reg){ // bizarre de mettre cette erreur ici, certes.... WARNING WARNING
-                ERROR_MSG("Arg1 de LW doit etre un registre !\n");
-            }
             reg = (int)((I->arg1)->val.entier);
             free(((LEXEM)(I->lex))->value);
             (I->lex)->value = strdup("LUI");
@@ -243,9 +240,6 @@ LIST change_pseudo_SW_LW(LIST list_instr, int* pdecalage) {
         if (((I->arg2)->type) == Label){ // cas où arg2 est une target
             if ( ((I-> arg1)->type!=Reg)) {
                ERROR_MSG("ERR LINE %d : Le 1er argument de SW (pseudo-instr) doit etre un registre", I->lex->nline);
-            }
-            if (((I->arg1)->type) =! Reg){ // bizarre de mettre cette erreur ici, certes.... WARNING WARNING
-                ERROR_MSG("Arg1 de SW doit etre un registre !\n");
             }
             reg = (int)((I->arg1)->val.entier);
             free(((LEXEM)(I->lex))->value);

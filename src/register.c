@@ -126,7 +126,12 @@ int check_type_arg_inst(int type_lexem, char* val_lexem, int type_arg_expected) 
             ERROR_MSG("Erreur, type inadapte pour cet argument !\n");
         }
         convert_value = strtol(val_lexem, NULL, 0);
-        if ((convert_value <-32768)||(convert_value >32767)){
+        if (type_lexem == HEXA) {
+            if ((convert_value <0)||(convert_value >0xFFFF)) {
+                ERROR_MSG("Erreur, argument immediat (hexa) over 16 bits long !\n");
+            }
+        }
+        else if ((convert_value <-32768)||(convert_value >32767)){
             ERROR_MSG("Erreur, argument immediat over 16 bits long !\n");
         }
         return convert_value;
@@ -138,8 +143,13 @@ int check_type_arg_inst(int type_lexem, char* val_lexem, int type_arg_expected) 
             ERROR_MSG("Erreur, type inadapte pour cet argument !\n");
         }
         convert_value = strtol(val_lexem, NULL, 0);
-        if ((convert_value <-131072)||(convert_value >131071) || (convert_value%4)){
-            ERROR_MSG("%d Erreur, argument immediat over 18 bits long !  ou pas multiple de 4\n",convert_value );
+        if (type_lexem == HEXA) {
+            if ((convert_value <0) || (convert_value >0x3FFFF) || (convert_value%4)) {
+                ERROR_MSG("Erreur, argument relatif (hexa) over 18 bits long !  ou pas multiple de 4\n");
+            }
+        }
+        else if ((convert_value <-131072)||(convert_value >131071) || (convert_value%4)){
+            ERROR_MSG("Erreur, argument relatif over 18 bits long !  ou pas multiple de 4\n");
         }
         return convert_value;
     }
@@ -149,8 +159,10 @@ int check_type_arg_inst(int type_lexem, char* val_lexem, int type_arg_expected) 
             ERROR_MSG("Erreur, type inadapte pour cet argument !\n");
         }
         convert_value = strtol(val_lexem, NULL, 0);
-        if ((convert_value <-134217728)||(convert_value >134217727) || (convert_value%4)){
-            ERROR_MSG("Erreur, argument immediat over 28 bits long ! ou pas multiple de 4\n");
+        // pas de cas particulier si hexa car absolu c'est un non signé
+        if (convert_value <0)  ERROR_MSG("Erreur, argument Absolu négatif interdit !\n");
+        if ((convert_value >0x0FFFFFFF) || (convert_value%4)){
+            ERROR_MSG("Erreur, argument Absolu over 28 bits long ! ou pas multiple de 4\n");
         }
         return convert_value;
     }

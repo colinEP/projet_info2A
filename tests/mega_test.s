@@ -12,21 +12,26 @@ predef:
     #LI predef, 1
     #LW predef, 8($4)
     #LW predef, predef
-    #SW predef, predef
+    # SW predef, predef
     ######################  => OK !
 
     ADD $5, $t2, $a2
-    adD $5, $t2, $a2
-    ADDI $5, $t2, 500
+    adD $5, $t2, $a2    #test uppercase
+    # ADDI $5, $t2, - -500  # doit planter  => OK
+    ADDI $5, $t2, -500
     ADDI $5, $t2, 0254
-    ADDI $5, $t2, 0x452    #gestion moins hexa pas bonne
+    ADDI $5, $t2, 0xFFFF     # gestion hexa RESOLU
+    #ADDI $5, $t2, 0xFFFF    # doit planter  => OK
     ADDI $5, $t2, -1
     ADDI $5, $t2, predef
     ADDI $5, $t2, postdef
-    ADDI $5, $t2, nodef     # TODO corrigé erreur    etiq reste type 7 (label)
-    ADDI $5, $t2, etiqdata  # TODO coorigé erreur    etis reeste type 7 (label)
-    ADDI $5, $t2, etiqbss     # TODO coorigé erreur    etis reeste type 7 (label)
-                                # Imm sur arg 3 mal géré ?
+    ADDI $5, $t2, nodef
+    ADDI $5, $t2, etiqdata
+    # ADDI $5, $t2, 0x1FFFF     # doit planter  => OK
+    ADDI $5, $t2, etiqbss     # PAS DE VERIF SUR LA TAILLE DU DECALAGE !!!
+                              # NORMALEMENT DEVRAIT FAIRE UNE ERREUR CAR etiqbss=0x1FFFF
+                              # MAIS BON PAS GRAVE !!!!
+
     SUB $5, $t2, $a2
     MULT $5, $t2
     DIV $5, $t2
@@ -34,6 +39,10 @@ predef:
     OR $5, $t2, $a2
     XOR $5, $t2, $a2
     ROTR $5, $t2, 31
+    ROTR $5, $t2, 0xF
+    # ROTR $5, $t2, predef    # Plante !!!!!  normal ? etiq interdit pour Sa ?
+    # ROTR $5, $t2, -0xF  # doit planter  => OK
+    # ROTR $5, $t2, 0x20  # doit planter  => OK
     # ROTR $5, $t2, 32 # doit planter  => OK
     # ROTR $5, $t2, -1 # doit planter  => OK
     SLL $5, $t2, 2
@@ -87,7 +96,12 @@ predef:
     J 8
     # J -8 #erreur normalement ???
     J 0x3FC
-    #J 0x3FD    #doit planter    => OK
+    # J -0x3FC     #doit planter    => OK
+    # J 0x3FD      #doit planter    => OK
+    # J -4         #doit planter    => OK
+    J 0x0FFFFFFC   # max car doit aussi etre divisible par 4
+    # J 0x1FFFFFFC   #doit planter    => OK
+    # J 0x10000000  #doit planter    => OK
     J predef
     J postdef
     J nodef
@@ -144,11 +158,16 @@ startdata:
     .byte 1
     .byte -1
     .byte 0xF
+    # .byte -0xF         # => doit planter => OK
     # .byte startdata    # => doit planter => OK
 
     .word 1
     .word -1
+    .word -32
+    .space 1
+    .byte -1
     .word 0xF
+    # .word -0xF         # => doit planter => OK
     .word 0xF , 1
     .word startdata , 1
     .word etiqdata
@@ -156,16 +175,25 @@ startdata:
     .word etiqbss
     .word nodef
 
-    .asciiz "abcd"
+    .byte -1
+    .asciiz "abcdef"
     .asciiz "1234","\n\t\\\""
     # .asciiz 10         # => doit planter => OK
     # .asciiz startdata  # => doit planter => OK
+    .word -1
+    .space 2
+    #.byte -1
 
+    .word -1
+    # .space 5
+    .byte -1
     .space 2
     #.space startdata    # => doit planter => OK
+
 
 etiqdata:
 
 .bss
+    #.space 0x1FFFF
     .space 2
 etiqbss:

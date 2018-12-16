@@ -90,6 +90,9 @@ data_op fill_val_op(void* pvalue, operand_type type_op)
             case LABEL:
                 D->val.LABEL = (char*)strdup(pvalue);
                 break;
+            default:
+                ERROR_MSG("ERR type d'opérande de directives");
+                break;
         }
     return D;
 }

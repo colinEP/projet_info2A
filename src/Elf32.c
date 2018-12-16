@@ -24,6 +24,11 @@
 #include <elf.h>
 
 
+// TODO TODO WARNING WARNING   prototype de elf_get_sym_index_from_name qui est dnas make_mips_elf_initial.c
+int elf_get_sym_index_from_name(section symtab, section shstrtab, section strtab, char* sym_name);
+
+
+
 Elf32_Sym* make_syms(int size_table, char** sym_tab, section strtab, section shstrtab, LIST table_des_symboles){ // OK
 
     Elf32_Sym* syms = calloc(size_table, sizeof(Elf32_Sym));

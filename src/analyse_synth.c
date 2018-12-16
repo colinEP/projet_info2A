@@ -257,8 +257,14 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
                     ERROR_MSG("ERR LINE %d : Element non acceptable apres cette instruction !\n", line);
                 }
 
-                if (type_lexem == MOINS) break;
-
+                if (type_lexem == MOINS) {
+                    // TODO si previous == MOIS => 2 moins a la suite => erreur ??
+                    if (previous_type_lexem==MOINS) ERROR_MSG("ERR LINE %d : 2 signes moins à la suite !\n", line);
+                    break;
+                }
+                if (type_lexem == HEXA) {
+                    if (previous_type_lexem==MOINS) ERROR_MSG("ERR LINE %d : signe MOINS impossible devant un hexa !\n", line);
+                }
 
                 if (((type_lexem == NL)||(type_lexem == COMMENT)) ) { // plus d'argument apres l'instruction ou apres la virgule
                     if ((nb_arg_ligne == nb_arg_needed) && (previous_type_lexem != VIRGULE) && (previous_type_lexem != MOINS)) // cas où 0 arg
@@ -345,6 +351,9 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
 
             case PWORD:
                 if (type_lexem == MOINS) break;
+                if (type_lexem == HEXA) {
+                    if (previous_type_lexem==MOINS) ERROR_MSG("ERR LINE %d : signe MOINS impossible devant un hexa !\n", line);
+                }
 
                 if (type_lexem == SYMBOLE) { // recherche étiquette dans symb_table
                     // alignement en mémoire du mot
@@ -382,7 +391,12 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
                     // conversion de la string en nombre
                     val_convert = strtol(val_lexem, NULL, 0);  // renvoie un long int => nécessaire pour savoir le nombre rentre dans un entier
                     if (previous_type_lexem == MOINS) val_convert = -val_convert;
-                    if ( (val_convert<-2147483648) || (2147483647<val_convert) ) {
+                    if (type_lexem == HEXA) {
+                        if ((val_convert <0)||(val_convert >0xFFFFFFFF)) {
+                            ERROR_MSG("ERR LINE %d : Nombre trop grand (hexa) pour etre stocké dans un word (32 bits : 0 < x < 0xFFFFFFFF)\n", line);
+                        }
+                    }
+                    else if ( (val_convert<-2147483648) || (2147483647<val_convert) ) {
                         ERROR_MSG("ERR LINE %d : Nombre trop grand pour etre stocké dans un word (32 bits : -2147483648 < x < 2147483647)\n", line);
                     }
                     *pcurrent_list = add_to_current_list(PWORD, &val_convert, *pdecalage, line, *pcurrent_list);
@@ -451,12 +465,20 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
 
             case PBYTE:
                 if (type_lexem == MOINS) break;
+                if (type_lexem == HEXA) {
+                    if (previous_type_lexem==MOINS) ERROR_MSG("ERR LINE %d : signe MOINS impossible devant un hexa !\n", line);
+                }
 
                 if ((type_lexem == HEXA) || (type_lexem == OCTAL) || (type_lexem == DECIMAL)) {
                     // conversion de la string en nombre
                     val_convert = strtol(val_lexem, NULL, 0);
                     if (previous_type_lexem == MOINS) val_convert = -val_convert;
-                    if ( (val_convert<-128) || (127<val_convert) ) {
+                    if (type_lexem == HEXA) {
+                        if ((val_convert <0)||(val_convert > 0xFF)) {
+                            ERROR_MSG("ERR LINE %d : Nombre trop grand (hexa) pour etre stocké dans un byte (8 bits : 0 < x < 0xFF)\n", line);
+                        }
+                    }
+                    else if ( (val_convert<-128) || (127<val_convert) ) {
                         ERROR_MSG("ERR LINE %d : Nombre trop grand pour etre stocké dans un byte (8 bits : -128 < x < 127)\n", line);
                     }
                     *pcurrent_list = add_to_current_list(PBYTE, &val_convert, *pdecalage, line, *pcurrent_list);
