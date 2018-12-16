@@ -350,7 +350,11 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
                 ERROR_MSG("ERR LINE %d : Element non acceptable apres cette instruction !\n", line);
 
             case PWORD:
-                if (type_lexem == MOINS) break;
+                if (type_lexem == MOINS) {
+                    // TODO si previous == MOIS => 2 moins a la suite => erreur ??
+                    if (previous_type_lexem==MOINS) ERROR_MSG("ERR LINE %d : 2 signes moins à la suite !\n", line);
+                    break;
+                }
                 if (type_lexem == HEXA) {
                     if (previous_type_lexem==MOINS) ERROR_MSG("ERR LINE %d : signe MOINS impossible devant un hexa !\n", line);
                 }
@@ -464,7 +468,11 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
                 break;
 
             case PBYTE:
-                if (type_lexem == MOINS) break;
+                if (type_lexem == MOINS) {
+                    // TODO si previous == MOIS => 2 moins a la suite => erreur ??
+                    if (previous_type_lexem==MOINS) ERROR_MSG("ERR LINE %d : 2 signes moins à la suite !\n", line);
+                    break;
+                }
                 if (type_lexem == HEXA) {
                     if (previous_type_lexem==MOINS) ERROR_MSG("ERR LINE %d : signe MOINS impossible devant un hexa !\n", line);
                 }
