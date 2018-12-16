@@ -366,7 +366,7 @@ int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_in
 
     print_section( text );
     print_section( data );
-    print_section( bss );
+    //print_section( bss );
     print_section( strtab );
     print_section( symtab );
 

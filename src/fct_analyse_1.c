@@ -234,7 +234,11 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
                     *p_nb_arg_ligne = 3;   // ()*p_nb_arg_ligne) ++
 
                     // arg3 = offset (type=Imm)
-                    convert_value = check_type_arg_inst(lexem->lex_type, offset_char, ((INSTR)(list_instr->element))->Exp_Type_3);
+                    if ( (offset_char[1]=='x') || (offset_char[1]=='X') ) {    //offset[1] existe car au moins 1 character + \0
+                        convert_value = check_type_arg_inst(HEXA, offset_char, ((INSTR)(list_instr->element))->Exp_Type_3);
+                    }
+                    else convert_value = check_type_arg_inst(lexem->lex_type, offset_char, ((INSTR)(list_instr->element))->Exp_Type_3);
+
                     list_instr = add_int(*p_nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_3, convert_value, etiq_definition, list_instr);
 
                     free(base_char);

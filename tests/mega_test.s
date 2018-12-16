@@ -49,9 +49,17 @@ predef:
     SRL $5, $t2, 2
     SLT $5, $t2, $a2
 
-    LW $5, 8($4)
+    LW $5, 200($4)
+    # LW $5, ($4)      #doit planter    => OK
+    # LW $5, 200( )    #doit planter    => OK
+    # LW $5, 200 ($4)   # error => a corrigé ??????? TODO TODO
+    # LW $5, 200( $4)   # error => a corrigé ??????? TODO TODO
     LW $5, -8($4)
-    # LW $5, 0xFFFFFFFF($4) #gestion moins hexa pas bonne
+    # LW $5, 0x1FFFF($4)  #doit planter (pas %4)    => OK
+    # LW $5, 0x10000($4)  #doit planter   => OK
+    LW $5, 0xFFFF($4)
+    LW $5, 0xFFFF($4)
+    LW $5, 0xFFFF($4)
     SW $5, 8($4)
     SW $5, -8($4)
 
@@ -59,7 +67,7 @@ predef:
     LUI $5 , -2
     LUI $5 , 32767
     LUI $5 , -32768
-    # LUI $5 , 0xFFFFFFFF  #gestion moins hexa pas bonne
+    LUI $5 , 0xFFFF   #  gestion hexa corrigé
     LUI $5 , predef
     LUI $5 , postdef
     LUI $5 , nodef
@@ -126,12 +134,12 @@ predef:
     LI $5 , -2
     LI $5 , 32767
     LI $5 , -32768
-    ## LI $5 , 0xFFFFFFFF  #gestion moins hexa pas bonne
+    LI $5 , 0xFFFF    # gestion hexa corrigé
     LI $5 , predef    #  => OK
     LI $5 , postdef
-    #LI $5 , nodef     # TODO corrigé erreur    etiq reste type 7 (label)
-    #LI $5 , etiqdata  # TODO corrigé erreur    etiq reste type 7 (label)
-    #LI $5 , etiqbss   # TODO corrigé erreur    etiq reste type 7 (label)
+    LI $5 , nodef
+    LI $5 , etiqdata
+    LI $5 , etiqbss
 
     BLT $5, $t2, 4
     BLT $5, $t2, 0xFC
@@ -164,6 +172,7 @@ startdata:
     .word 1
     .word -1
     .word -32
+    .word 0xFFFFFFFF   # -1
     .space 1
     .byte -1
     .word 0xF
@@ -194,6 +203,6 @@ startdata:
 etiqdata:
 
 .bss
-    #.space 0x1FFFF
+    .space 0x1FFFF
     .space 2
 etiqbss:
