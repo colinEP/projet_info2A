@@ -395,7 +395,7 @@ int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_in
 //--------------------------------------------------------------------------------
 //--------------------------- VERSION DES PROFS-----------------------------------
 //--------------------------- ne pas modifier ! ----------------------------------
-// int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_instr, int size_data, int size_table) {
+// int main_init_function(int* text_tab, int* data_tab, char** sym_tab, int size_instr, int size_data, int size_table, int spaces_needed_in_bss, LIST table_des_symboles, LIST reloc_table_text, LIST reloc_table_data, int size_reloc_text, int size_reloc_data) {
 //
 //     /* prepare sections*/
 //     section     text = NULL;
