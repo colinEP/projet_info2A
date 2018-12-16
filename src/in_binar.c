@@ -44,11 +44,14 @@ int* instr_in_binar(LIST list_instr, int size_list, LIST dictionnaire)
             // if _ ne rien faire
             // if a1, a2 ou a3 ajouter la valeur stockée dans la liste:
             // l'ajout se fera sur une taille qui dépendra du type de l'argument (5 bits si Reg, 16 bits si c'est un Rel ou 26 si c'est un Abs, etc. )
-        printf("\n%s \nopcode : %d \nfrom_25_21 : %s  \nfrom_20_16 : %s     \nfrom_15_11: %s\n from_10_6 : %s \nfrom_5_0 : %s\n",instruction,opc, from_25_21,from_20_16,from_15_11,from_10_6,from_5_0 );
+
+        /* MISE EN COMM POUR LE DEBUG */
+//        printf("\n%s \nopcode : %d \nfrom_25_21 : %s  \nfrom_20_16 : %s     \nfrom_15_11: %s\nfrom_10_6 : %s \nfrom_5_0 : %s\n",instruction,opc, from_25_21,from_20_16,from_15_11,from_10_6,from_5_0 );
+        //////////////////////////////////////
 
         // ------------------------------------
         // opcode:
-        binar_value = binar_value | ( (opc << 26) & 4227858432 ); // OK
+        binar_value = binar_value | ( (opc << 26) & 0xFC000000 ); // OK
         // printf("Je suis ici ! \n");
         // printf("ici binar_value vaut : %d \n",binar_value);
         // printf("Je suis ici ! \n");
@@ -76,14 +79,14 @@ int* instr_in_binar(LIST list_instr, int size_list, LIST dictionnaire)
                 val_1 = (I->arg3)->val.entier;
             }
             // ajouter la valeur
-            binar_value = binar_value | ( (val_1 << 21) & 65011712 );
+            binar_value = binar_value | ( (val_1 << 21) & 0x03E00000 );
         }
 
-        if (isdigit(from_25_21[1])){
+        if (isdigit(from_25_21[0])){
             // si ne commence pas par 'a' ni '_' alors c'est un nombre car c'est ainsi que nous avons fait le dico
             // on suppose que de par l'écriture du dico sa valeur < 5 bits
             val_1 = strtol(from_25_21, NULL, 0);
-            binar_value = binar_value | ( ((int) val_1 << 21) & 65011712 );
+            binar_value = binar_value | ( ((int) val_1 << 21) & 0x03E00000 );
         }
         //OK
         //printf("ici binar_value vaut : %d",binar_value);
@@ -103,20 +106,23 @@ int* instr_in_binar(LIST list_instr, int size_list, LIST dictionnaire)
             if (from_20_16[1] == '2'){
                 if (((I->arg2)->type != Reg)&&((I->arg2)->type != Sa)) ERROR_MSG("Erreur, type de longeur 5 bits attendu !\n");
                 val_2 = (I->arg2)->val.entier;
+
             }
             if (from_20_16[1] == '3'){
                 if (((I->arg3)->type != Reg)&&((I->arg3)->type != Sa)) ERROR_MSG("Erreur, type de longeur 5 bits attendu !\n");
                 val_2 = (I->arg3)->val.entier;
+
             }
             // ajouter la valeur
-            binar_value = binar_value | ( (val_2 << 16) & 2031616 );
+            binar_value = binar_value | ( (val_2 << 16) & 0x001F0000 );
         }
 
-        if (isdigit(from_20_16[1])){
+        if (isdigit(from_20_16[0])){
             // si ne commence pas par 'a' ni '_' alors c'est un nombre car c'est ainsi que nous avons fait le dico
             // on sait que de par l'écriture du dico sa valeur < 5 < 16 bits
             val_2 = strtol(from_20_16, NULL, 0);
-            binar_value = binar_value | ( ((int) val_1 << 16) & 2031616 );
+            binar_value = binar_value | ( ((int) val_2 << 16) & 0x001F0000 );
+
         }
 
         // -------------------------------------------
@@ -140,14 +146,14 @@ int* instr_in_binar(LIST list_instr, int size_list, LIST dictionnaire)
                 val_3 = (I->arg3)->val.entier;
             }
             // ajouter la valeur
-            binar_value = binar_value | ( (val_3 << 11) & 63488 );
+            binar_value = binar_value | ( (val_3 << 11) & 0x0000F800 );
         }
 
-        if (isdigit(from_15_11[1])){
+        if (isdigit(from_15_11[0])){
             // si ne commence pas par 'a' ni '_' alors c'est un nombre car c'est ainsi que nous avons fait le dico
             // on sait que de par l'écriture du dico sa valeur < 5 < 16 bits
             val_3 = strtol(from_15_11, NULL, 0);
-            binar_value = binar_value | ( ((int) val_1 << 11) & 63488 );
+            binar_value = binar_value | ( ((int) val_3 << 11) & 0x0000F800 );
         }
 
         // -------------------------------------------
@@ -171,16 +177,15 @@ int* instr_in_binar(LIST list_instr, int size_list, LIST dictionnaire)
                 val_4 = (I->arg3)->val.entier;
             }
             // ajouter la valeur
-            binar_value = binar_value | ( (val_4 << 6) & 1984 );
+            binar_value = binar_value | ( (val_4 << 6) & 0x000007C0 );
         }
 
-        if (isdigit(from_10_6[1])){
+        if (isdigit(from_10_6[0])){
             // si ne commence pas par 'a' ni '_' alors c'est un nombre car c'est ainsi que nous avons fait le dico
             // on sait que de par l'écriture du dico sa valeur < 5 < 16 bits
             val_4 = strtol(from_10_6, NULL, 0);
-            binar_value = binar_value | ( ((int) val_4 << 6) & 1984 );
+            binar_value = binar_value | ( ((int) val_4 << 6) & 0x000007C0 );
         }
-
         // -------------------------------------------
         // from_5_0
         if (from_5_0[0] == 'a'){
@@ -190,7 +195,7 @@ int* instr_in_binar(LIST list_instr, int size_list, LIST dictionnaire)
                 // check le TYPE :
                 if (((I->arg1)->type == Reg)||((I->arg1)->type == Sa)) {
                     val_5 = (I->arg1)->val.entier;
-                    binar_value = binar_value | ( val_5 & 63 );
+                    binar_value = binar_value | ( val_5 & 0x0000003F );
                 }
                 if (((I->arg1)->type == Imm)||((I->arg1)->type == Bas)||((I->arg1)->type == Rel)) {
                     if( strcmp(from_10_6, "_") || strcmp(from_15_11, "_")){ // càd que juste avant on n'a pas laissé de "place" pour mettre 16 bits
@@ -198,7 +203,7 @@ int* instr_in_binar(LIST list_instr, int size_list, LIST dictionnaire)
                     }
                     val_5 = (I->arg1)->val.entier;
                     val_5 =  val_5 >> 2; // DECALAGE pour avoir 18 bits sur 16
-                    binar_value = binar_value | ( val_5 & 65535 );
+                    binar_value = binar_value | ( val_5 & 0x0000FFFF );
                 }
                 if ((I->arg1)->type == Abs) {
                     if( strcmp(from_10_6, "_") || strcmp(from_15_11, "_")|| strcmp(from_20_16, "_")|| strcmp(from_25_21, "_")){ // càd que juste avant on n'a pas laissé de "place" pour mettre 26 bits
@@ -206,14 +211,14 @@ int* instr_in_binar(LIST list_instr, int size_list, LIST dictionnaire)
                     }
                     val_5 = (I->arg1)->val.entier;
                     val_5 =  val_5 >> 2; // DECALAGE pour avoir 28 bits sur 26
-                    binar_value = binar_value | ( val_5 & 67108863 );
+                    binar_value = binar_value | ( val_5 & 0x03FFFFFF );
                 }
             }
             if (from_5_0[1] == '2'){
                 // check le TYPE :
                 if (((I->arg2)->type == Reg)||((I->arg2)->type == Sa)) {
                     val_5 = (I->arg2)->val.entier;
-                    binar_value = binar_value | ( val_5 & 63 );
+                    binar_value = binar_value | ( val_5 & 0x0000003F );
                 }
                 if (((I->arg2)->type == Imm)||((I->arg2)->type == Bas)||((I->arg2)->type == Rel)) {
                     if( strcmp(from_10_6, "_") || strcmp(from_15_11, "_")){ // càd que juste avant on n'a pas laissé de "place" pour mettre 16 bits
@@ -221,7 +226,7 @@ int* instr_in_binar(LIST list_instr, int size_list, LIST dictionnaire)
                     }
                     val_5 = (I->arg2)->val.entier;
                     val_5 =  val_5 >> 2; // DECALAGE pour avoir 18 bits sur 16
-                    binar_value = binar_value | ( val_5 & 65535 );
+                    binar_value = binar_value | ( val_5 & 0x0000FFFF );
                 }
                 if ((I->arg2)->type == Abs) {
                     if( strcmp(from_10_6, "_") || strcmp(from_15_11, "_")|| strcmp(from_20_16, "_")|| strcmp(from_25_21, "_")){ // càd que juste avant on n'a pas laissé de "place" pour mettre 26 bits
@@ -229,7 +234,7 @@ int* instr_in_binar(LIST list_instr, int size_list, LIST dictionnaire)
                     }
                     val_5 = (I->arg2)->val.entier;
                     val_5 =  val_5 >> 2; // DECALAGE pour avoir 28 bits sur 26
-                    binar_value = binar_value | ( val_5 & 67108863 );
+                    binar_value = binar_value | ( val_5 & 0x03FFFFFF );
                 }
             }
             if (from_5_0[1] == '3'){
@@ -237,7 +242,7 @@ int* instr_in_binar(LIST list_instr, int size_list, LIST dictionnaire)
                 if (((I->arg3)->type == Reg)||((I->arg3)->type == Sa)) {
                     val_5 = (I->arg3)->val.entier;
                     // ajouter la valeur
-                    binar_value = binar_value | ( val_5 & 63 );
+                    binar_value = binar_value | ( val_5 & 0x0000003F );
                 }
                 if (((I->arg3)->type == Imm)||((I->arg3)->type == Bas)||((I->arg3)->type == Rel)) {
                     if( strcmp(from_10_6, "_") || strcmp(from_15_11, "_")){ // càd que juste avant on n'a pas laissé de "place" pour mettre 16 bits
@@ -248,7 +253,7 @@ int* instr_in_binar(LIST list_instr, int size_list, LIST dictionnaire)
                     if ((I->arg3)->type == Rel) val_5 =  val_5 >> 2; // DECALAGE pour avoir 18 bits sur 16
                     //printf("from 5_0 a3 vaut après décalage : %d\n",val_5 );
                     // ajouter la valeur
-                    binar_value = binar_value | ( val_5 & 65535 );
+                    binar_value = binar_value | ( val_5 & 0x0000FFFF );
                 }
                 if ((I->arg3)->type == Abs) {
                     if( strcmp(from_10_6, "_") || strcmp(from_15_11, "_")|| strcmp(from_20_16, "_")|| strcmp(from_25_21, "_")){ // càd que juste avant on n'a pas laissé de "place" pour mettre 26 bits
@@ -258,20 +263,19 @@ int* instr_in_binar(LIST list_instr, int size_list, LIST dictionnaire)
                     //
                     val_5 =  val_5 >> 2; // DECALAGE pour avoir 28 bits sur 26
                     // ajouter la valeur
-                    binar_value = binar_value | ( val_5 & 67108863 );
+                    binar_value = binar_value | ( val_5 & 0x03FFFFFF );
                 }
             }
 
 
         }
 
-        if (isdigit(from_5_0[1])){
+        if (isdigit(from_5_0[0])){
             // si ne commence pas par 'a' ni '_' alors c'est un nombre car c'est ainsi que nous avons fait le dico
             // on sait que de par l'écriture du dico sa valeur < 5 < 16 bits
             val_5 = strtol(from_5_0, NULL, 0);
-            binar_value = binar_value | ( val_5 & 63 );
+            binar_value = binar_value | ( val_5 & 0x0000003F );
         }
-
 
         printf("Pour cette instruction, binar_value vaut : %08x\n",binar_value);
         binar_value = swap(binar_value);

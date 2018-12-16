@@ -49,7 +49,7 @@ LIST add_to_list_instr(LEXEM l, int dec, int nbarg, LIST list_instr, int exp_typ
     INSTR I = new_instr();
     I-> decalage = dec;
     I-> nb_arg = nbarg;
-    I-> lex = l;
+    // copy du lexem
     I-> lex = calloc(1, sizeof(*l));
     I-> lex = memcpy(I->lex, l, sizeof(*l));
     I-> lex->value = strdup(l->value);
@@ -179,20 +179,17 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
 
  LIST fill_arguments(LEXEM lexem, LIST list_instr, int previous_type_lexem, int etiq_definition, int* p_nb_arg_ligne) // faire la verification des type d'arg ICI
  {
-     //pour pas modifier la list de lexem avec le cas du moins
-     // LEXEM lexem = calloc(1, sizeof(*lexem));
-     // lexem = memcpy(lexem, lexem_arg, sizeof(*lexem));
-     // lexem->value = strdup(lexem->value);
 
      if (previous_type_lexem == MOINS){
          //lexem->value = strdup(mystrcat("-", lexem->value)); //pas du dup car calloc déjà dans mystrcat
+         char* old_value = lexem->value;
          lexem->value = (mystrcat("-", lexem->value));
+         free(old_value);
      }
 
      if (etiq_definition != -1){
          // cas où l'on a une étiquette, pas besoin de checker expected_type ! ce sera fait après !
          list_instr = add_label(*p_nb_arg_ligne, Label, lexem->value, etiq_definition, list_instr);
-         // free_lex(lexem);
          return list_instr;
      }
 
@@ -206,7 +203,6 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
             convert_value = check_type_arg_inst(lexem->lex_type, val_lexem, ((INSTR)(list_instr->element))->Exp_Type_1);
             // renvoit une erreur si jamais les bons types ne sont pas reliés et renvoit un entier correspondant à convert value
             list_instr = add_int(*p_nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_1, convert_value, etiq_definition, list_instr);
-            // free_lex(lexem);
             return list_instr;
         }
 
@@ -238,7 +234,8 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
                     convert_value = check_type_arg_inst(lexem->lex_type, offset_char, ((INSTR)(list_instr->element))->Exp_Type_3);
                     list_instr = add_int(*p_nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_3, convert_value, etiq_definition, list_instr);
 
-                    // free_lex(lexem);
+                    free(base_char);
+                    free(offset_char);
                     return list_instr;
                 }
                 else ERROR_MSG("Erreur, type argument inadapte pour cette instruction (Base_offset attendu)!\n");
@@ -246,7 +243,6 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
             convert_value = check_type_arg_inst(lexem->lex_type, val_lexem, ((INSTR)(list_instr->element))->Exp_Type_2);
             // renvoit une erreur si jamais les bons types ne sont pas reliés et renvoit un entier correspondant à convert value
             list_instr = add_int(*p_nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_2, convert_value, etiq_definition, list_instr);
-            // free_lex(lexem);
             return list_instr;
         }
 
@@ -254,11 +250,9 @@ LIST add_int(int nb_arg_ligne, inst_op_type type, int valeur, int etiq_definitio
             convert_value = check_type_arg_inst(lexem->lex_type, val_lexem, ((INSTR)(list_instr->element))->Exp_Type_3);
             // renvoit une erreur si jamais les bons types ne sont pas reliés et renvoit un entier correspondant à convert value
             list_instr = add_int(*p_nb_arg_ligne, ((INSTR)(list_instr->element))->Exp_Type_3, convert_value, etiq_definition, list_instr);
-            // free_lex(lexem);
             return list_instr;
         }
     }
-    // free_lex(lexem);
     return list_instr;
 }
 

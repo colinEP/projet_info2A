@@ -2,7 +2,9 @@
 # allons au ru
 .set noreorder
 .text
+	NEG $5, $4
     Lw $t0 , lunchtime
+    LUi $at, 0
     LW $6, -200($7)
     ADDI $t1,$zero, BEQ
 boucle:

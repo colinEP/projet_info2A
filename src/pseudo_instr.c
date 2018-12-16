@@ -93,18 +93,22 @@ LIST change_pseudo_instr(LIST list_instr, int* pdecalage)
           I->Exp_Type_2 = Reg;
           I->Exp_Type_3 = Imm;
 
-         if ((I-> arg2)->type == Label) {
+         if      ((I-> arg2)->type == Label) {
              (I-> arg3)->type = Label;
              (I-> arg3)->etiq_def = (I-> arg2)->etiq_def;
              (I-> arg3)->val.char_chain = strdup((I-> arg2)->val.char_chain);
          }
-         else {
+         else if ((I-> arg2)->type == Imm){
              (I-> arg3)->type = Imm;
              (I-> arg3)->val.entier = (I-> arg2)->val.entier;
          }
+         else ERROR_MSG("Error de type dans la pseudo instr LI, normalement impossible :)");
+
+         if ((I-> arg2)->type == Label) free((I-> arg2)->val.char_chain);
 
          (I-> arg2)->type = Reg;
          (I-> arg2)->val.entier = 0;
+         (I-> arg2)->etiq_def = -1;
 
      }
 
@@ -126,6 +130,7 @@ LIST change_pseudo_instr(LIST list_instr, int* pdecalage)
          I->Exp_Type_2 = Reg;
          I->Exp_Type_3 = Reg;
 
+        if ((I-> arg3)->type == Label) free((I-> arg3)->val.char_chain);
         (I-> arg3)->type = Reg;
         (I-> arg3)->val.entier = (I-> arg2)->val.entier;  //copie de $rs
         (I-> arg3)->etiq_def = -1;
@@ -185,6 +190,7 @@ LIST change_pseudo_SW_LW(LIST list_instr, int* pdecalage) {
                 ERROR_MSG("Arg1 de LW doit etre un registre !\n");
             }
             reg = (int)((I->arg1)->val.entier);
+            free(((LEXEM)(I->lex))->value);
             (I->lex)->value = strdup("LUI");
             I-> nb_arg = 2;
             I->Exp_Type_1 = Reg;
@@ -231,6 +237,7 @@ LIST change_pseudo_SW_LW(LIST list_instr, int* pdecalage) {
                 ERROR_MSG("Arg1 de SW doit etre un registre !\n");
             }
             reg = (int)((I->arg1)->val.entier);
+            free(((LEXEM)(I->lex))->value);
             (I->lex)->value = strdup("LUI");
             I-> nb_arg = 2;
             I->Exp_Type_1 = Reg;

@@ -265,7 +265,7 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
                     {
                         // ici si l'on a bien un NOP alors il faut la remplacer (pseudo_instruction): peut-on avoir autre chose qu'un NOP ??
 
-                        char* val_instr = strdup( ((LEXEM)(((INSTR)((*p_list_instr)->element))->lex)) -> value);
+                        char* val_instr = ( (LEXEM)((INSTR)(*p_list_instr)->element )->lex)->value;
 
                         if ( strcmp( val_instr, "NOP") ==  0){
                             *p_list_instr = change_pseudo_instr(*p_list_instr, pdecalage);
