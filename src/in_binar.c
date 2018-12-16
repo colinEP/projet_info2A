@@ -202,7 +202,8 @@ int* instr_in_binar(LIST list_instr, int size_list, LIST dictionnaire)
                         ERROR_MSG("Erreur, 16 bits libres sont nécessaires pour stocker argument !\n");
                     }
                     val_5 = (I->arg1)->val.entier;
-                    val_5 =  val_5 >> 2; // DECALAGE pour avoir 18 bits sur 16
+                    if ((I->arg1)->type == Rel) val_5 =  val_5 >> 2; // DECALAGE pour avoir 18 bits sur 16
+                                                                    // c'est jamais le cas en réalité
                     binar_value = binar_value | ( val_5 & 0x0000FFFF );
                 }
                 if ((I->arg1)->type == Abs) {
@@ -225,7 +226,7 @@ int* instr_in_binar(LIST list_instr, int size_list, LIST dictionnaire)
                         ERROR_MSG("Erreur, 16 bits libres sont nécessaires pour stocker argument !\n");
                     }
                     val_5 = (I->arg2)->val.entier;
-                    val_5 =  val_5 >> 2; // DECALAGE pour avoir 18 bits sur 16
+                    if ((I->arg2)->type == Rel) val_5 =  val_5 >> 2; // DECALAGE pour avoir 18 bits sur 16
                     binar_value = binar_value | ( val_5 & 0x0000FFFF );
                 }
                 if ((I->arg2)->type == Abs) {
