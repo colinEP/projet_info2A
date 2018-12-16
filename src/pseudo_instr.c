@@ -50,41 +50,41 @@ LIST change_pseudo_instr(LIST list_instr, int* pdecalage)
      }
 
     else if (strcmp(instruction,"MOVE")==0){ //OK
-         //  ici peu de cas car pour arg1 et arg2, ils restent les mêmes, qu'ils soient Reg ou Label
-         free(((LEXEM)(I->lex))->value);
-         (I->lex)->value = strdup("ADD");
-         I-> nb_arg = 3;
-         I->Exp_Type_3 = Reg;
-         (I-> arg3)->type = Reg;
-         (I-> arg3)->val.entier = 0;
-         (I-> arg3)->etiq_def = -1;
+
+        if ( ((I-> arg1)->type!=Reg) || ((I-> arg2)->type!=Reg) ) {
+           ERROR_MSG("ERR LINE %d : Les arguments de MOVE doivent etre des registres", I->lex->nline);
+        }
+        free(((LEXEM)(I->lex))->value);
+        (I->lex)->value = strdup("ADD");
+        I-> nb_arg = 3;
+        I->Exp_Type_3 = Reg;
+        (I-> arg3)->type = Reg;
+        (I-> arg3)->val.entier = 0;
+        (I-> arg3)->etiq_def = -1;
      }
 
     else if (strcmp(instruction,"NEG")==0){ //OK
-         // cas arg 1 :  il reste le même, qu'il soit Label ou Reg
-         // idem pour Exp_Type_2
+
+         if ( ((I-> arg1)->type!=Reg) || ((I-> arg2)->type!=Reg) ) {
+            ERROR_MSG("ERR LINE %d : Les arguments de NEG doivent etre des registres", I->lex->nline);
+         }
 
          free(((LEXEM)(I->lex))->value);
          ((LEXEM)(I->lex))->value = strdup("SUB");
-          I-> nb_arg = 3;
-          I->Exp_Type_3 = Reg;
 
-         if ((I-> arg2)->type == Label) {    ERROR_MSG(" AVOIR PLUS EN DETAIL !! C'est impossible d'avoir une étiquette pour un registre !");
-             (I-> arg3)->type = Label;
-             (I-> arg3)->etiq_def = (I-> arg2)->etiq_def;
-             (I-> arg3)->val.char_chain = strdup((I-> arg2)->val.char_chain);
-         }
-         else {
-             (I-> arg3)->type = Reg;
-             (I-> arg3)->val.entier = (I-> arg2)->val.entier;
-         }
+         I-> nb_arg = 3;
+         I->Exp_Type_3 = Reg;
+         (I-> arg3)->type = Reg;
+         (I-> arg3)->val.entier = (I-> arg2)->val.entier;
+         (I-> arg3)->etiq_def = -1;
 
-         (I-> arg2)->type = Reg;
          (I-> arg2)->val.entier = 0;
        }
 
     else if (strcmp(instruction,"LI")==0){ //OK
-         // cas arg 1 :  il reste le même, qu'il soit Label ou Reg
+        if ( (I-> arg1)->type!=Reg ) {
+           ERROR_MSG("ERR LINE %d : Le 1er argument de LI doit etre un registre", I->lex->nline);
+        }
 
          free(((LEXEM)(I->lex))->value);
 
@@ -114,6 +114,9 @@ LIST change_pseudo_instr(LIST list_instr, int* pdecalage)
 
     else if (strcmp(instruction,"BLT")==0){
          // sauvegarde de la valeur de target
+         if ( ((I-> arg1)->type!=Reg) || ((I-> arg2)->type!=Reg) ) {
+            ERROR_MSG("ERR LINE %d : Les 2 premiers arguments de BLT doivent etre des registres", I->lex->nline);
+         }
          if ((I->arg3)->type == Label){
              is_label = 1;
              is_def = (I-> arg3)-> etiq_def;
@@ -183,9 +186,14 @@ LIST change_pseudo_SW_LW(LIST list_instr, int* pdecalage) {
     int is_def;
     char* name_etiq;
 
+
+
     // ------- cas LW ---------
     if (strcmp(instruction,"LW")==0){
         if ((I->arg2)->type == Label){ // cas où arg2 est une target
+            if ( ((I-> arg1)->type!=Reg)) {
+               ERROR_MSG("ERR LINE %d : Le 1er argument de LW (pseudo-instr) doit etre un registre", I->lex->nline);
+            }
             if ((I->arg1)->type =! Reg){ // bizarre de mettre cette erreur ici, certes.... WARNING WARNING
                 ERROR_MSG("Arg1 de LW doit etre un registre !\n");
             }
@@ -233,6 +241,9 @@ LIST change_pseudo_SW_LW(LIST list_instr, int* pdecalage) {
     // ------- cas SW ---------
     else if (strcmp(instruction,"SW")==0){
         if (((I->arg2)->type) == Label){ // cas où arg2 est une target
+            if ( ((I-> arg1)->type!=Reg)) {
+               ERROR_MSG("ERR LINE %d : Le 1er argument de SW (pseudo-instr) doit etre un registre", I->lex->nline);
+            }
             if (((I->arg1)->type) =! Reg){ // bizarre de mettre cette erreur ici, certes.... WARNING WARNING
                 ERROR_MSG("Arg1 de SW doit etre un registre !\n");
             }

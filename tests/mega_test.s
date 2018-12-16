@@ -3,6 +3,18 @@
 
 .text
 predef:
+    ##### test erreur pseudo instruction #####
+    #NEG $t2, predef
+    #MOVE $t2, predef
+    #LI predef , 64
+    #BLT $4, predef, 4
+    #NoP $4
+    #LI predef, 1
+    #LW predef, 8($4)
+    #LW predef, predef
+    #SW predef, predef
+    ######################  => OK !
+
     ADD $5, $t2, $a2
     adD $5, $t2, $a2
     ADDI $5, $t2, 500

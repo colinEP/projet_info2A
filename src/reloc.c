@@ -31,8 +31,6 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l_instr, LIST symb_table)
             I = l_instr->element;
             //RELOC Re = calloc (1, sizeof(*Re));
             ETIQ Et;
-            printf("%d\n", I->lex->nline);
-
 
             if ( ((ARG_INST)(I->arg1))->type == Label ) {
                 RELOC Re = calloc (1, sizeof(*Re));
