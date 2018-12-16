@@ -89,11 +89,20 @@ int main ( int argc, char *argv[] ) {
 
     file  	= argv[argc-1];
 
+
     if ( NULL == file ) {
         fprintf( stderr, "Missing ASM source file, aborting.\n" );
         exit( EXIT_FAILURE );
     }
 
+
+    int   len           = strlen(file);
+    char* out_file_name = strdup(file);
+    printf("%c    %c\n", out_file_name[len-2] , out_file_name[len-1] );
+    if ( (out_file_name[len-2]=='.') && (out_file_name[len-1]=='s') ) {
+        out_file_name[len-1] = 'o';
+    }
+    else ERROR_MSG("Le fichier n'est pas du type .s");
 
 
     /* ----------- Chargement du dico d'instructions -------------*/
@@ -184,7 +193,7 @@ int main ( int argc, char *argv[] ) {
     sym_char =  make_sym_char_table(sort_symb_tab, size_sym_table); // NOTE fonction dans etiq.c
 
     /* ---------------- make mips_elf -------------------*/
-    main_init_function(tab_instr_binaire, tab_data_binaire, sym_char, size_list_instr, size_list_data, size_sym_table, spaces_needed_in_bss, symb_table, reloc_table_text,reloc_table_data, size_reloc_text, size_reloc_data);
+    main_init_function(tab_instr_binaire, tab_data_binaire, sym_char, size_list_instr, size_list_data, size_sym_table, spaces_needed_in_bss, symb_table, reloc_table_text,reloc_table_data, size_reloc_text, size_reloc_data, out_file_name);
     //main_init_function();
 
      // char* str = ((LEXEM)list_lex->element)->value;
@@ -214,6 +223,8 @@ int main ( int argc, char *argv[] ) {
     free(tab_instr_binaire);
     free(tab_data_binaire);
     free_sym_char(sym_char, size_sym_table);
+
+    free(out_file_name);
 
 
 

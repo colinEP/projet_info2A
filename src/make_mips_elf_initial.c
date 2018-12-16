@@ -282,10 +282,11 @@ section make_rel32_section(char *relname, Elf32_Rel relocations[], int nb_reloc)
 
 
 
-int main_init_function(int* text_tab, int* data_tab, char** sym_tab, 
+int main_init_function(int* text_tab, int* data_tab, char** sym_tab,
                        int size_instr, int size_data, int size_table, int spaces_needed_in_bss,
                        LIST table_des_symboles, LIST reloc_table_text, LIST reloc_table_data,
-                       int size_reloc_text, int size_reloc_data) {
+                       int size_reloc_text, int size_reloc_data,
+                       char* out_file_name) {
 
     /* prepare sections*/
     section     text = NULL;
@@ -306,7 +307,6 @@ int main_init_function(int* text_tab, int* data_tab, char** sym_tab,
     int bss_prog = spaces_needed_in_bss;   //IDEM
     char ** sym_char = sym_tab;
     char* machine = "mips";
-    char* name = "donnees_simples.o";
     /* pelf options */
     int noreorder =1;
 
@@ -356,7 +356,7 @@ int main_init_function(int* text_tab, int* data_tab, char** sym_tab,
 
 
     /*write these sections in file*/
-    elf_write_relocatable( name, machine, noreorder,
+    elf_write_relocatable( out_file_name, machine, noreorder,
                            text->start, text->sz,
                            data->start, data->sz,
                            bss->start, bss->sz,

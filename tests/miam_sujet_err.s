@@ -1,4 +1,4 @@
-# TEST_RETURN_CODE = PASS
+# TEST_RETURN_CODE=FAIL
 # allons au ru
 .set noreorder   $t5
 

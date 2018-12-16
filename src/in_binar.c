@@ -393,19 +393,18 @@ int* data_in_binar(LIST list_data, int size_list){ // FONCTIONNE !
             }
         } // HOP On sort du else car la cellule DATA a été traitée, on passe à la suivante !
 
-        printf("AAAAAAAAAAAAAAA %08x\n\n",binar_value);
-
-
         list_data = list_data->next;
 
     }
-    while(j!=32) {
-        binar_value = (binar_value << 8);
-        j += 8;
-        if (j == 32){
-            binar_value = swap(binar_value);
-            tab_data_binar[i] = binar_value;
-            printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
+    if (j!=0) {
+        while(j!=32) {
+            binar_value = (binar_value << 8);
+            j += 8;
+            if (j == 32){
+                binar_value = swap(binar_value);
+                tab_data_binar[i] = binar_value;
+                printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
+            }
         }
     }
 
