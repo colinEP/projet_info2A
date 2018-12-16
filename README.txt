@@ -1,44 +1,91 @@
-Le code fourni permet d'ouvrir un fichier assembleur MIPS,
-et d'afficher à l'écran les différents lexèmes qui le composent, avec leur type et leur numéro de ligne.
-Ces lexèmes avec leurs informations sont également stockés dans une liste chaînée, renvoyée par lex_load_file.
+
+Projet réalisé dans le cadre du projet-info de 2A à Phelma
+Septembre->décembre 2018
+Par Eléonore Barges & Colin Epalle
+
+
+------ Desciption globale des fonctions de ce repertoire -------
+
+	Le code fourni permet d'ouvrir un fichier assembleur MIPS. Il affiche à l'écran les différents lexèmes qui le composent, avec leur type et leur numéro de ligne. Il les stocke dans 3 tables : list_instr, list_data et list_bss, lesquelles regroupent les instructions et directives, ainsi que leurs arguments, propres au section .TEXT, .DATA et .BSS. Les étiquettes sont, elles, stockées dans la table des symboles par ordre d'apparition dans le code en assembleur. En outre, ce programme permet de stocker dans les tables de relocations .data et .text les indications qui permettront de faire une relocation lors de certains appels d'étiquettes spécifiques. Les informations qui y sont stockées sont la section dans laquelle doit être faite la relocation, le décalage correspondant à la zone devant être réallouée, le type de relocation et enfin le symbole (c'est-à-dire le nom de la section ou le nom de l'étiquette lors de symboles globaux) par rapport auquel il faudra faire la relocation.
+Enfin, les instructions et les données de la list_data sont traduites en binaire, swapées de little Endian à big Endian, avant d'être fournies à une fonction qui produit le fichier .o associé au fichier .s analysé. 
+
 
 
 Le répertoire est organisé ainsi :
 .
 ├── tests
 │   └── donnees_simple.s
+│   └── exemple.s
+│   └── mega_tests.s
 │   └── miam_sujet_err.s
 │   └── miam_sujet.s
+│   └── symb_tab_order.s
+│   └── test_analyse_1.s
+│   └── test_binaire.s
 
 ├── src
-│   └──	error.c
+│   └──	analyse_synth.c
+│   └── dictionnaire.c
+│   └── Elf32.c
+│   └── error.c
+│   └── etiq.c
+│   └── fct_analyse_1.c
+│   └── in_binar.c
 │   └── lex.c
 │   └── main.c
+│   └──	make_mips_elf_initial.c
+│   └──	print_functions.c
 │   └──	queue_list.c
-│   └──	test.c
+│   └──	register.c
+│   └──	reloc.c
+│   └──	test_register.c
+│   └── test_state_machine.c
+
 
 ├── include
+│   └──	analyse_synth.h
+│   └── dictionnaire.h
+│   └── elf-mips32.h
+│   └── elf.h
+│   └── Elf32.h
 │   └── error.h
+│   └── etiq.h
+│   └── fct_analyse_1.h
 │   └── global.h
+│   └── in_binar.h
 │   └── lex.h
+│   └──	make_elf.h
 │   └── notify.h
-│   └── queue_list.h
+│   └── pelf.h
+│   └──	print_functions.h
+│   └──	queue_list.h
+│   └──	reloc.h
+│   └── section.h
 │   └── test.h
 
 ├── doc
-│   └── livrables_1.pdf
+│   └── livrable_1.pdf
+    └── livrable_2.pdf
+    └── livrable_3.pdf
+    └── livrable_4.pdf
 ├── README.txt
 ├── Makefile
-└── Doxyfile
+├── Doxyfile
+├── dictionnaire.txt
+├── libpelf.so
+└── biblioth_pelf
+
 
 - tests : contient les fichiers assembleur pour tester le programme
           miam_sujet_err.s contient volontairement des erreurs détectées par le programme.
-- src : qui contient le code C de votre interpréteur et les fonctions de test.
+- src : qui contient le code C de l'interpréteur et les fonctions de test.
 - include : qui contient toutes les définitions de types et prototypes de votre programme.
 - doc : qui contient les livrables.
 - README.txt : ce document
 - Makefile : pour compiler soit en mode debug (afficher les traces du programme) soit en mode release (produit final)
 - Doxyfile : fichier de configuration du générateur automatique de documentation doxygen
+- dictionnaire.txt : contient la liste des instructions avec le nombre d'arguments attendus, ainsi que leur type, et des informations sur le codage en binaire pour chaque instruction.
+- libpelf.so et biblioth_pelf : fournisse les fonctions nécessaires pour la traduction finale des données en binaire en un fichier .o. (dans les fonctions appelées dans make_mips_elf_initial.c) .
 
 
 

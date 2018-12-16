@@ -152,9 +152,9 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
                         else if (strcmp(val_lexem, ".set") == 0){
                             list_lex = list_lex->next;   //pas de risque de faire ça, meme s'il y a pas l'arg apres le .set il y a au moins un NL
                                                          //et une erreur sera levé donc pas de risque à la fin du switch quand on refait list_lex = list_lex->next
-                            if (section != NONE) {
-                                ERROR_MSG("ERR LINE %d : .set doit etre au debut du programme (avant la 1e section) \n", line);
-                            }
+                            // if (section != NONE) {
+                            //     ERROR_MSG("ERR LINE %d : .set doit etre au debut du programme (avant la 1e section) \n", line);
+                            // }
                             if ( strcmp( ((LEXEM)list_lex->element)->value , "noreorder") ) {
                                 ERROR_MSG("ERR LINE %d : \"noreorder\" attendu après un .set\n", line);
                             }

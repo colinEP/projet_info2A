@@ -18,6 +18,7 @@ predef:
     #       3 = 00011
     # t7 = 15 = 01111
     # a2 = 6  = 00110
+    .set noreorder
 
     ADD $3, $t7, $a2
     adD $3, $t7, $a2    #test uppercase
