@@ -22,7 +22,7 @@ enum {INIT , DEUX_PTS , VIRGULE , MOINS , COMMENT , REGISTRE ,
 //      12          13       14     15
 
 
-typedef struct {
+typedef struct lex_t {
     int nline;
     //int pos;
     int lex_type;

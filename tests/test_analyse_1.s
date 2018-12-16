@@ -33,6 +33,7 @@ lunchtime:
 	.word -2147483648
 	#.word -2147483649
     .byte 4 ,5 , 6
+	#.space 1000000  #=> ca marche
     .word boucle
     .asciiz "ils disent : \"au ru!\""
     .byte 4
@@ -41,7 +42,8 @@ lunchtime:
 .bss
 menu:
     .space 20
+	.space 4
 etiq5:    #OK
 	#.space 65500   #pour test offset negatif
-	.space 100000   #pour test offset negatif   =0x186a0
+	#.space 0x1ffff   #pour test offset negatif   =0x186a0
 testoffsetneg:

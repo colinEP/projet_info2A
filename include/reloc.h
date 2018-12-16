@@ -9,6 +9,9 @@ typedef struct {
     unsigned int adress;
     reloc_type type_r;
     char* addend; // nom de la section de definition OU nom de l'etiq si non def
+    /* WARNING WARNING à la faute de vocabulaire : ici addend désigne le symbole
+       sur qui faire le relocation est pas la valeur de decalage avant reloc comme c'est
+       sensé etre !!!! */
 }* RELOC;
 
 

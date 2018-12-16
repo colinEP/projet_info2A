@@ -94,9 +94,6 @@ void print_list_instr( LIST l ) {
     while (l!= NULL)
     {
         I = l->element;
-        char* a1;
-        char* a2;
-        char* a3;
         ARG_INST A1 = I->arg1;
         ARG_INST A2 = I->arg2;
         ARG_INST A3 = I->arg3;
@@ -106,8 +103,7 @@ void print_list_instr( LIST l ) {
         printf("   Décalage : %d \n", I->decalage);
 
         if (( A1->type) == None) {
-            a1 = strdup("NONE");
-            printf("   Arg1 : %s \n", a1);
+            printf("   Arg1 : NONE \n");
         }
         else {
             // if ( ((A1->type) == Bas_Target)||((A1->type) == Target)){
@@ -118,8 +114,7 @@ void print_list_instr( LIST l ) {
         }
 
         if ((A2->type)== None) {
-             a2 = strdup("NONE");
-             printf("   Arg2 : %s \n", a2);
+             printf("   Arg2 : NONE \n");
         }
         else {
             // if ( ((A2->type) == Bas_Target)||((A2->type) == Target)){
@@ -130,8 +125,7 @@ void print_list_instr( LIST l ) {
         }
 
         if ((A3->type) == None) {
-            a3 = strdup("NONE");
-            printf("   Arg3 : %s \n", a3);
+            printf("   Arg3 : NONE \n");
         }
         else {
             // if ( ((A3->type) == Bas_Target)||((A3->type) == Target)){
@@ -169,7 +163,7 @@ void print_symb_table( LIST l ) {
 
 void print_reloc_table( LIST l ) {
     printf("\n====== Table de relocation ======\n");
-    printf("\n section  |   decalage appel   | type relocation | valeur offset|\n");
+    printf("\n section  |   decalage appel   | type relocation | symbole \n");
 
     RELOC R;
     while (l!= NULL)

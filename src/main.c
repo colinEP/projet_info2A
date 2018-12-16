@@ -126,28 +126,46 @@ int main ( int argc, char *argv[] ) {
     //TODO
     LIST reloc_table_text = reloc_and_replace_etiq_by_dec_in_instr (list_instr, symb_table);
     LIST reloc_table_data = reloc_and_replace_etiq_by_dec_in_data (list_data, symb_table);
+    // bon petite fonction pour mettre dans le bon ordre la table des symboles ...
+    // Fallait le dire avant ...
+    LIST sort_symb_tab = new_list();
+    sort_symb_tab = sort_symb_table(sort_symb_tab, symb_table, list_lex);
 
     size_list_instr = lengh_of_list(list_instr);
     printf("Taille liste instr : %d \n", size_list_instr);
+
+
 
     // pour .data, ce qui nous intéresse c'est le nombre de int que cela va nécéssiter en binaire !
     // don on n'utilse pas la fonction lengh_of_list mais une autre qui considère le décalage !
     size_list_data = lengh_of_tab_data_in_binar(list_data); // cette fonction est dans in_binar.c
     printf("Taille équivalente tableau de data en binaire : %d \n", size_list_data);
 
-    size_sym_table = lengh_of_list(symb_table);
+    size_sym_table = lengh_of_list(sort_symb_tab);
     printf("Taille symb table : %d \n", size_sym_table);
 
     int spaces_needed_in_bss = lengh_of_space_in_bss(list_bss);
     printf("spaces nedded : %d\n",spaces_needed_in_bss );
 
+    int size_reloc_text = lengh_of_list(reloc_table_text);
+    printf("Taille reloc text table : %d \n", size_reloc_text);
 
-    print_symb_table(symb_table);
+    int size_reloc_data = lengh_of_list(reloc_table_data);
+    printf("Taille reloc text table : %d \n", size_reloc_data);
+
+
+
+
+
+
+    print_symb_table(sort_symb_tab);
     print_list_instr(list_instr);
     print_list_data(list_data);
     print_list_bss(list_bss);
     print_reloc_table( reloc_table_text);
     print_reloc_table( reloc_table_data);
+
+    //print_list_lex(list_lex);
 
 
     /* ---------------- test et conversion en binaire -------------------*/
@@ -164,10 +182,10 @@ int main ( int argc, char *argv[] ) {
     int* tab_data_binaire = NULL;
     tab_data_binaire = data_in_binar(list_data, size_list_data);
     char** sym_char = NULL;
-    sym_char =  make_sym_char_table(symb_table, size_sym_table); // NOTE fonction dans etiq.c
+    sym_char =  make_sym_char_table(sort_symb_tab, size_sym_table); // NOTE fonction dans etiq.c
 
     /* ---------------- make mips_elf -------------------*/
-    main_init_function(tab_instr_binaire, tab_data_binaire, sym_char, size_list_instr, size_list_data, size_sym_table, spaces_needed_in_bss, symb_table, reloc_table_text,reloc_table_data);
+    main_init_function(tab_instr_binaire, tab_data_binaire, sym_char, size_list_instr, size_list_data, size_sym_table, spaces_needed_in_bss, symb_table, reloc_table_text,reloc_table_data, size_reloc_text, size_reloc_data);
     //main_init_function();
 
      // char* str = ((LEXEM)list_lex->element)->value;
@@ -183,10 +201,22 @@ int main ( int argc, char *argv[] ) {
     INFO_MSG("Libération de la mémoire");
     free_list_dico(dictionnaire);
     free_list_lex(list_lex);
-    // free_list_inst  //TODO
-    // free_list_data  //TODO
-    // free_list_bss   //TODO
-    // free_symb_table //TODO
+    free_list_inst(list_instr);    //16:1    + 3:1
+    free_list_data(list_data);
+    free_list_data(list_bss);      // bss meme struct que data
+    free_symb_table(symb_table);
+    free_sort_symb_tab(sort_symb_tab); // pas la m^eme fonction car les 2 tables
+                                       // partagent pas le m^eme maillon de liste
+                                       // mais elles partagent le m^eme element (ETIQ) !
+                                       // => 2 fct pour pas free 2 fois
+    free_reloc_table(reloc_table_text);
+    free_reloc_table(reloc_table_data);
+
+    free(tab_instr_binaire);
+    free(tab_data_binaire);
+    free_sym_char(sym_char, size_sym_table);
+
+
 
 
     INFO_MSG("Fin du programme %s", argv[0]);

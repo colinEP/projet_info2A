@@ -24,6 +24,11 @@
 #include <elf.h>
 
 
+// TODO TODO WARNING WARNING   prototype de elf_get_sym_index_from_name qui est dnas make_mips_elf_initial.c
+int elf_get_sym_index_from_name(section symtab, section shstrtab, section strtab, char* sym_name);
+
+
+
 Elf32_Sym* make_syms(int size_table, char** sym_tab, section strtab, section shstrtab, LIST table_des_symboles){ // OK
 
     Elf32_Sym* syms = calloc(size_table, sizeof(Elf32_Sym));
@@ -46,15 +51,19 @@ Elf32_Sym* make_syms(int size_table, char** sym_tab, section strtab, section shs
         printf("st_info = %d\n", syms[i].st_info);
         syms[i].st_other = 0; // toujours à 0
         printf("st_other = %d\n", syms[i].st_other);
-        if (E->section == TEXT){
-            syms[i].st_shndx  = elf_get_string_index( shstrtab->start, shstrtab->sz, ".text" );
+        if (E->def_in_file) {
+            if      (E->section == TEXT) {
+                syms[i].st_shndx  = elf_get_string_index( shstrtab->start, shstrtab->sz, ".text" );
+            }
+            else if (E->section == PDATA) {
+                syms[i].st_shndx  = elf_get_string_index( shstrtab->start, shstrtab->sz, ".data" );
+            }
+            else if (E->section == BSS) {
+                syms[i].st_shndx  = elf_get_string_index( shstrtab->start, shstrtab->sz, ".bss" );
+            }
         }
-        if (E->section == PDATA){
-            syms[i].st_shndx  = elf_get_string_index( shstrtab->start, shstrtab->sz, ".data" );
-        }
-        if (E->section == BSS){
-            syms[i].st_shndx  = elf_get_string_index( shstrtab->start, shstrtab->sz, ".bss" );
-        }
+        else syms[i].st_shndx = SHN_UNDEF;
+
         printf("st_shndx = %d\n", syms[i].st_shndx);
         i = i+1;
     }

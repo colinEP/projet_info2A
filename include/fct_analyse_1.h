@@ -11,7 +11,7 @@ enum{TEXT, PDATA, BSS, NONE};
 #include "queue_list.h"
 #include "lex.h"
 
-typedef struct{
+typedef struct d_op{
     operand_type type;
     union {
         char PBYTE;

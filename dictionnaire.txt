@@ -21,7 +21,7 @@ BGTZ 2 Reg Rel None	7 a1 0 _ _ a2
 BLEZ 2 Reg Rel None	6 a1 0 _ _ a2
 J 1 Abs None None	2 _ _ _ _ a1
 JAL 1 Abs None None	3 _ _ _ _ a1
-JR 2 Reg None None	0 a1 0 0 ? 8
+JR 1 Reg None None	0 a1 0 0 0 8
 NOP 0 None None None	0 0 0 0 0 0
 MOVE 2 Reg Reg None	0 0 0 0 0 0
 NEG 2 Reg Reg None	0 0 0 0 0 0

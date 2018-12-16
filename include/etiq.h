@@ -17,5 +17,7 @@ LIST add_to_symb_table(char* etiq, int decalage, int line, int section, int def,
 ETIQ look_for_etiq_and_return( LIST symb_table, char* lexem);
 char** make_sym_char_table(LIST symb_table, int size_list);
 
+ETIQ look_for_etiq_and_return_no_error( LIST symb_table, char* lexem);
+LIST sort_symb_table(LIST sort_list, LIST symb_table, LIST list_lex);
 
 #endif
