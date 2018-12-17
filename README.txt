@@ -6,8 +6,16 @@ Par Eléonore Barges & Colin Epalle
 
 ------ Desciption globale des fonctions de ce repertoire -------
 
-	Le code fourni permet d'ouvrir un fichier assembleur MIPS. Il affiche à l'écran les différents lexèmes qui le composent, avec leur type et leur numéro de ligne. Il les stocke dans 3 tables : list_instr, list_data et list_bss, lesquelles regroupent les instructions et directives, ainsi que leurs arguments, propres au section .TEXT, .DATA et .BSS. Les étiquettes sont, elles, stockées dans la table des symboles par ordre d'apparition dans le code en assembleur. En outre, ce programme permet de stocker dans les tables de relocations .data et .text les indications qui permettront de faire une relocation lors de certains appels d'étiquettes spécifiques. Les informations qui y sont stockées sont la section dans laquelle doit être faite la relocation, le décalage correspondant à la zone devant être réallouée, le type de relocation et enfin le symbole (c'est-à-dire le nom de la section ou le nom de l'étiquette lors de symboles globaux) par rapport auquel il faudra faire la relocation.
-Enfin, les instructions et les données de la list_data sont traduites en binaire, swapées de little Endian à big Endian, avant d'être fournies à une fonction qui produit le fichier .o associé au fichier .s analysé. 
+	Le code fourni permet d'ouvrir un fichier assembleur MIPS. Il affiche à l'écran les différents lexèmes qui le composent,
+	avec leur type et leur numéro de ligne. Il les stocke dans 3 tables : list_instr, list_data et list_bss, lesquelles regroupent
+	les instructions et directives, ainsi que leurs arguments, propres au section .TEXT, .DATA et .BSS. Les étiquettes sont, elles,
+	stockées dans la table des symboles par ordre d'apparition dans le code en assembleur. En outre, ce programme permet de stocker
+	dans les tables de relocations .data et .text les indications qui permettront de faire une relocation lors de certains appels
+	d'étiquettes spécifiques. Les informations qui y sont stockées sont la section dans laquelle doit être faite la relocation,
+	le décalage correspondant à la zone devant être réallouée, le type de relocation et enfin le symbole (c'est-à-dire le nom de
+	la section ou le nom de l'étiquette lors de symboles globaux) par rapport auquel il faudra faire la relocation.
+	Enfin, les instructions et les données de la list_data sont traduites en binaire, swapées de little Endian à big Endian, avant 
+	d'être fournies à une fonction qui produit le fichier .o associé au fichier .s analysé.
 
 
 
