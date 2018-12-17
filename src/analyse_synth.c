@@ -170,12 +170,13 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
                         }
                         else if (section == BSS ){
                             if      (strcmp(val_lexem, ".space")  == 0) S = PSPACE;
-                            else    ERROR_MSG("ERR LINE %d : Directive inconnue ou dans mauvaise section !\n", line);
+                            else    ERROR_MSG("AAAERR LINE %d : Directive inconnue ou dans mauvaise section !\n", line);
                         }
                         else if (section == TEXT ){
                             // Les directives (autres que celles de section) sont interdites dans la section TEXT
-                            ERROR_MSG("ERR LINE %d : Directive interdites dans la section TEXT !\n", line);
+                            ERROR_MSG("ERR LINE %d : Directives interdites dans la section TEXT !\n", line);
                         }
+                        else ERROR_MSG("ERR LINE %d : Directive inconnue OUDirective de définition de données doivent etre dans une section!\n", line);
 
                         break;
 
