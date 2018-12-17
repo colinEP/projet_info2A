@@ -53,6 +53,13 @@ QUEUE open_dict(char *file) //fonctionne ! Cette fonction ouvre le dictionnaire 
             //     ERROR_MSG("Instruction dans le dico (line %d) trop longue (length max = 14 characters)", nline);
             // }
             //printf (" Instruction %s et nb_arguments: %d \n", inst, nb_arg); // pour DEBUG
+
+            ////////////////////////////////////////////////////////////
+            ///  WARNING  ///// SAISIE PAS SECURISEE /////  WARNING  ///
+            ////////////////////////////////////////////////////////////
+
+            /* il faut pas que qq'un s'amuse à modifier le dico, sinon ça peut partir en cacahuète !!  */
+
             list_dico = add_definition(list_dico, inst, nb_arg, arg1, arg2, arg3, opcode, c_b_1, c_b_2, c_b_3, c_b_4, c_b_5);
             nline++;
         }

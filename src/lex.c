@@ -56,8 +56,22 @@ char* getNextToken(char** p_token, char* start, unsigned int nline, char* line) 
     else {
         while ( *end!='\0' && ( ( !isblank(*end) && *end!=':' && *end!=',' && *end!='-' ) || inString || inComment ) ) {
 
-            if ( *end == '#' ) inComment = TRUE;   // le comment va jusqu'a la fin de la ligne
-    		if ( !inComment && *end == '"' ) inString = !inString;
+            if ( !inString && *end == '#' ) {
+                if (end==start) {       // ce token sera un commentaire
+                    inComment = TRUE;   // le comment va jusqu'a la fin de la ligne
+                }
+                else break;    // le prochain token sera un commentaire
+            }
+    		if ( !inComment && *end == '"' ) {
+                inString = !inString;
+                if (!inString) {   // fin de la chaine de caractère
+                    end++;
+                    if ( (!isblank(*end)) && (*end!=',') && (*end!='#') && (*end!='\0')) {   // il y a un mot collé juste après
+                        print_error_lex("Mot collé à la chaine de caractère", nline, end-1-line, line);
+                    }
+                    break;   // pour pas refaire end++
+                }
+            }
             if ( inString && *end == '\\' ) {
                 end++;                  // on saute le prochain caractere
                 if (*end=='\0') {       // Sinon risque d'index out si '\\' est le dernier caractère de la ligne (on a suppr '\n' en fin de ligne)

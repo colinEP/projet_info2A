@@ -13,12 +13,11 @@ boucle:
     NOP
 byebye:
     JAL viteviteauru
-    JAL COUROUCOUCOU
 
 .data
 lunchtime:
     .word 12
-    .word boucle
+    .word menu
     .asciiz "ils disent : \"au ru!\""
 .bss
 menu:

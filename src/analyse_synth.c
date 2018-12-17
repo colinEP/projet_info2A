@@ -170,12 +170,13 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
                         }
                         else if (section == BSS ){
                             if      (strcmp(val_lexem, ".space")  == 0) S = PSPACE;
-                            else    ERROR_MSG("ERR LINE %d : Directive inconnue ou dans mauvaise section !\n", line);
+                            else    ERROR_MSG("AAAERR LINE %d : Directive inconnue ou dans mauvaise section !\n", line);
                         }
                         else if (section == TEXT ){
                             // Les directives (autres que celles de section) sont interdites dans la section TEXT
-                            ERROR_MSG("ERR LINE %d : Directive interdites dans la section TEXT !\n", line);
+                            ERROR_MSG("ERR LINE %d : Directives interdites dans la section TEXT !\n", line);
                         }
+                        else ERROR_MSG("ERR LINE %d : Directive inconnue OUDirective de définition de données doivent etre dans une section!\n", line);
 
                         break;
 
@@ -350,7 +351,11 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
                 ERROR_MSG("ERR LINE %d : Element non acceptable apres cette instruction !\n", line);
 
             case PWORD:
-                if (type_lexem == MOINS) break;
+                if (type_lexem == MOINS) {
+                    // TODO si previous == MOIS => 2 moins a la suite => erreur ??
+                    if (previous_type_lexem==MOINS) ERROR_MSG("ERR LINE %d : 2 signes moins à la suite !\n", line);
+                    break;
+                }
                 if (type_lexem == HEXA) {
                     if (previous_type_lexem==MOINS) ERROR_MSG("ERR LINE %d : signe MOINS impossible devant un hexa !\n", line);
                 }
@@ -464,7 +469,11 @@ void analyse_synth(LIST* p_list_instr, LIST* p_list_data, LIST* p_list_bss, LIST
                 break;
 
             case PBYTE:
-                if (type_lexem == MOINS) break;
+                if (type_lexem == MOINS) {
+                    // TODO si previous == MOIS => 2 moins a la suite => erreur ??
+                    if (previous_type_lexem==MOINS) ERROR_MSG("ERR LINE %d : 2 signes moins à la suite !\n", line);
+                    break;
+                }
                 if (type_lexem == HEXA) {
                     if (previous_type_lexem==MOINS) ERROR_MSG("ERR LINE %d : signe MOINS impossible devant un hexa !\n", line);
                 }
