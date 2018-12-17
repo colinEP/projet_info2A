@@ -135,9 +135,21 @@ int main ( int argc, char *argv[] ) {
     //TODO
     LIST reloc_table_text = reloc_and_replace_etiq_by_dec_in_instr (list_instr, symb_table);
     LIST reloc_table_data = reloc_and_replace_etiq_by_dec_in_data (list_data, symb_table);
-    // bon petite fonction pour mettre dans le bon ordre la table des symboles ...
+
+    /////////////////////////////////////////////////////////
+    int reorder = FALSE;
+    /* TRUE  => table des symboles par ordre d'apparition  */
+    /* FALSE => table des symboles par ordre de définition */
+    /*          symboles globaux à la fin                  */
+    /////////////////////////////////////////////////////////
     LIST sort_symb_tab = new_list();
-    sort_symb_tab = sort_symb_table(sort_symb_tab, symb_table, list_lex);
+    if (reorder) {
+        // bon petite fonction pour mettre dans le bon ordre la table des symboles ...
+        sort_symb_tab = sort_symb_table(sort_symb_tab, symb_table, list_lex);
+    }
+    else {
+        sort_symb_tab = symb_table;
+    }
 
     size_list_instr = lengh_of_list(list_instr);
     printf("Taille liste instr : %d \n", size_list_instr);
@@ -213,10 +225,12 @@ int main ( int argc, char *argv[] ) {
     free_list_data(list_data);
     free_list_data(list_bss);      // bss meme struct que data
     free_symb_table(symb_table);
-    free_sort_symb_tab(sort_symb_tab); // pas la m^eme fonction car les 2 tables
-                                       // partagent pas le m^eme maillon de liste
-                                       // mais elles partagent le m^eme element (ETIQ) !
-                                       // => 2 fct pour pas free 2 fois
+    if (reorder) {
+        free_sort_symb_tab(sort_symb_tab); // pas la m^eme fonction car les 2 tables
+                                           // partagent pas le m^eme maillon de liste
+                                           // mais elles partagent le m^eme element (ETIQ) !
+                                           // => 2 fct pour pas free 2 fois
+    }
     free_reloc_table(reloc_table_text);
     free_reloc_table(reloc_table_data);
 
