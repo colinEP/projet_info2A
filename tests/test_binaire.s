@@ -1,6 +1,6 @@
 # TEST_RETURN_CODE = PASS
 # allons au ru
-.set noreorder #test
+
 .text
 	BNE $4,$5, boucle #test decalage
 	BLT $4,$5, boucle
@@ -10,6 +10,7 @@ boucle:
     NOP
     J etiqnondef
 	J boucle
+	.set noreorder #test
     NOP
 byebye:
     addi $t1 , $t1 , 8
