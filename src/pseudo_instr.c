@@ -210,7 +210,7 @@ LIST change_pseudo_SW_LW(LIST list_instr, int* pdecalage) {
             // PB:  pour avoir l'adresse du poiteur, il faut qu'il y ait eu relocation !
 
             (I-> arg1)->type = Reg; // UTILE
-            (I-> arg1)->val.entier = 1; // = $at
+            (I-> arg1)->val.entier = reg; // = $rt
             (I-> arg3)->type = None;
 
             LEXEM second_instr = calloc(1, sizeof(*second_instr));

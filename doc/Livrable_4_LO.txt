@@ -1,14 +1,15 @@
-LIVRABLE 4:
+﻿LIVRABLE 4
 Colin EPALLE, Eléonore BARGES
 
 
-Pour ce dernier incrément nous avons dû dans un premier temps terminer certains point de l'incrément 3, sur lesquels nous reviendrons brièvement, avant d'aborder à proprement parler le dernier incrément. 
+	
+	Pour ce dernier incrément nous avons dû dans un premier temps terminer certains point de l'incrément 3, sur lesquels nous reviendrons brièvement, avant d'aborder à proprement parler le dernier incrément. 
 Puis nous expliciterons les choix que nous avons fait lors du codage ainsi que les objectifs que nous avons atteints dans cette 4ème et dernière étape. 
 Enfin, nous terminerons sur les tests que nous avons effectués et la façon que nous avons eu de suivre l'évolution du projet bout par bout. 
 
 
 
-I. La fin de l'incrément 3 
+	I. La fin de l'incrément 3 
 
 Pour parachever l'incrément 3, il nous restait plusieurs points à finir de coder et nous avons fait certains choix en termes de codage. 
 - Ce fut notamment le cas pour le stockage des arguments de type Bas. Nous avons finalement choisi de les stocker dans deux arguments : un argument de type Immédiat et un autre de type de Registre, ce qui nous a permis par la même occasion de vérifier l'existence du registre correspondant et la taille de l'Immédiat. 
@@ -16,9 +17,9 @@ Pour parachever l'incrément 3, il nous restait plusieurs points à finir de cod
 - Nous avons récemment appris que la table des symboles devait contenir la liste des symboles par ordre d'apparition des symboles et non par ordre de définition, ce que nous avions initialement codé. Nous avons contourné ce problème en réalisant une fonction, sort_symb_table, qui permet de renvoyer une table où les symboles sont rangés par ordre d'apparition des symboles à partir de la table des symboles que nous avions initialement crée (simplement en parcourant à nouveau la liste des lexèmes et en remplissant la nouvelle table des symboles à partir des informations de l'ancienne à mesure que les symboles sont trouvés). 
 
 
-II. Choix sur la façon d'aborder l'incrément 3
+	II. Choix sur la façon d'aborder l'incrément 3
 
-	1. Le dictionnaire et la traduction en binaire
+		1. Le dictionnaire et la traduction en binaire
 
 Le premier objectif que nous nous sommes fixé était celui de stocker dans le dictionnaire sous une forme facilement interprétable les informations utiles à la traduction en binaire, laquelle est spécifique pour chaque instruction. Nous avons souhaité respecter la contrainte qui voulait que sur chaque ligne du dictionnaire se trouvent le même nombre de termes, afin de conserver notre lecture du dictionnaire simultanée au stockage des infomations dans une liste_dictionnaire (cf: la ligne de code suivante : 
 while (fscanf (fp, "%s %d %s %s %s %d %s %s %s %s %s", inst, &nb_arg, arg1, arg2, arg3, &opcode, c_b_1, c_b_2, c_b_3, c_b_4, c_b_5 ) != EOF) ). 
@@ -30,7 +31,7 @@ Ces informations sur le codage en binaire sont stockées dans une liste dictionn
 Concernant le codage en binaire, nous avons choisi d'utiliser des masques et des décalages, que nous avons trouvés plus faciles à manipuler, lesquels sont utilisés dans les fonctions instr_in_binar et data_in_binar. 
 
 
-	2. La réalisation du fichier elf, étapes de la réalisation
+		2. La réalisation du fichier elf, étapes de la réalisation
 
 
 Après étude approfondie du fichier initial make_mips_elf, nous avons abordé la réalisation de notre propre fonction de la sorte : 
@@ -47,27 +48,9 @@ Après ces premiers tests sur l'unique fichier exemple.s, nous avons lancé d'au
 Ainsi, notre programme est actuellement capable de traduire un fichier .s en un fichier binaire executable. Il est semble-t-il assez robuste aux erreurs. 
 
 
-III. Tests effectués 
+
+	III. Tests effectués 
 
 Dans notre fichier, plusieurs fichiers de tests sont disponibles. Ils nous ont permis, étape par étape de mettre à l'épreuve la robustesse de notre code. 
 Ainsi, le test symb_table_ordre nous a permis de vérifier le bon fonctionnement de notre fonction sort_symb_table, et la capacité de notre code à gérer le cas d'étiquettes ayant le même nom que des instructions. 
 Le test mega_test nous a permis de vérifier la bonne détection de différents types d'erreurs concernant les instructions (taille des arguments, type des arguements,...) et les directives. 
-
-
-
-
-
-
-
-
-
-
-
-
-	
-
-
-
-
-
-

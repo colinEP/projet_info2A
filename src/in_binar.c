@@ -278,9 +278,9 @@ int* instr_in_binar(LIST list_instr, int size_list, LIST dictionnaire)
             binar_value = binar_value | ( val_5 & 0x0000003F );
         }
 
-        printf("Pour cette instruction, binar_value vaut : %08x\n",binar_value);
+        //printf("Pour cette instruction, binar_value vaut : %08x\n",binar_value);
         binar_value = swap(binar_value);
-        printf("Pour cette instruction, binar_value SWAPEE vaut : %08x\n\n",binar_value);
+        //printf("Pour cette instruction, binar_value SWAPEE vaut : %08x\n\n",binar_value);
         tab_instr_binar[i] = binar_value;
         i = i+1;
         list_instr = list_instr->next;
@@ -320,7 +320,7 @@ int* data_in_binar(LIST list_data, int size_list){ // FONCTIONNE !
                 binar_value = swap(binar_value);
                 tab_data_binar[i] = binar_value;
                 i = i+1;
-                printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
+                //printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
                 binar_value = 0; // remise à 0 pour la suite
             }
             j=0;
@@ -328,7 +328,7 @@ int* data_in_binar(LIST list_data, int size_list){ // FONCTIONNE !
             binar_value = swap(binar_value);
             tab_data_binar[i] = binar_value;
             i = i+1;
-            printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
+            //printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
             binar_value = 0;
         }
 
@@ -340,7 +340,7 @@ int* data_in_binar(LIST list_data, int size_list){ // FONCTIONNE !
                 binar_value = swap(binar_value);
                 tab_data_binar[i] = binar_value;
                 i = i+1;
-                printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
+                //printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
                 j = 0;
                 binar_value = 0;
             }
@@ -362,7 +362,7 @@ int* data_in_binar(LIST list_data, int size_list){ // FONCTIONNE !
                         binar_value = swap(binar_value);
                         tab_data_binar[i] = binar_value;
                         i = i+1;
-                        printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
+                        //printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
                         j = 0;
                         binar_value = 0;
                     }
@@ -380,7 +380,7 @@ int* data_in_binar(LIST list_data, int size_list){ // FONCTIONNE !
                         binar_value = swap(binar_value);
                         tab_data_binar[i] = binar_value;
                         i = i+1;
-                        printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
+                        //printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
                         j = 0;
                         binar_value = 0;
                     }
@@ -403,7 +403,7 @@ int* data_in_binar(LIST list_data, int size_list){ // FONCTIONNE !
             if (j == 32){
                 binar_value = swap(binar_value);
                 tab_data_binar[i] = binar_value;
-                printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
+                //printf("Pour cette directive, binar_value vaut : %08x\n\n",binar_value);
             }
         }
     }

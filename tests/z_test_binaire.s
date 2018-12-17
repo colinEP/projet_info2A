@@ -1,6 +1,6 @@
 # TEST_RETURN_CODE = PASS
 # allons au ru
-
+.set noreorder
 .text
 	BNE $4,$5, boucle #test decalage
 	BLT $4,$5, boucle

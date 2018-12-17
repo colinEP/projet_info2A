@@ -138,7 +138,9 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l_instr, LIST symb_table)
                         I->Exp_Type_3       = Imm;
 
                         free( (I->arg2)->val.char_chain ); // free de la str avant de remplacer par le decalage
-                        I->arg2->val.entier = 1; // $at
+
+                        if( !strcmp(I->lex->value, "SW") ) I->arg2->val.entier = 1; // $at
+                        else I->arg2->val.entier = I->arg1->val.entier;
                         I->arg2->type       = Reg;
                         I->Exp_Type_2       = Reg;
 
@@ -191,7 +193,8 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l_instr, LIST symb_table)
                                 I->Exp_Type_3       = Imm;
 
                                 free( (I->arg2)->val.char_chain ); // free de la str avant de remplacer par le decalage
-                                I->arg2->val.entier = 1; // $at
+                                if( !strcmp(I->lex->value, "SW") ) I->arg2->val.entier = 1; // $at
+                                else I->arg2->val.entier = I->arg1->val.entier;
                                 I->arg2->type       = Reg;
                                 I->Exp_Type_2       = Reg;
 
@@ -229,7 +232,8 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l_instr, LIST symb_table)
                                 I->Exp_Type_3       = Imm;
 
                                 free( (I->arg2)->val.char_chain ); // free de la str avant de remplacer par le decalage
-                                I->arg2->val.entier = 1; // $at
+                                if( !strcmp(I->lex->value, "SW") ) I->arg2->val.entier = 1; // $at
+                                else I->arg2->val.entier = I->arg1->val.entier;
                                 I->arg2->type       = Reg;
                                 I->Exp_Type_2       = Reg;
 
@@ -277,7 +281,8 @@ LIST reloc_and_replace_etiq_by_dec_in_instr (LIST l_instr, LIST symb_table)
                                     I->Exp_Type_3       = Imm;
 
                                     free( (I->arg2)->val.char_chain ); // free de la str avant de remplacer par le decalage
-                                    I->arg2->val.entier = 1; // $at
+                                    if( !strcmp(I->lex->value, "SW") ) I->arg2->val.entier = 1; // $at
+                                    else I->arg2->val.entier = I->arg1->val.entier;
                                     I->arg2->type       = Reg;
                                     I->Exp_Type_2       = Reg;
 

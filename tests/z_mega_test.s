@@ -1,6 +1,5 @@
-# TEST_RETURN_CODE = PASS
+# TEST_RETURN_CODE = DO_NOT_CHECK
 .set noreorder
-
 .text
 predef:
     ##### test erreur pseudo instruction #####

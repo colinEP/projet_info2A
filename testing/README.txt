@@ -12,15 +12,15 @@ simpleUnitTest.sh : script de test "unitaire" "boite noire" (ou "externe") minim
 ########################################
 
 ########################################
-# Lancement rapide des tests 
+# Lancement rapide des tests
 ########################################
 1/ se placer dans le répertoire de l'exécutable a tester
 2/ entrer, par exemple
 	../testing/simpleUnitTest.sh -e ./as-mips tests/*.s
 
-Où : 
+Où :
 	../testing/simpleUnitTest.sh est le chemin vers script de test
-	./as-mips est le chemin vers l'executable a tester  
+	./as-mips est le chemin vers l'executable a tester
 	test/*.s  designe l'ensemble des fichiers .s à tester
 
 Variante, mode batch, avec l’option -b : tous les tests sont lancés immédiatement, jusqu’au rapport final :
@@ -54,17 +54,16 @@ Dans le dernier cas DO_NOT_CHECK, le code de retour du programme testé ne sera 
 
 
 ==> chaque fichier <test>.s doit être accompagné d'un fichier <test>.o.ref
-	Ce fichier doit contenir la sortie attendue - ce qu'est censé générer l'<executable> 
+	Ce fichier doit contenir la sortie attendue - ce qu'est censé générer l'<executable>
 	sur son fichier de sortie quand il est exécuté sur le fichier <test>.
 	C'est ce fichier <test>.o.ref qui est utilisé pour comparer le fichier de sortie attendu avec le fichier généré par l'<exécutable>.
 
 
 
-Pour chacun des fichiers de <test> passé en argument, le script : 
+Pour chacun des fichiers de <test> passé en argument, le script :
 	- lance l'<executable> en lui passant <test> en argument
 	- détecte si l'<executable> a "planté" (segmentation fault, etc.)
 	- sinon, détecte si le code de sortie renvoyé par l'<exécutable> correspond au code erreur attendu, donné dans le fichier .s
 	- et détecte si la sortie de l'<executable> correspond à la sortie attendue, spécifiée dans le fichier .o.ref
 
 Enfin, le script génère un rapport de test avec les résultats de tous les tests.
-
