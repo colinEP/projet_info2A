@@ -353,12 +353,14 @@ LIST look_for_undefined_etiq_in_data(LIST l, LIST symb_table){ // met à 1 etiq 
                 }
                 ((DATA)(l->element))-> etiq_def = 1;
 
-                if ((a == 0)||(b ==0)) {                                         // etiq non trouvée donc non déf
-                    char* name_etiq = ((data_op)(((DATA)(l->element))->D))->val.LABEL;  //pas de strdup car add_to_symb_table le fait déjà
-                    int dec = 0;
-                    int line = ((DATA)(l->element))->line;
-                    int sect = PDATA; // car list .data
-                    symb_table = add_to_symb_table(name_etiq, dec, line, sect, FALSE, symb_table);
+                if ((a == 0)||(b == 0)) {                                         // etiq non trouvée donc non déf
+                    if (a ==0){
+                        char* name_etiq = ((data_op)(((DATA)(l->element))->D))->val.LABEL;  //pas de strdup car add_to_symb_table le fait déjà
+                        int dec = 0;
+                        int line = ((DATA)(l->element))->line;
+                        int sect = PDATA; // car list .data
+                        symb_table = add_to_symb_table(name_etiq, dec, line, sect, FALSE, symb_table);
+                    }
                     ((DATA)(l->element))-> etiq_def = 0;
                 }
 
